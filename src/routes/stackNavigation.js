@@ -13,7 +13,12 @@ export default function Tab() {
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="CadUsuario" component={CadUsuario} />
             <Stack.Screen name="EsqSenha" component={EsqSenha} />
-            <Stack.Screen name="Home" component={Home} />
+            <Stack.Screen name="Home" component={Home}
+            options={{
+                headerShown: false, // Esconde o cabeçalho da tela Home
+                headerBackVisible: false, // Esconde o botão de voltar
+                gestureEnabled: false, // Desabilita o gesto de voltar
+            }} />
         </Stack.Navigator>
     );
 }
