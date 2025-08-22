@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import styles from './styles'; // Importando os estilos
+import BottonTab from '../../routes/bottonTab';
 
 export default function Login() {
     const navigation = useNavigation();
@@ -20,7 +21,7 @@ export default function Login() {
 
     function Acesso() {
         if (usuTemp.email === email && usuTemp.senha === senha) {
-            navigation.navigate('Home', { usuTemp });
+            navigation.navigate('BottonTab', { usuTemp });
         } else {
             Alert.alert(
                 'Erro! Senha ou e-mail inválidos',

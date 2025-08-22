@@ -16,8 +16,8 @@ export default function Tab() {
             <Stack.Screen name="CadUsuario" component={CadUsuario} />
             <Stack.Screen name="EsqSenha" component={EsqSenha} />
             <Stack.Screen 
-                name="ButtonTab" 
-                component={ButtonTab}
+                name="BottonTab" 
+                component={BottonTab}
                 options={{
                     headerShown: false, // Esconde o cabeçalho da tela Home
                     headerBackVisible: false, // Esconde o botão de voltar
