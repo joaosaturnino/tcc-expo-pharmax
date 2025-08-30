@@ -5,10 +5,15 @@ export default StyleSheet.create({
         flex: 1,
         backgroundColor: '#f5f6fa',
         alignItems: 'center',
-        justifyContent: 'flex-start', // Alinha itens no topo
+        justifyContent: 'center',
         padding: 20,
     },
-
+    title: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        marginBottom: 20,
+        color: '#A2CD5A',
+    },
     input: {
         width: '100%',
         height: 50,
@@ -20,7 +25,6 @@ export default StyleSheet.create({
         borderColor: '#dcdde1',
         fontSize: 16,
     },
-
     button: {
         width: '100%',
         height: 50,
@@ -28,28 +32,11 @@ export default StyleSheet.create({
         borderRadius: 8,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 10,
+        marginTop: 10,
     },
-
     buttonText: {
         color: '#fff',
         fontSize: 18,
         fontWeight: 'bold',
     },
-
-    link: {
-        marginTop: 10,
-        color: '#A2CD5A',
-        fontSize: 16,
-        textAlign: 'center',
-    },
-
-    logo: {
-        width: 400,
-        height: 200,
-        marginTop: 100,      // Espaço do topo
-        marginBottom: 100,   // Espaço abaixo da imagem
-        alignSelf: 'center', // Corrige capitalização
-    },
-
 });

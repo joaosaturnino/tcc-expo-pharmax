@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, Alert, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 import styles from './styles'; // Importando os estilos
-import BottonTab from '../../routes/bottonTab';
+import bottonTab from '../../routes/bottonTab';
+
+
+import LogoEscrita from '../../public/LogoEscrita.png';
 
 export default function Login() {
     const navigation = useNavigation();
@@ -34,7 +37,12 @@ export default function Login() {
     }
 
     return (
-        <View>
+        <View style={styles.container}>
+            <Image
+                source={LogoEscrita}
+                style={styles.logo}
+                resizeMode="contain"
+            />
             <TextInput
                 style={styles.input}
                 placeholder='e-mail'
@@ -48,16 +56,16 @@ export default function Login() {
                 secureTextEntry
                 onChangeText={v => setSenha(v)}
             />
-            <TouchableOpacity onPress={Acesso}>
-                <Text>Acessar sistema</Text>
+            <TouchableOpacity style={styles.button} onPress={Acesso}>
+                <Text style={styles.buttonText}>Acessar sistema</Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => navigation.navigate('CadUsuario')}>
-                <Text>Cadastro de Usuários</Text>
+                <Text style={styles.link}>Cadastro de Usuários</Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => navigation.navigate('EsqSenha')}>
-                <Text>Esqueceu a senha</Text>
+                <Text style={styles.link}>Esqueceu a senha</Text>
             </TouchableOpacity>
         </View>
     );
