@@ -18,6 +18,7 @@ export default function Login() {
         senha: '123456',
         tipo: 'cliente'
     };
+    
 
     function Acesso() {
         if (usuTemp.email === email && usuTemp.senha === senha) {
