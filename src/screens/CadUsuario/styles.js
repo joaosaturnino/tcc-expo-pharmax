@@ -1,6 +1,6 @@
 import { StyleSheet, Dimensions } from 'react-native';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 export default StyleSheet.create({
     container: {
@@ -11,20 +11,14 @@ export default StyleSheet.create({
         flexGrow: 1,
         justifyContent: 'center',
         paddingHorizontal: 20,
-        paddingVertical: 40,
+        paddingVertical: 20,
     },
-    logoContainer: {
+    header: {
         alignItems: 'center',
-        marginBottom: 40,
-    },
-    logo: {
-        width: width * 0.8,
-        height: width * 0.8,
-        marginBottom: 20,
-        //tintColor: '#000000ff', // Remove se sua logo já tiver cores
+        marginBottom: 30,
     },
     title: {
-        fontSize: 24,
+        fontSize: 28,
         fontWeight: 'bold',
         color: '#2c3e50',
         marginBottom: 8,
@@ -57,8 +51,43 @@ export default StyleSheet.create({
         shadowRadius: 2,
         elevation: 2,
     },
-    loginButton: {
+    radioContainer: {
+        marginBottom: 20,
+    },
+    radioLabel: {
+        fontSize: 16,
+        color: '#2c3e50',
+        marginBottom: 10,
+        fontWeight: '500',
+    },
+    radioGroup: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    radioButton: {
+        flex: 1,
+        paddingVertical: 12,
+        paddingHorizontal: 15,
+        borderRadius: 8,
+        backgroundColor: '#f1f2f6',
+        marginHorizontal: 5,
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#ddd',
+    },
+    radioButtonSelected: {
         backgroundColor: '#3498db',
+        borderColor: '#3498db',
+    },
+    radioText: {
+        color: '#7f8c8d',
+        fontWeight: '500',
+    },
+    radioTextSelected: {
+        color: '#fff',
+    },
+    cadastroButton: {
+        backgroundColor: '#2ecc71',
         borderRadius: 8,
         paddingVertical: 15,
         alignItems: 'center',
@@ -72,7 +101,7 @@ export default StyleSheet.create({
         shadowRadius: 3.84,
         elevation: 5,
     },
-    loginButtonText: {
+    cadastroButtonText: {
         color: '#fff',
         fontSize: 18,
         fontWeight: 'bold',

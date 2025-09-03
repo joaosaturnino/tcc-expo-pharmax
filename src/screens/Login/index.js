@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, Alert, Image, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-import styles from './styles'; // Importando os estilos
-import BottonTab from '../../routes/bottonTab';
+import styles from './styles';
 
 export default function Login() {
     const navigation = useNavigation();
@@ -24,9 +23,9 @@ export default function Login() {
             navigation.navigate('BottonTab', { usuTemp });
         } else {
             Alert.alert(
-                'Erro! Senha ou e-mail inválidos',
-                '',
-                [{ text: 'OK', onPress: () => console.log('OK Pressed') }]
+                'Erro!',
+                'Senha ou e-mail inválidos',
+                [{ text: 'OK' }]
             );
         }
         setEmail('');
@@ -34,31 +33,54 @@ export default function Login() {
     }
 
     return (
-        <View>
-            <TextInput
-                style={styles.input}
-                placeholder='e-mail'
-                value={email}
-                onChangeText={v => setEmail(v)}
-            />
-            <TextInput
-                style={styles.input}
-                placeholder='senha'
-                value={senha}
-                secureTextEntry
-                onChangeText={v => setSenha(v)}
-            />
-            <TouchableOpacity onPress={Acesso}>
-                <Text>Acessar sistema</Text>
-            </TouchableOpacity>
+        <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={styles.container}
+        >
+            <ScrollView contentContainerStyle={styles.scrollContainer}>
+                <View style={styles.logoContainer}>
+                    <Image
+                        source={require('../../../public/LogoEscrita.png')}
+                        style={styles.logo}
+                        resizeMode="contain"
+                    />
 
-            <TouchableOpacity onPress={() => navigation.navigate('CadUsuario')}>
-                <Text>Cadastro de Usuários</Text>
-            </TouchableOpacity>
+                </View>
 
-            <TouchableOpacity onPress={() => navigation.navigate('EsqSenha')}>
-                <Text>Esqueceu a senha</Text>
-            </TouchableOpacity>
-        </View>
+                <View style={styles.formContainer}>
+                    <TextInput
+                        style={styles.input}
+                        placeholder='E-mail'
+                        placeholderTextColor="#999"
+                        value={email}
+                        onChangeText={setEmail}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder='Senha'
+                        placeholderTextColor="#999"
+                        value={senha}
+                        secureTextEntry
+                        onChangeText={setSenha}
+                    />
+
+                    <TouchableOpacity style={styles.loginButton} onPress={Acesso}>
+                        <Text style={styles.loginButtonText}>Acessar sistema</Text>
+                    </TouchableOpacity>
+
+                    <View style={styles.linksContainer}>
+                        <TouchableOpacity onPress={() => navigation.navigate('CadUsuario')}>
+                            <Text style={styles.link}>Cadastro de Usuários</Text>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity onPress={() => navigation.navigate('EsqSenha')}>
+                            <Text style={styles.link}>Esqueceu a senha?</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 }
