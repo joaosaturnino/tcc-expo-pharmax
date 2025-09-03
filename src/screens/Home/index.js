@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { View, Text, Button, BackHandler } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import styles from './styles';
 
 export default function Home({ route }) {
   const navigation = useNavigation();
@@ -17,9 +18,9 @@ export default function Home({ route }) {
   );
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>{`Bem vindo ${usuTemp.nome}`}</Text>
-      <Text>Você não pode voltar com o botão físico.</Text>
+    <View style={styles.container}>
+      <Text style={styles.welcome}>{`Bem vindo ${usuTemp.nome}`}</Text>
+      <Text style={styles.info}>Você não pode voltar com o botão físico.</Text>
       <Button title="Voltar manualmente" onPress={() => navigation.goBack()} />
     </View>
   );
