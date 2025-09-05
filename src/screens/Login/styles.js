@@ -58,7 +58,7 @@ export default StyleSheet.create({
         elevation: 2,
     },
     loginButton: {
-        backgroundColor: '#3498db',
+        backgroundColor: '#66CD00',
         borderRadius: 8,
         paddingVertical: 15,
         alignItems: 'center',
@@ -82,7 +82,7 @@ export default StyleSheet.create({
         alignItems: 'center',
     },
     link: {
-        color: '#3498db',
+        color: '#66CD00',
         fontSize: 16,
         marginVertical: 8,
         fontWeight: '500',

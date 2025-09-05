@@ -11,23 +11,25 @@ export default StyleSheet.create({
         flexGrow: 1,
         justifyContent: 'center',
         paddingHorizontal: 20,
-        paddingVertical: 20,
+        paddingVertical: 40,
     },
     header: {
         alignItems: 'center',
-        marginBottom: 30,
+        marginBottom: 40,
     },
     title: {
         fontSize: 28,
         fontWeight: 'bold',
         color: '#2c3e50',
-        marginBottom: 8,
+        marginBottom: 15,
         textAlign: 'center',
     },
     subtitle: {
         fontSize: 16,
         color: '#7f8c8d',
         textAlign: 'center',
+        lineHeight: 22,
+        paddingHorizontal: 20,
     },
     formContainer: {
         width: '100%',
@@ -39,7 +41,7 @@ export default StyleSheet.create({
         borderRadius: 8,
         paddingHorizontal: 15,
         paddingVertical: 12,
-        marginBottom: 15,
+        marginBottom: 25,
         fontSize: 16,
         color: '#2c3e50',
         shadowColor: '#000',
@@ -51,42 +53,7 @@ export default StyleSheet.create({
         shadowRadius: 2,
         elevation: 2,
     },
-    radioContainer: {
-        marginBottom: 20,
-    },
-    radioLabel: {
-        fontSize: 16,
-        color: '#2c3e50',
-        marginBottom: 10,
-        fontWeight: '500',
-    },
-    radioGroup: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-    radioButton: {
-        flex: 1,
-        paddingVertical: 12,
-        paddingHorizontal: 15,
-        borderRadius: 8,
-        backgroundColor: '#f1f2f6',
-        marginHorizontal: 5,
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#ddd',
-    },
-    radioButtonSelected: {
-        backgroundColor: '#3498db',
-        borderColor: '#3498db',
-    },
-    radioText: {
-        color: '#7f8c8d',
-        fontWeight: '500',
-    },
-    radioTextSelected: {
-        color: '#fff',
-    },
-    cadastroButton: {
+    recuperarButton: {
         backgroundColor: '#66CD00',
         borderRadius: 8,
         paddingVertical: 15,
@@ -101,13 +68,13 @@ export default StyleSheet.create({
         shadowRadius: 3.84,
         elevation: 5,
     },
-    cadastroButtonText: {
+    recuperarButtonText: {
         color: '#fff',
         fontSize: 18,
         fontWeight: 'bold',
     },
     linksContainer: {
-        marginTop: 20,
+        marginTop: 30,
         alignItems: 'center',
     },
     link: {
