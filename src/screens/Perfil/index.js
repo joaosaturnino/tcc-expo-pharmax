@@ -69,7 +69,7 @@ const PerfilScreen = () => {
         {/* Menu de opções */}
         <View style={styles.menuSection}>
           {menuOptions.map((item) => (
-            <MenuItem
+            <MenuItems
               key={item.id}
               icon={item.icon}
               title={item.title}
