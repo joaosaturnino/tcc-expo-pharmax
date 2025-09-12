@@ -1,31 +1,48 @@
 import { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Image, FlatList, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 import styles from './styles';
 
 export default function Favoritos() {
+    const navigation = useNavigation();
+
     // Dados de exemplo - substitua pelos seus produtos reais
     const [favoritos, setFavoritos] = useState([
         {
-            id: 1,
+            id: '1',
             nome: 'Paracetamol 500mg',
             preco: 'R$ 12,90',
-            laboratorio: 'Medley',
-            imagem: require('../../../public/logo.png') // Use sua imagem real
+            marca: 'Medley',
+            imagem: require('../../../public/logo.png')
         },
         {
-            id: 2,
+            id: '2',
             nome: 'Dipirona 500mg',
             preco: 'R$ 8,50',
-            laboratorio: 'Neo Química',
-            imagem: require('../../../public/logo.png') // Use sua imagem real
+            marca: 'Neo Química',
+            imagem: require('../../../public/logo.png')
         },
         {
-            id: 3,
+            id: '3',
             nome: 'Omeprazol 20mg',
             preco: 'R$ 15,75',
-            laboratorio: 'EMS',
-            imagem: require('../../../public/logo.png') // Use sua imagem real
+            marca: 'EMS',
+            imagem: require('../../../public/logo.png')
+        },
+        {
+            id: '4',
+            nome: 'Ibuprofeno 400mg',
+            preco: 'R$ 14,90',
+            marca: 'Eurofarma',
+            imagem: require('../../../public/logo.png')
+        },
+        {
+            id: '5',
+            nome: 'Loratadina 10mg',
+            preco: 'R$ 9,90',
+            marca: 'Aché',
+            imagem: require('../../../public/logo.png')
         }
     ]);
 
@@ -34,14 +51,40 @@ export default function Favoritos() {
         Alert.alert('Removido', `${nome} foi removido dos favoritos`);
     };
 
+    const renderProduto = ({ item }) => (
+        <View style={styles.produtoCard}>
+            <View style={styles.produtoImagem}>
+                <Image
+                    source={item.imagem}
+                    style={styles.produtoImagem}
+                    resizeMode="contain"
+                />
+            </View>
+
+            <View style={styles.produtoInfo}>
+                <Text style={styles.produtoNome} numberOfLines={2}>{item.nome}</Text>
+                <Text style={styles.produtoMarca}>{item.marca}</Text>
+                <Text style={styles.produtoPreco}>{item.preco}</Text>
+            </View>
+
+            <TouchableOpacity
+                style={styles.removerButton}
+                onPress={() => removerFavorito(item.id, item.nome)}
+            >
+                <Text style={styles.removerIcon}>✕</Text>
+            </TouchableOpacity>
+        </View>
+    );
+
     if (favoritos.length === 0) {
         return (
             <View style={styles.container}>
                 <View style={styles.header}>
-                    <Text style={styles.title}>Meus Favoritos</Text>
+                    <Text style={styles.headerTitle}>Meus Favoritos</Text>
                 </View>
 
                 <View style={styles.vazioContainer}>
+                    <Text style={styles.vazioIcon}>❤️</Text>
                     <Text style={styles.vazioTexto}>Nenhum produto favoritado</Text>
                     <Text style={styles.vazioSubtexto}>
                         Os produtos que você favoritar aparecerão aqui
@@ -53,35 +96,20 @@ export default function Favoritos() {
 
     return (
         <View style={styles.container}>
+            {/* Header */}
             <View style={styles.header}>
-                <Text style={styles.title}>Meus Favoritos</Text>
+                <Text style={styles.headerTitle}>Meus Favoritos</Text>
                 <Text style={styles.subtitle}>{favoritos.length} produto(s) salvo(s)</Text>
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false}>
-                {favoritos.map((produto) => (
-                    <View key={produto.id} style={styles.produtoCard}>
-                        <Image
-                            source={produto.imagem}
-                            style={styles.produtoImagem}
-                            resizeMode="contain"
-                        />
-
-                        <View style={styles.produtoInfo}>
-                            <Text style={styles.produtoNome}>{produto.nome}</Text>
-                            <Text style={styles.produtoLaboratorio}>{produto.laboratorio}</Text>
-                            <Text style={styles.produtoPreco}>{produto.preco}</Text>
-                        </View>
-
-                        <TouchableOpacity
-                            style={styles.removerButton}
-                            onPress={() => removerFavorito(produto.id, produto.nome)}
-                        >
-                            <Text style={styles.removerButtonText}>×</Text>
-                        </TouchableOpacity>
-                    </View>
-                ))}
-            </ScrollView>
+            <FlatList
+                data={favoritos}
+                renderItem={renderProduto}
+                keyExtractor={item => item.id}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.listaContainer}
+                ListFooterComponent={<View style={styles.espacoFinal} />}
+            />
         </View>
     );
 }

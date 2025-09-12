@@ -6,40 +6,29 @@ export default StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f8f9fa',
-        padding: 16,
     },
     header: {
-        alignItems: 'center',
-        marginBottom: 24,
-        paddingTop: 20,
+        paddingTop: 50,
+        paddingHorizontal: 16,
+        paddingBottom: 10,
+        backgroundColor: '#fff',
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
     },
-    title: {
+    headerTitle: {
         fontSize: 24,
         fontWeight: 'bold',
         color: '#2c3e50',
-        marginBottom: 8,
+        textAlign: 'center',
     },
     subtitle: {
-        fontSize: 16,
-        color: '#7f8c8d',
-    },
-    vazioContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 40,
-    },
-    vazioTexto: {
-        fontSize: 20,
-        fontWeight: '600',
-        color: '#2c3e50',
-        marginBottom: 8,
-        textAlign: 'center',
-    },
-    vazioSubtexto: {
-        fontSize: 16,
+        fontSize: 14,
         color: '#7f8c8d',
         textAlign: 'center',
+        marginTop: 5,
+    },
+    listaContainer: {
+        padding: 16,
     },
     produtoCard: {
         flexDirection: 'row',
@@ -61,8 +50,10 @@ export default StyleSheet.create({
         width: 60,
         height: 60,
         borderRadius: 8,
-        marginRight: 16,
         backgroundColor: '#f1f2f6',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 16,
     },
     produtoInfo: {
         flex: 1,
@@ -73,7 +64,7 @@ export default StyleSheet.create({
         color: '#2c3e50',
         marginBottom: 4,
     },
-    produtoLaboratorio: {
+    produtoMarca: {
         fontSize: 14,
         color: '#7f8c8d',
         marginBottom: 4,
@@ -84,17 +75,43 @@ export default StyleSheet.create({
         color: '#27ae60',
     },
     removerButton: {
-        backgroundColor: '#e74c3c',
         width: 40,
         height: 40,
         borderRadius: 20,
+        backgroundColor: '#e74c3c',
         justifyContent: 'center',
         alignItems: 'center',
         marginLeft: 10,
     },
-    removerButtonText: {
+    removerIcon: {
         color: 'white',
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: 'bold',
+    },
+    vazioContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 40,
+    },
+    vazioIcon: {
+        fontSize: 50,
+        marginBottom: 20,
+    },
+    vazioTexto: {
+        fontSize: 20,
+        fontWeight: '600',
+        color: '#2c3e50',
+        marginBottom: 8,
+        textAlign: 'center',
+    },
+    vazioSubtexto: {
+        fontSize: 16,
+        color: '#7f8c8d',
+        textAlign: 'center',
+        lineHeight: 22,
+    },
+    espacoFinal: {
+        height: 20,
     },
 });

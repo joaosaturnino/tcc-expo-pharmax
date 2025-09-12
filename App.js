@@ -5,10 +5,10 @@ import Navegacao from './src/routes';
 
 export default function App() {
   return (
-    
-      <Navegacao />
+
+    <Navegacao />
     // <StatusBar style="auto" />
-    
+
   );
 }
 
@@ -19,4 +19,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+
 });
