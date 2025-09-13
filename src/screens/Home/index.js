@@ -1,22 +1,21 @@
 import { useState } from 'react';
-import { View, Text, ScrollView, TextInput, TouchableOpacity, Image, FlatList } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
+import LottieView from 'lottie-react-native';
 import styles from './styles';
 
 export default function Home() {
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
 
-  // Dados das categorias
+  // Categorias com animações Lottie
   const categorias = [
-    { id: '1', nome: 'Antialérgicos', icon: '💊' },
-    { id: '2', nome: 'Analgésicos', icon: '💊' },
-    { id: '3', nome: 'Vitaminas', icon: '💊' },
-    { id: '4', nome: 'Antibióticos', icon: '💊' },
+    { id: '1', nome: 'Antialérgicos', animacao: require('../../../assets/animacao-alergia.json') },
+    { id: '2', nome: 'Analgésicos', animacao: require('../../../assets/animacao-analgesico.json') },
+    { id: '3', nome: 'Vitaminas', animacao: require('../../../assets/animacao-vitaminas.json') },
+    { id: '4', nome: 'Antibióticos', animacao: require('../../../assets/animacao-antibiotico.json') },
   ];
 
-  // Produtos em promoção
   const produtosPromocao = [
     { id: '1', nome: 'Paracetamol', preco: 'R$ 15,00', marca: 'Medley' },
     { id: '2', nome: 'Dipirona', preco: 'R$ 12,50', marca: 'Neo Química' },
@@ -26,7 +25,6 @@ export default function Home() {
     { id: '6', nome: 'Amoxilina', preco: 'R$ 22,00', marca: 'Novartis' },
   ];
 
-  // Marcas populares
   const marcas = [
     { id: '1', nome: 'Pampers', logo: 'P' },
     { id: '2', nome: 'GIN1B', logo: 'G' },
@@ -36,7 +34,12 @@ export default function Home() {
 
   const renderCategoria = ({ item }) => (
     <TouchableOpacity style={styles.categoriaItem}>
-      <Text style={styles.categoriaIcon}>{item.icon}</Text>
+      <LottieView
+        source={item.animacao}
+        autoPlay
+        loop
+        style={styles.categoriaIcon}
+      />
       <Text style={styles.categoriaNome}>{item.nome}</Text>
     </TouchableOpacity>
   );
@@ -61,6 +64,16 @@ export default function Home() {
     </TouchableOpacity>
   );
 
+  // Pesquisa
+  function handlePesquisar() {
+    if (searchText.trim().length > 0) {
+      navigation.navigate('Pesquisa', {
+        termo: searchText,
+        produtos: produtosPromocao,
+      });
+    }
+  }
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -72,10 +85,12 @@ export default function Home() {
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Hinted search text"
+          placeholder="Pesquisar produto..."
           placeholderTextColor="#999"
           value={searchText}
           onChangeText={setSearchText}
+          onSubmitEditing={handlePesquisar}
+          returnKeyType="search"
         />
       </View>
 

@@ -4,6 +4,7 @@ import Login from '../screens/Login';
 import CadUsuario from '../screens/CadUsuario';
 import EsqSenha from '../screens/EsqSenha';
 import Home from '../screens/Home';
+import Pesquisa from '../screens/Pesquisa'; // <-- Adicione esta linha
 import BottonTab from "./bottonTab";
 import { Button } from "@react-navigation/elements";
 
@@ -19,9 +20,16 @@ export default function Tab() {
                 name="BottonTab"
                 component={BottonTab}
                 options={{
-                    headerShown: false, // Esconde o cabeçalho da tela Home
-                    headerBackVisible: false, // Esconde o botão de voltar
-                    gestureEnabled: false, // Desabilita o gesto de voltar
+                    headerShown: false,
+                    headerBackVisible: false,
+                    gestureEnabled: false,
+                }}
+            />
+            <Stack.Screen
+                name="Pesquisa"
+                component={Pesquisa}
+                options={{
+                    headerShown: false,
                 }}
             />
         </Stack.Navigator>

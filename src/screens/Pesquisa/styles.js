@@ -1,0 +1,96 @@
+import { StyleSheet } from 'react-native';
+
+export default StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#f8f9fa',
+    },
+    header: {
+        paddingTop: 50,
+        paddingHorizontal: 16,
+        paddingBottom: 10,
+        backgroundColor: '#fff',
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+    },
+    headerTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#2c3e50',
+        textAlign: 'center',
+    },
+    searchContainer: {
+        padding: 16,
+        backgroundColor: '#fff',
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+    },
+    searchInput: {
+        backgroundColor: '#f1f2f6',
+        borderRadius: 25,
+        paddingHorizontal: 20,
+        paddingVertical: 12,
+        fontSize: 16,
+        color: '#2c3e50',
+    },
+    section: {
+        marginTop: 20,
+        paddingHorizontal: 16,
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#2c3e50',
+        marginBottom: 16,
+    },
+    resultadosList: {
+        paddingBottom: 30,
+        justifyContent: 'space-between',
+    },
+    produtoCard: {
+        flex: 1,
+        backgroundColor: '#fff',
+        borderRadius: 14,
+        padding: 16,
+        margin: 8,
+        minWidth: 150,
+        maxWidth: '48%',
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    produtoImagem: {
+        width: 70,
+        height: 70,
+        backgroundColor: '#f1f2f6',
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 12,
+    },
+    produtoImagemTexto: {
+        fontSize: 30,
+    },
+    produtoNome: {
+        fontSize: 15,
+        fontWeight: '600',
+        color: '#2c3e50',
+        marginBottom: 4,
+        textAlign: 'center',
+    },
+    produtoMarca: {
+        fontSize: 13,
+        color: '#7f8c8d',
+        marginBottom: 6,
+        textAlign: 'center',
+    },
+    produtoPreco: {
+        fontSize: 17,
+        fontWeight: 'bold',
+        color: '#27ae60',
+        textAlign: 'center',
+    },
+});

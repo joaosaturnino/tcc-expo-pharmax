@@ -151,4 +151,8 @@ export default StyleSheet.create({
     espacoFinal: {
         height: 30,
     },
+    categoriaIcon: {
+        width: 48,
+        height: 48,
+    },
 });

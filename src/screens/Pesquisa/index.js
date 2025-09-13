@@ -1,74 +1,79 @@
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { NavigationContainer } from "@react-navigation/native";
+import { useState } from 'react';
+import { View, Text, TextInput, FlatList, TouchableOpacity } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import styles from './styles';
 
-// Importações das telas
-import Login from '../screens/Login';
-import CadUsuario from '../screens/CadUsuario';
-import EsqSenha from '../screens/EsqSenha';
-import Home from '../screens/Home';
-import Pesquisa from '../screens/Pesquisa';
-import Favoritos from '../screens/Favoritos';
-import Perfil from '../screens/Perfil';
-import BottonTab from "./bottomTab";
+export default function Pesquisa() {
+    const navigation = useNavigation();
+    const route = useRoute();
+    const { termo = '', produtos = [] } = route.params || {};
 
-const Stack = createNativeStackNavigator();
+    const [searchText, setSearchText] = useState(termo);
 
-export default function StackNavigation() {
+    const resultados = produtos.filter(item =>
+        item.nome.toLowerCase().includes(searchText.toLowerCase())
+    );
+
+    const renderProduto = ({ item }) => (
+        <TouchableOpacity style={styles.produtoCard}>
+            <View style={styles.produtoImagem}>
+                <Text style={styles.produtoImagemTexto}>📦</Text>
+            </View>
+            <Text style={styles.produtoNome} numberOfLines={1}>{item.nome}</Text>
+            <Text style={styles.produtoMarca}>{item.marca}</Text>
+            <Text style={styles.produtoPreco}>{item.preco}</Text>
+        </TouchableOpacity>
+    );
+
     return (
-        <NavigationContainer>
-            <Stack.Navigator initialRouteName="Login">
-                {/* Telas de autenticação */}
-                <Stack.Screen
-                    name="Login"
-                    component={Login}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="CadUsuario"
-                    component={CadUsuario}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="EsqSenha"
-                    component={EsqSenha}
-                    options={{ headerShown: false }}
-                />
+        <View style={styles.container}>
+            {/* Header */}
+            <View style={styles.header}>
+                <Text style={styles.headerTitle}>Resultados da Pesquisa</Text>
+            </View>
 
-                {/* Tela de pesquisa */}
-                <Stack.Screen
-                    name="Pesquisa"
-                    component={Pesquisa}
-                    options={{ headerShown: false }}
-                />
+            {/* Botão Voltar */}
+            <TouchableOpacity
+                style={{
+                    margin: 16,
+                    backgroundColor: '#3498db',
+                    padding: 12,
+                    borderRadius: 8,
+                    alignItems: 'center',
+                }}
+                onPress={() => navigation.goBack()}
+            >
+                <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 16 }}>Voltar para Home</Text>
+            </TouchableOpacity>
 
-                {/* Navegação por abas (BottomTab) */}
-                <Stack.Screen
-                    name="BottonTab"
-                    component={BottonTab}
-                    options={{
-                        headerShown: false,
-                        headerBackVisible: false,
-                        gestureEnabled: false,
-                    }}
+            {/* Barra de Pesquisa */}
+            <View style={styles.searchContainer}>
+                <TextInput
+                    style={styles.searchInput}
+                    placeholder="Pesquisar produto..."
+                    placeholderTextColor="#999"
+                    value={searchText}
+                    onChangeText={setSearchText}
                 />
+            </View>
 
-                {/* Telas adicionais (se necessário acessar diretamente) */}
-                <Stack.Screen
-                    name="Home"
-                    component={Home}
-                    options={{ headerShown: false }}
+            {/* Resultados */}
+            <View style={styles.section}>
+                <Text style={styles.sectionTitle}>
+                    {resultados.length > 0
+                        ? `Encontrados ${resultados.length} produtos`
+                        : 'Nenhum produto encontrado'}
+                </Text>
+                <FlatList
+                    data={resultados}
+                    renderItem={renderProduto}
+                    keyExtractor={item => item.id}
+                    horizontal={false}
+                    numColumns={2}
+                    contentContainerStyle={{ paddingBottom: 30 }}
+                    showsVerticalScrollIndicator={false}
                 />
-                <Stack.Screen
-                    name="Favoritos"
-                    component={Favoritos}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="Perfil"
-                    component={Perfil}
-                    options={{ headerShown: false }}
-                />
-            </Stack.Navigator>
-        </NavigationContainer>
+            </View>
+        </View>
     );
 }
