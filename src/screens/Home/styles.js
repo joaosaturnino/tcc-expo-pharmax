@@ -8,9 +8,9 @@ export default StyleSheet.create({
         backgroundColor: '#f8f9fa',
     },
     header: {
-        paddingTop: 50,
+        paddingTop: 0,           // diminuído para aproximar do topo
         paddingHorizontal: 16,
-        paddingBottom: 10,
+        paddingBottom: 0,         // diminuído para aproximar da barra de pesquisa
         backgroundColor: '#fff',
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
@@ -64,7 +64,8 @@ export default StyleSheet.create({
         width: 80,
     },
     categoriaIcon: {
-        fontSize: 30,
+        width: 48,
+        height: 48,
         marginBottom: 8,
     },
     categoriaNome: {
@@ -151,8 +152,11 @@ export default StyleSheet.create({
     espacoFinal: {
         height: 30,
     },
-    categoriaIcon: {
-        width: 48,
-        height: 48,
+    logo: {
+        width: 300,         // ajuste conforme necessário
+        height: 150,         // ajuste conforme necessário
+        resizeMode: 'contain',
+        alignSelf: 'center',
+        marginBottom: 0,
     },
 });

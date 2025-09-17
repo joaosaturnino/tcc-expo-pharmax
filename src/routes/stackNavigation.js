@@ -4,7 +4,8 @@ import Login from '../screens/Login';
 import CadUsuario from '../screens/CadUsuario';
 import EsqSenha from '../screens/EsqSenha';
 import Home from '../screens/Home';
-import Pesquisa from '../screens/Pesquisa'; // <-- Adicione esta linha
+import Pesquisa from '../screens/Pesquisa';
+import Categoria from '../screens/Categoria'; // <-- Adicione esta linha
 import BottonTab from "./bottonTab";
 import { Button } from "@react-navigation/elements";
 
@@ -30,6 +31,14 @@ export default function Tab() {
                 component={Pesquisa}
                 options={{
                     headerShown: false,
+                }}
+            />
+            <Stack.Screen
+                name="Categoria"
+                component={Categoria}
+                options={{
+                    headerShown: true,
+                    title: 'Categoria',
                 }}
             />
         </Stack.Navigator>

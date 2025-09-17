@@ -1,19 +1,18 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, ScrollView, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import LottieView from 'lottie-react-native';
 import styles from './styles';
 
 export default function Home() {
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
 
-  // Categorias com animações Lottie
+  // Categorias com imagens (ajuste os caminhos conforme sua pasta)
   const categorias = [
-    { id: '1', nome: 'Antialérgicos', animacao: require('../../../assets/animacao-alergia.json') },
-    { id: '2', nome: 'Analgésicos', animacao: require('../../../assets/animacao-analgesico.json') },
-    { id: '3', nome: 'Vitaminas', animacao: require('../../../assets/animacao-vitaminas.json') },
-    { id: '4', nome: 'Antibióticos', animacao: require('../../../assets/animacao-antibiotico.json') },
+    { id: '1', nome: 'Antialérgicos', imagem: require('../../../public/alergia.png') },
+    { id: '2', nome: 'Analgésicos', imagem: require('../../../public/dor-de-cabeca.png') },
+    { id: '3', nome: 'Vitaminas', imagem: require('../../../public/vitaminas.png') },
+    { id: '4', nome: 'Antibióticos', imagem: require('../../../public/antibiotico.png') },
   ];
 
   const produtosPromocao = [
@@ -32,14 +31,13 @@ export default function Home() {
     { id: '4', nome: 'HUGEIES', logo: 'H' },
   ];
 
+  // Ao clicar na categoria, navega para a tela Categoria passando o nome
   const renderCategoria = ({ item }) => (
-    <TouchableOpacity style={styles.categoriaItem}>
-      <LottieView
-        source={item.animacao}
-        autoPlay
-        loop
-        style={styles.categoriaIcon}
-      />
+    <TouchableOpacity
+      style={styles.categoriaItem}
+      onPress={() => navigation.navigate('Categoria', { nome: item.nome })}
+    >
+      <Image source={item.imagem} style={styles.categoriaIcon} resizeMode="contain" />
       <Text style={styles.categoriaNome}>{item.nome}</Text>
     </TouchableOpacity>
   );
@@ -78,7 +76,10 @@ export default function Home() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Pharma</Text>
+        <Image
+          source={require('../../../public/LogoEscrita.png')} // ajuste o caminho conforme sua logo
+          style={styles.logo}
+        />
       </View>
 
       {/* Barra de Pesquisa */}
@@ -128,7 +129,7 @@ export default function Home() {
 
         {/* Marcas Populares */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Marcas Populares</Text>
+          <Text style={styles.sectionTitle}>Laboratórios Populares</Text>
           <FlatList
             data={marcas}
             renderItem={renderMarca}
