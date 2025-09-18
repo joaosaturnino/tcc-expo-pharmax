@@ -25,10 +25,10 @@ export default function Home() {
   ];
 
   const marcas = [
-    { id: '1', nome: 'Pampers', logo: 'P' },
-    { id: '2', nome: 'GIN1B', logo: 'G' },
-    { id: '3', nome: 'ZERSTEI', logo: 'Z' },
-    { id: '4', nome: 'HUGEIES', logo: 'H' },
+    { id: '1', nome: 'Cimed', logo: 'P' },
+    { id: '2', nome: 'EuroPharma', logo: 'G' },
+    { id: '3', nome: 'NeoQuímica', logo: 'Z' },
+    { id: '4', nome: 'Generico', logo: 'H' },
   ];
 
   // Ao clicar na categoria, navega para a tela Categoria passando o nome
