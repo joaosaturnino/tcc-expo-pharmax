@@ -3,7 +3,8 @@ import { Ionicons } from '@expo/vector-icons';
 
 import Home from "./../screens/Home/index";
 import Favoritos from "./../screens/Favoritos/index";
-import Perfil from "./../screens/Perfil/index";
+import Perfil from "./../screens/Perfil/index"; 
+import Produto from '../screens/produto'; // Adicione este import
 
 const Tab = createBottomTabNavigator();
 
@@ -13,7 +14,7 @@ export default function BottomTab() {
             screenOptions={({ route }) => ({
                 tabBarIcon: ({ color, size }) => {
                     let iconName;
-                    
+
                     if (route.name === 'Home') {
                         iconName = 'home-outline';
                     } else if (route.name === 'Favoritos') {
@@ -21,7 +22,7 @@ export default function BottomTab() {
                     } else if (route.name === 'Perfil') {
                         iconName = 'person-outline';
                     }
-                    
+
                     return <Ionicons name={iconName} size={size} color={color} />;
                 },
                 tabBarActiveTintColor: '#2A7CC7', // Azul do PharmaX
@@ -40,20 +41,30 @@ export default function BottomTab() {
                 headerShown: false,
             })}
         >
-            <Tab.Screen 
-                name="Home" 
+            <Tab.Screen
+                name="Home"
                 component={Home}
                 options={{ title: 'Home' }}
             />
-            <Tab.Screen 
-                name="Favoritos" 
+            <Tab.Screen
+                name="Favoritos"
                 component={Favoritos}
                 options={{ title: 'Favoritos' }}
             />
-            <Tab.Screen 
-                name="Perfil" 
+            <Tab.Screen
+                name="Perfil"
                 component={Perfil}
                 options={{ title: 'Perfil' }}
+            />
+
+            <Tab.Screen
+                name="Produto"
+                component={Produto}
+                options={{
+                    tabBarButton: () => null, // não mostra na bottom tab
+                    headerShown: false,       // opcional: também remove o header
+                }} 
+                
             />
         </Tab.Navigator>
     );

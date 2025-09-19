@@ -44,14 +44,14 @@ export default function Tab() {
                     title: 'Categoria',
                 }}
             />
-            <Stack.Screen
+            {/* <Stack.Screen
                 name="Produto"
                 component={Produto}
                 options={{
                     headerShown: true,
                     title: 'Produto',
                 }}
-            />
+            /> */}
 
         </Stack.Navigator>
     );
