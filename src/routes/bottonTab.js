@@ -1,20 +1,19 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from '@expo/vector-icons';
 
-import Home from "../screens/Home";
-import Favoritos from "../screens/Favoritos";
-import Perfil from "../screens/Perfil";
+import Home from "./../screens/Home/index";
+import Favoritos from "./../screens/Favoritos/index";
+import Perfil from "./../screens/Perfil/index";
 
 const Tab = createBottomTabNavigator();
 
-export default function BottonTab({ route }) {
-    const { usuTemp } = route.params;
-
+export default function BottomTab() {
     return (
         <Tab.Navigator
             screenOptions={({ route }) => ({
                 tabBarIcon: ({ color, size }) => {
                     let iconName;
+                    
                     if (route.name === 'Home') {
                         iconName = 'home-outline';
                     } else if (route.name === 'Favoritos') {
@@ -22,15 +21,40 @@ export default function BottonTab({ route }) {
                     } else if (route.name === 'Perfil') {
                         iconName = 'person-outline';
                     }
+                    
                     return <Ionicons name={iconName} size={size} color={color} />;
                 },
-                tabBarActiveTintColor: '#3498db',
+                tabBarActiveTintColor: '#2A7CC7', // Azul do PharmaX
                 tabBarInactiveTintColor: '#888',
+                tabBarStyle: {
+                    backgroundColor: 'white',
+                    borderTopWidth: 1,
+                    borderTopColor: '#ddd',
+                    paddingVertical: 5,
+                    height: 60,
+                },
+                tabBarLabelStyle: {
+                    fontSize: 12,
+                    marginBottom: 5,
+                },
+                headerShown: false,
             })}
         >
-            <Tab.Screen name="Home" component={Home} initialParams={{ usuTemp }} />
-            <Tab.Screen name="Favoritos" component={Favoritos} />
-            <Tab.Screen name="Perfil" component={Perfil} />
+            <Tab.Screen 
+                name="Home" 
+                component={Home}
+                options={{ title: 'Home' }}
+            />
+            <Tab.Screen 
+                name="Favoritos" 
+                component={Favoritos}
+                options={{ title: 'Favoritos' }}
+            />
+            <Tab.Screen 
+                name="Perfil" 
+                component={Perfil}
+                options={{ title: 'Perfil' }}
+            />
         </Tab.Navigator>
     );
 }

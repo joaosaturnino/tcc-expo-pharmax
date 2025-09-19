@@ -7,6 +7,8 @@ export default function Home() {
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
 
+  
+
   // Categorias com imagens (ajuste os caminhos conforme sua pasta)
   const categorias = [
     { id: '1', nome: 'Antialérgicos', imagem: require('../../../public/alergia.png') },
@@ -41,16 +43,28 @@ export default function Home() {
       <Text style={styles.categoriaNome}>{item.nome}</Text>
     </TouchableOpacity>
   );
-
+function handlePesquisar() {
+  const resultado = produtosPromocao.find(p => 
+    p.nome.toLowerCase().includes(searchText.trim().toLowerCase())
+  );
+  if (resultado) {
+    navigation.navigate('Produto', { produto: resultado });
+  } else {
+    // Exibir alerta ou mensagem de não encontrado
+  }
+}
   const renderProduto = ({ item }) => (
-    <TouchableOpacity style={styles.produtoCard}>
-      <View style={styles.produtoImagem}>
-        <Text style={styles.produtoImagemTexto}>📦</Text>
-      </View>
-      <Text style={styles.produtoNome} numberOfLines={1}>{item.nome}</Text>
-      <Text style={styles.produtoMarca}>{item.marca}</Text>
-      <Text style={styles.produtoPreco}>{item.preco}</Text>
-    </TouchableOpacity>
+  <TouchableOpacity 
+    style={styles.produtoCard}
+    onPress={() => navigation.navigate('Produto', { produto: item })}
+  >
+    <View style={styles.produtoImagem}>
+      <Text style={styles.produtoImagemTexto}>📦</Text>
+    </View>
+    <Text style={styles.produtoNome} numberOfLines={1}>{item.nome}</Text>
+    <Text style={styles.produtoMarca}>{item.marca}</Text>
+    <Text style={styles.produtoPreco}>{item.preco}</Text>
+  </TouchableOpacity>
   );
 
   const renderMarca = ({ item }) => (

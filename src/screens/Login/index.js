@@ -13,14 +13,15 @@ export default function Login() {
     const usuTemp = {
         id: 101,
         nome: 'João Henrique',
-        email: 'joao@gmail.com',
+        email: '123456',
         senha: '123456',
         tipo: 'cliente'
     };
 
     function Acesso() {
         if (usuTemp.email === email && usuTemp.senha === senha) {
-            navigation.navigate('BottonTab', { usuTemp });
+            // navigation.navigate('BottonTab', { usuTemp });
+            navigation.navigate('BottonTab' );
         } else {
             Alert.alert(
                 'Erro!',
