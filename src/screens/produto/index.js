@@ -179,7 +179,7 @@ export default function Produto() {
       </ScrollView>
 
       {/* Bottom Tab Navigation */}
-      <View style={styles.bottomTab}>
+      {/* <View style={styles.bottomTab}>
         <TouchableOpacity style={styles.tabItem} onPress={() => navigation.navigate('Home')}>
           <Text style={[styles.tabIcon, styles.tabActive]}>🏠</Text>
           <Text style={[styles.tabText, styles.tabActive]}>Home</Text>
@@ -195,6 +195,7 @@ export default function Produto() {
           <Text style={styles.tabText}>Perfil</Text>
         </TouchableOpacity>
       </View>
+    </View> */}
     </View>
   );
 }
