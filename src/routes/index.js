@@ -2,12 +2,12 @@ import * as React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 
-import StackNavigation from './stackNavigation';
+import RootNavigation from './rootNavigation';
 
 export default function Navegacao() {
     return (
         <NavigationContainer>
-            <StackNavigation />
+            <RootNavigation />
             <StatusBar style="auto" />
         </NavigationContainer>
     );
