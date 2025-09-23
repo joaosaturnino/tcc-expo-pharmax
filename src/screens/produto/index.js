@@ -1,20 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, ScrollView, TouchableOpacity, FlatList, Linking } from 'react-native';
+import { View, Text, Image, ScrollView, TouchableOpacity, FlatList, Linking, Alert } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useFavoritos } from '../Favoritos/FavoritosContext';
 import styles from './styles';
 
 export default function Produto() {
   const navigation = useNavigation();
   const route = useRoute();
   const { produto } = route.params || {};
-
+  
+  const { adicionarFavorito, removerFavorito, isFavorito } = useFavoritos();
+  
   const [quantidade, setQuantidade] = useState(1);
   const [farmacias, setFarmacias] = useState([]);
+  const [favoritado, setFavoritado] = useState(false);
 
-  // Dados de exemplo - substitua pela sua API
   useEffect(() => {
     if (produto) {
-      // Simulando busca de farmácias que têm o produto
+      setFavoritado(isFavorito(produto.id));
+    }
+  }, [produto, isFavorito]);
+
+  useEffect(() => {
+    if (produto) {
       const farmaciasComProduto = [
         {
           id: '1',
@@ -50,6 +58,20 @@ export default function Produto() {
       setFarmacias(farmaciasComProduto);
     }
   }, [produto]);
+
+  const toggleFavorito = () => {
+    if (!produto) return;
+    
+    if (favoritado) {
+      removerFavorito(produto.id);
+      setFavoritado(false);
+      Alert.alert('Removido', `${produto.nome} foi removido dos favoritos`);
+    } else {
+      adicionarFavorito(produto);
+      setFavoritado(true);
+      Alert.alert('Adicionado', `${produto.nome} foi adicionado aos favoritos`);
+    }
+  };
 
   const aumentarQuantidade = () => {
     setQuantidade(quantidade + 1);
@@ -112,13 +134,17 @@ export default function Produto() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
+      {/* Header Atualizado */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Detalhes do Produto</Text>
-        <View style={styles.placeholder} />
+        <TouchableOpacity onPress={toggleFavorito} style={styles.favoritoButton}>
+          <Text style={[styles.favoritoIcon, favoritado && styles.favoritoAtivo]}>
+            {favoritado ? '❤️' : '🤍'}
+          </Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.content}>
@@ -126,7 +152,7 @@ export default function Produto() {
         <View style={styles.produtoHeader}>
           <View style={styles.produtoImagemContainer}>
             <Image 
-              source={produto.imagem || require('../../../public/alergia.png')} 
+              source={produto.imagem || require('../../../public/logo.png')} 
               style={styles.produtoImagem}
               resizeMode="contain"
             />
@@ -174,28 +200,8 @@ export default function Produto() {
           />
         </View>
 
-        {/* Espaço no final */}
         <View style={styles.espacoFinal} />
       </ScrollView>
-
-      {/* Bottom Tab Navigation */}
-      {/* <View style={styles.bottomTab}>
-        <TouchableOpacity style={styles.tabItem} onPress={() => navigation.navigate('Home')}>
-          <Text style={[styles.tabIcon, styles.tabActive]}>🏠</Text>
-          <Text style={[styles.tabText, styles.tabActive]}>Home</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.tabItem} onPress={() => navigation.navigate('Favoritos')}>
-          <Text style={styles.tabIcon}>❤️</Text>
-          <Text style={styles.tabText}>Favoritos</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.tabItem} onPress={() => navigation.navigate('Perfil')}>
-          <Text style={styles.tabIcon}>👤</Text>
-          <Text style={styles.tabText}>Perfil</Text>
-        </TouchableOpacity>
-      </View>
-    </View> */}
     </View>
   );
 }

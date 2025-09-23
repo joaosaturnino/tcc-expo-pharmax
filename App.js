@@ -1,14 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
-
 import Navegacao from './src/routes';
+import { FavoritosProvider } from './src/screens/Favoritos/FavoritosContext';
 
 export default function App() {
   return (
-
-    <Navegacao />
-    // <StatusBar style="auto" />
-
+    <FavoritosProvider>
+      <Navegacao />
+      <StatusBar style="auto" />
+    </FavoritosProvider>
   );
 }
 
@@ -19,5 +19,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-
 });
