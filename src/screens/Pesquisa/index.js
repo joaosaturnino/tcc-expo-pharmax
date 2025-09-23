@@ -15,7 +15,10 @@ export default function Pesquisa() {
     );
 
     const renderProduto = ({ item }) => (
-        <TouchableOpacity style={styles.produtoCard}>
+        <TouchableOpacity
+            style={styles.produtoCard}
+            onPress={() => navigation.navigate('Produto', { produto: item })}
+        >
             <View style={styles.produtoImagem}>
                 <Text style={styles.produtoImagemTexto}>📦</Text>
             </View>
