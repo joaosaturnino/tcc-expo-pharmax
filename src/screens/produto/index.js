@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, FlatList, Linking } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './styles';
 
 export default function Produto() {
@@ -10,6 +11,7 @@ export default function Produto() {
 
   const [quantidade, setQuantidade] = useState(1);
   const [farmacias, setFarmacias] = useState([]);
+  const [isFavorito, setIsFavorito] = useState(false);
 
   // Dados de exemplo - substitua pela sua API
   useEffect(() => {
@@ -50,6 +52,27 @@ export default function Produto() {
       setFarmacias(farmaciasComProduto);
     }
   }, [produto]);
+
+  useEffect(() => {
+    const verificarFavorito = async () => {
+      const favoritos = await AsyncStorage.getItem('favoritos');
+      if (favoritos) {
+        const lista = JSON.parse(favoritos);
+        setIsFavorito(lista.some(item => item.id === produto.id));
+      }
+    };
+    if (produto) verificarFavorito();
+  }, [produto]);
+
+  const adicionarFavorito = async () => {
+    const favoritos = await AsyncStorage.getItem('favoritos');
+    let lista = favoritos ? JSON.parse(favoritos) : [];
+    if (!lista.some(item => item.id === produto.id)) {
+      lista.push(produto);
+      await AsyncStorage.setItem('favoritos', JSON.stringify(lista));
+      setIsFavorito(true);
+    }
+  };
 
   const aumentarQuantidade = () => {
     setQuantidade(quantidade + 1);
@@ -118,7 +141,12 @@ export default function Produto() {
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Detalhes do Produto</Text>
-        <View style={styles.placeholder} />
+        {/* Botão de coração */}
+        <TouchableOpacity onPress={adicionarFavorito} style={{marginRight: 16}}>
+          <Text style={{fontSize: 24, color: isFavorito ? 'red' : 'gray'}}>
+            {isFavorito ? '❤️' : '🤍'}
+          </Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.content}>

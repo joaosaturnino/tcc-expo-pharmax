@@ -1,79 +1,55 @@
-import { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, FlatList, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { View, Text, FlatList, TouchableOpacity, Image, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 import styles from './styles';
 
 export default function Favoritos() {
     const navigation = useNavigation();
+    const [favoritos, setFavoritos] = useState([]);
 
-    // Dados de exemplo - substitua pelos seus produtos reais
-    const [favoritos, setFavoritos] = useState([
-        {
-            id: '1',
-            nome: 'Paracetamol 500mg',
-            preco: 'R$ 12,90',
-            marca: 'Medley',
-            imagem: require('../../../public/logo.png')
-        },
-        {
-            id: '2',
-            nome: 'Dipirona 500mg',
-            preco: 'R$ 8,50',
-            marca: 'Neo Química',
-            imagem: require('../../../public/logo.png')
-        },
-        {
-            id: '3',
-            nome: 'Omeprazol 20mg',
-            preco: 'R$ 15,75',
-            marca: 'EMS',
-            imagem: require('../../../public/logo.png')
-        },
-        {
-            id: '4',
-            nome: 'Ibuprofeno 400mg',
-            preco: 'R$ 14,90',
-            marca: 'Eurofarma',
-            imagem: require('../../../public/logo.png')
-        },
-        {
-            id: '5',
-            nome: 'Loratadina 10mg',
-            preco: 'R$ 9,90',
-            marca: 'Aché',
-            imagem: require('../../../public/logo.png')
-        }
-    ]);
+    useFocusEffect(
+        React.useCallback(() => {
+            const carregarFavoritos = async () => {
+                const fav = await AsyncStorage.getItem('favoritos');
+                setFavoritos(fav ? JSON.parse(fav) : []);
+            };
+            carregarFavoritos();
+        }, [])
+    );
 
-    const removerFavorito = (id, nome) => {
-        setFavoritos(favoritos.filter(item => item.id !== id));
+    const removerFavorito = async (id, nome) => {
+        const novaLista = favoritos.filter(item => item.id !== id);
+        setFavoritos(novaLista);
+        await AsyncStorage.setItem('favoritos', JSON.stringify(novaLista));
         Alert.alert('Removido', `${nome} foi removido dos favoritos`);
     };
 
     const renderProduto = ({ item }) => (
-        <View style={styles.produtoCard}>
+        <TouchableOpacity
+            style={styles.produtoCard}
+            onPress={() => navigation.navigate('Produto', { produto: item })}
+        >
             <View style={styles.produtoImagem}>
                 <Image
-                    source={item.imagem}
+                    source={item.imagem || require('../../../public/alergia.png')}
                     style={styles.produtoImagem}
                     resizeMode="contain"
                 />
             </View>
-
             <View style={styles.produtoInfo}>
                 <Text style={styles.produtoNome} numberOfLines={2}>{item.nome}</Text>
                 <Text style={styles.produtoMarca}>{item.marca}</Text>
                 <Text style={styles.produtoPreco}>{item.preco}</Text>
             </View>
-
             <TouchableOpacity
                 style={styles.removerButton}
                 onPress={() => removerFavorito(item.id, item.nome)}
             >
                 <Text style={styles.removerIcon}>✕</Text>
             </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
     );
 
     if (favoritos.length === 0) {
@@ -82,7 +58,6 @@ export default function Favoritos() {
                 <View style={styles.header}>
                     <Text style={styles.headerTitle}>Meus Favoritos</Text>
                 </View>
-
                 <View style={styles.vazioContainer}>
                     <Text style={styles.vazioIcon}>❤️</Text>
                     <Text style={styles.vazioTexto}>Nenhum produto favoritado</Text>
@@ -96,12 +71,10 @@ export default function Favoritos() {
 
     return (
         <View style={styles.container}>
-            {/* Header */}
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>Meus Favoritos</Text>
                 <Text style={styles.subtitle}>{favoritos.length} produto(s) salvo(s)</Text>
             </View>
-
             <FlatList
                 data={favoritos}
                 renderItem={renderProduto}
