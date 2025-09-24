@@ -1,90 +1,69 @@
 import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
+import { useRoute, useNavigation } from '@react-navigation/native';
+import styles from './styles';
 
-export default function Laboratorio({ route, navigation }) {
-    const { nome, medicamentos = [] } = route.params;
+export default function Laboratorio() {
+  const route = useRoute();
+  const navigation = useNavigation();
+  const { nome, medicamentos } = route.params;
 
-    // Filtra os medicamentos pelo laboratório selecionado
-    const filtrados = medicamentos.filter(med => med.marca === nome);
+  // Filtrar medicamentos por laboratório (marca)
+  const medicamentosLaboratorio = medicamentos.filter(
+    medicamento => medicamento.marca.toLowerCase().includes(nome.toLowerCase())
+  );
 
-    const renderMedicamento = ({ item }) => (
-        <TouchableOpacity
-            style={styles.card}
-            onPress={() => navigation.navigate('Produto', { produto: item })}
+  const renderMedicamento = ({ item }) => (
+    <TouchableOpacity 
+      style={styles.medicamentoCard}
+      onPress={() => navigation.navigate('Produto', { produto: item })}
+    >
+      <View style={styles.medicamentoImagem}>
+        <Text style={styles.medicamentoImagemTexto}>💊</Text>
+      </View>
+      <View style={styles.medicamentoInfo}>
+        <Text style={styles.medicamentoNome} numberOfLines={2}>{item.nome}</Text>
+        <Text style={styles.medicamentoCategoria}>{item.categoria}</Text>
+        <Text style={styles.medicamentoPreco}>{item.preco}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+
+  return (
+    <View style={styles.container}>
+      {/* Header com nome do laboratório */}
+      <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
         >
-            <View style={styles.imgContainer}>
-                <Image
-                    source={require('../../../public/alergia.png')}
-                    style={styles.img}
-                    resizeMode="contain"
-                />
-            </View>
-            <View style={styles.info}>
-                <Text style={styles.nome}>{item.nome}</Text>
-                <Text style={styles.preco}>{item.preco}</Text>
-            </View>
+          <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
-    );
+        <Text style={styles.headerTitle}>{nome}</Text>
+        <View style={styles.headerRight} />
+      </View>
 
-    return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Medicamentos do laboratório:</Text>
-            <Text style={styles.labName}>{nome}</Text>
-            <FlatList
-                data={filtrados}
-                renderItem={renderMedicamento}
-                keyExtractor={item => item.id}
-                contentContainerStyle={{ padding: 16 }}
-                ListEmptyComponent={
-                    <View style={styles.emptyContainer}>
-                        <Text style={styles.emptyText}>Nenhum medicamento deste laboratório.</Text>
-                    </View>
-                }
-            />
+      {/* Contador de medicamentos */}
+      <View style={styles.contadorContainer}>
+        <Text style={styles.contadorText}>
+          {medicamentosLaboratorio.length} medicamento{medicamentosLaboratorio.length !== 1 ? 's' : ''} encontrado{medicamentosLaboratorio.length !== 1 ? 's' : ''}
+        </Text>
+      </View>
+
+      {/* Lista de medicamentos */}
+      {medicamentosLaboratorio.length > 0 ? (
+        <FlatList
+          data={medicamentosLaboratorio}
+          renderItem={renderMedicamento}
+          keyExtractor={item => item.id}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.medicamentosList}
+        />
+      ) : (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>Nenhum medicamento encontrado para este laboratório</Text>
         </View>
-    );
+      )}
+    </View>
+  );
 }
-
-const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#f8f9fa' },
-    title: { fontSize: 20, fontWeight: 'bold', marginTop: 24, marginHorizontal: 16, color: '#2A7CC7' },
-    labName: { fontSize: 18, fontWeight: 'bold', marginBottom: 16, marginHorizontal: 16, color: '#333' },
-    card: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        borderRadius: 10,
-        padding: 16,
-        marginBottom: 14,
-        shadowColor: '#000',
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-        elevation: 2,
-    },
-    imgContainer: {
-        width: 54,
-        height: 54,
-        borderRadius: 27,
-        backgroundColor: '#eaf1fa',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginRight: 14,
-    },
-    img: {
-        width: 38,
-        height: 38,
-    },
-    info: {
-        flex: 1,
-    },
-    nome: { fontSize: 17, fontWeight: 'bold', color: '#222' },
-    preco: { fontSize: 16, color: '#2A7CC7', marginTop: 4 },
-    emptyContainer: {
-        alignItems: 'center',
-        marginTop: 40,
-    },
-    emptyText: {
-        fontSize: 16,
-        color: '#888',
-    },
-});

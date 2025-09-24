@@ -1,18 +1,20 @@
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import React from 'react';
+import { createStackNavigator } from '@react-navigation/stack';
 
 import Login from '../screens/Login';
 import CadUsuario from '../screens/CadUsuario';
 import EsqSenha from '../screens/EsqSenha';
 import Home from '../screens/Home';
 import Pesquisa from '../screens/Pesquisa';
-import Categoria from '../screens/Categoria'; // <-- Adicione esta linha
-import Produto from '../screens/produto'; // Adicione este import
+import Categoria from '../screens/Categoria';
+import Produto from '../screens/produto';
+import Favoritos from '../screens/Favoritos';
+import Perfil from '../screens/Perfil';
+import Laboratorio from '../screens/laboratorio';
 import BottonTab from "./bottonTab";
 import { Button } from "@react-navigation/elements";
 
-
-
-const Stack = createNativeStackNavigator();
+const Stack = createStackNavigator();
 
 export default function Tab() {
     return (
@@ -52,7 +54,10 @@ export default function Tab() {
                     title: 'Produto',
                 }}
             />
-
+            <Stack.Screen name="Home" component={Home} />
+            <Stack.Screen name="Favoritos" component={Favoritos} />
+            <Stack.Screen name="Perfil" component={Perfil} />
+            <Stack.Screen name="Laboratorio" component={Laboratorio} />
         </Stack.Navigator>
     );
 }

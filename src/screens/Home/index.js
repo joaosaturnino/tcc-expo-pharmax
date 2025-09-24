@@ -3,6 +3,23 @@ import { View, Text, TextInput, TouchableOpacity, FlatList, ScrollView, Image } 
 import { useNavigation } from '@react-navigation/native';
 import styles from './styles';
 
+
+const renderMarca = ({ item }) => (
+  <TouchableOpacity
+    style={styles.marcaCard}
+    onPress={() => navigation.navigate('Laboratorio', { 
+      nome: item.nome, 
+      medicamentos: produtosPromocao 
+    })}
+  >
+    <View style={styles.marcaLogo}>
+      <Text style={styles.marcaLogoTexto}>{item.logo}</Text>
+    </View>
+    <Text style={styles.marcaNome}>{item.nome}</Text>
+  </TouchableOpacity>
+);
+
+
 export default function Home() {
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
