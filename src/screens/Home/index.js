@@ -68,7 +68,10 @@ function handlePesquisar() {
   );
 
   const renderMarca = ({ item }) => (
-    <TouchableOpacity style={styles.marcaCard}>
+    <TouchableOpacity
+      style={styles.marcaCard}
+      onPress={() => navigation.navigate('Laboratorio', { nome: item.nome, medicamentos: produtosPromocao })}
+    >
       <View style={styles.marcaLogo}>
         <Text style={styles.marcaLogoTexto}>{item.logo}</Text>
       </View>
