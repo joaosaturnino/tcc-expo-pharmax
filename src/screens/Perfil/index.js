@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Alert, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, Alert, ScrollView, Image } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 
 import styles from './styles';
 
@@ -8,7 +9,8 @@ export default function Perfil() {
     const [userData, setUserData] = useState({
         nome: 'João Henrique',
         email: 'joao@gmail.com',
-        telefone: '(11) 99999-9999'
+        telefone: '(11) 99999-9999',
+        foto: null // Adicione o campo foto
     });
 
     const handleSave = () => {
@@ -18,6 +20,20 @@ export default function Perfil() {
         }
         setEditing(false);
         Alert.alert('Sucesso', 'Dados salvos com sucesso!');
+        // Aqui você pode salvar userData em AsyncStorage se quiser persistir
+    };
+
+    const trocarFoto = async () => {
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            setUserData({ ...userData, foto: result.assets[0].uri });
+        }
     };
 
     return (
@@ -27,13 +43,22 @@ export default function Perfil() {
             </View>
 
             <View style={styles.profileContainer}>
-                {/* Foto do perfil - simples */}
+                {/* Foto do perfil */}
                 <View style={styles.photoContainer}>
-                    <View style={styles.profilePhoto}>
-                        <Text style={styles.photoText}>
-                            {userData.nome.charAt(0)}
-                        </Text>
-                    </View>
+                    <TouchableOpacity onPress={editing ? trocarFoto : null}>
+                        {userData.foto ? (
+                            <Image
+                                source={{ uri: userData.foto }}
+                                style={styles.profilePhoto}
+                            />
+                        ) : (
+                            <View style={styles.profilePhoto}>
+                                <Text style={styles.photoText}>
+                                    {userData.nome.charAt(0)}
+                                </Text>
+                            </View>
+                        )}
+                    </TouchableOpacity>
                 </View>
 
                 {/* Formulário de dados */}

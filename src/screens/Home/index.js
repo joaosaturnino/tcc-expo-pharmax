@@ -18,12 +18,12 @@ export default function Home() {
   ];
 
   const produtosPromocao = [
-    { id: '1', nome: 'Paracetamol', preco: 'R$ 15,00', marca: 'Medley' },
-    { id: '2', nome: 'Dipirona', preco: 'R$ 12,50', marca: 'Neo Química' },
-    { id: '3', nome: 'Omeprazol', preco: 'R$ 18,90', marca: 'EMS' },
-    { id: '4', nome: 'Ibuprofeno', preco: 'R$ 14,75', marca: 'Eurofarma' },
-    { id: '5', nome: 'Loratadina', preco: 'R$ 9,90', marca: 'Aché' },
-    { id: '6', nome: 'Amoxilina', preco: 'R$ 22,00', marca: 'Novartis' },
+    { id: '1', nome: 'Paracetamol', preco: 'R$ 15,00', marca: 'Medley', categoria: 'Analgésicos' },
+    { id: '2', nome: 'Dipirona', preco: 'R$ 12,50', marca: 'Neo Química', categoria: 'Analgésicos' },
+    { id: '3', nome: 'Omeprazol', preco: 'R$ 18,90', marca: 'EMS', categoria: 'Vitaminas' },
+    { id: '4', nome: 'Ibuprofeno', preco: 'R$ 14,75', marca: 'Eurofarma', categoria: 'Analgésicos' },
+    { id: '5', nome: 'Loratadina', preco: 'R$ 9,90', marca: 'Aché', categoria: 'Antialérgicos' },
+    { id: '6', nome: 'Amoxilina', preco: 'R$ 22,00', marca: 'Novartis', categoria: 'Antibióticos' },
   ];
 
   const marcas = [
@@ -37,7 +37,7 @@ export default function Home() {
   const renderCategoria = ({ item }) => (
     <TouchableOpacity
       style={styles.categoriaItem}
-      onPress={() => navigation.navigate('Categoria', { nome: item.nome })}
+      onPress={() => navigation.navigate('Categoria', { nome: item.nome, medicamentos: produtosPromocao })}
     >
       <Image source={item.imagem} style={styles.categoriaIcon} resizeMode="contain" />
       <Text style={styles.categoriaNome}>{item.nome}</Text>
