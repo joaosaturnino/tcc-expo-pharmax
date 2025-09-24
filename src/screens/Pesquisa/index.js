@@ -1,7 +1,16 @@
 import { useState } from 'react';
-import { View, Text, TextInput, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, FlatList, TouchableOpacity, Image } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import styles from './styles';
+
+// Exemplo de medicamentos
+const produtosPromocao = [
+  { id: '1', nome: 'Paracetamol', preco: 'R$ 15,00', marca: 'Medley', categoria: 'Analgésicos', descricao: 'Analgésico para dor e febre.' },
+  { id: '2', nome: 'Dipirona', preco: 'R$ 12,50', marca: 'Neo Química', categoria: 'Analgésicos', descricao: 'Alívio de dores e febre.' },
+  { id: '3', nome: 'Loratadina', preco: 'R$ 9,90', marca: 'Aché', categoria: 'Antialérgicos', descricao: 'Antialérgico para rinite e alergias.' },
+  { id: '4', nome: 'Amoxilina', preco: 'R$ 22,00', marca: 'Novartis', categoria: 'Antibióticos', descricao: 'Antibiótico para infecções.' },
+  { id: '5', nome: 'Vitamina C', preco: 'R$ 8,50', marca: 'EMS', categoria: 'Vitaminas', descricao: 'Suplemento de vitamina C.' },
+];
 
 export default function Pesquisa() {
     const navigation = useNavigation();
@@ -27,6 +36,26 @@ export default function Pesquisa() {
             <Text style={styles.produtoPreco}>{item.preco}</Text>
         </TouchableOpacity>
     );
+
+    // Adicione este renderCategoria na Home
+    const renderCategoria = ({ item }) => {
+      // Filtra o primeiro medicamento da categoria
+      const produto = produtosPromocao.find(prod => prod.categoria === item.nome);
+
+      return (
+        <TouchableOpacity
+          style={styles.categoriaItem}
+          onPress={() => {
+            if (produto) {
+              navigation.navigate('Produto', { produto });
+            }
+          }}
+        >
+          <Image source={item.imagem} style={styles.categoriaIcon} resizeMode="contain" />
+          <Text style={styles.categoriaNome}>{item.nome}</Text>
+        </TouchableOpacity>
+      );
+    };
 
     return (
         <View style={styles.container}>
@@ -57,6 +86,18 @@ export default function Pesquisa() {
                     placeholderTextColor="#999"
                     value={searchText}
                     onChangeText={setSearchText}
+                />
+            </View>
+
+            {/* Categorias - Adicionado na tela de pesquisa */}
+            <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Categorias</Text>
+                <FlatList
+                    data={categorias}
+                    renderItem={renderCategoria}
+                    keyExtractor={item => item.id}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
                 />
             </View>
 
