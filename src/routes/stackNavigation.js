@@ -11,6 +11,7 @@ import Produto from '../screens/produto';
 import Favoritos from '../screens/Favoritos';
 import Perfil from '../screens/Perfil';
 import Laboratorio from '../screens/laboratorio';
+import Farmacia from '../screens/farmacia';
 import BottonTab from "./bottonTab";
 import { Button } from "@react-navigation/elements";
 
@@ -58,6 +59,8 @@ export default function Tab() {
             <Stack.Screen name="Favoritos" component={Favoritos} />
             <Stack.Screen name="Perfil" component={Perfil} />
             <Stack.Screen name="Laboratorio" component={Laboratorio} />
+            <Stack.Screen name="Farmacia" component={Farmacia} />
+            
         </Stack.Navigator>
     );
 }

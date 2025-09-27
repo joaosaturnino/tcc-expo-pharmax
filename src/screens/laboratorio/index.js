@@ -3,17 +3,23 @@ import { View, Text, FlatList, TouchableOpacity } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import styles from './styles';
 
-export default function Laboratorio() {
+export default function BaseLista() {
   const route = useRoute();
   const navigation = useNavigation();
-  const { nome, medicamentos } = route.params;
+  // Recebe nome (ex: laboratório, farmácia, categoria) e lista de medicamentos
+  const { nome, medicamentos, tipo = 'item' } = route.params;
 
-  // Filtrar medicamentos por laboratório (marca)
-  const medicamentosLaboratorio = medicamentos.filter(
-    medicamento => medicamento.marca.toLowerCase().includes(nome.toLowerCase())
+  // Exemplo de filtro genérico (ajuste conforme o tipo)
+  const itensFiltrados = medicamentos.filter(
+    item => {
+      if (tipo === 'laboratorio') return item.marca?.toLowerCase().includes(nome.toLowerCase());
+      if (tipo === 'farmacia') return item.farmacia?.toLowerCase().includes(nome.toLowerCase());
+      if (tipo === 'categoria') return item.categoria?.toLowerCase().includes(nome.toLowerCase());
+      return true;
+    }
   );
 
-  const renderMedicamento = ({ item }) => (
+  const renderItem = ({ item }) => (
     <TouchableOpacity 
       style={styles.medicamentoCard}
       onPress={() => navigation.navigate('Produto', { produto: item })}
@@ -31,25 +37,28 @@ export default function Laboratorio() {
 
   return (
     <View style={styles.container}>
-      {/* Contador de medicamentos */}
-      <View style={styles.contadorContainer}>
-        <Text style={styles.contadorText}>
-          {medicamentosLaboratorio.length} medicamento{medicamentosLaboratorio.length !== 1 ? 's' : ''} encontrado{medicamentosLaboratorio.length !== 1 ? 's' : ''}
-        </Text>
+      {/* Banner/Perfil do Laboratório */}
+      <View style={styles.bannerContainer}>
+        <Text style={styles.bannerIcon}>🏭</Text>
+        <Text style={styles.bannerNome}>{nome}</Text>
       </View>
 
-      {/* Lista de medicamentos */}
-      {medicamentosLaboratorio.length > 0 ? (
+      <View style={styles.contadorContainer}>
+        <Text style={styles.contadorText}>
+          {itensFiltrados.length} {tipo}{itensFiltrados.length !== 1 ? 's' : ''} encontrado{itensFiltrados.length !== 1 ? 's' : ''}
+        </Text>
+      </View>
+      {itensFiltrados.length > 0 ? (
         <FlatList
-          data={medicamentosLaboratorio}
-          renderItem={renderMedicamento}
+          data={itensFiltrados}
+          renderItem={renderItem}
           keyExtractor={item => item.id}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.medicamentosList}
         />
       ) : (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>Nenhum medicamento encontrado para este laboratório</Text>
+          <Text style={styles.emptyText}>Nenhum {tipo} encontrado</Text>
         </View>
       )}
     </View>

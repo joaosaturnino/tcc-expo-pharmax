@@ -99,7 +99,7 @@ function handlePesquisar() {
    const renderFarmacia = ({ item }) => (
     <TouchableOpacity
       style={styles.marcaCard}
-      onPress={() => navigation.navigate('Laboratorio', { nome: item.nome, medicamentos: produtosPromocao })}
+      onPress={() => navigation.navigate('Farmacia', { nome: item.nome, medicamentos: produtosPromocao })}
     >
       <View style={styles.marcaLogo}>
         <Text style={styles.marcaLogoTexto}>{item.logo}</Text>

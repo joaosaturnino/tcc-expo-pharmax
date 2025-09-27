@@ -76,6 +76,26 @@ const styles = StyleSheet.create({
         color: '#7f8c8d',
         textAlign: 'center',
     },
+    bannerContainer: {
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        paddingBottom: 16,
+        paddingTop: 24,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+    },
+    bannerImagem: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        marginBottom: 8,
+        backgroundColor: '#eaf1fa',
+    },
+    bannerNome: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: '#2c3e50',
+    },
 });
 
 export default styles;

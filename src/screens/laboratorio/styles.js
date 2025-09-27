@@ -101,6 +101,23 @@ const styles = StyleSheet.create({
         color: '#7f8c8d',
         textAlign: 'center',
     },
+    bannerContainer: {
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        paddingBottom: 16,
+        paddingTop: 24,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+    },
+    bannerIcon: {
+        fontSize: 48,
+        marginBottom: 8,
+    },
+    bannerNome: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: '#2c3e50',
+    },
 });
 
 export default styles;

@@ -1,14 +1,14 @@
 import React from 'react';
-import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import styles from './styles';
 
 export default function Farmacia() {
   const route = useRoute();
   const navigation = useNavigation();
-  const { nome, medicamentos } = route.params;
+  const { nome, medicamentos, imagemFarmacia } = route.params;
 
-  // Filtrar medicamentos por farmácia (marca)
+  // Filtrar medicamentos por farmácia
   const medicamentosFarmacia = medicamentos.filter(
     medicamento => medicamento.farmacia?.toLowerCase().includes(nome.toLowerCase())
   );
@@ -31,11 +31,24 @@ export default function Farmacia() {
 
   return (
     <View style={styles.container}>
+      {/* Banner/Perfil da Farmácia */}
+      <View style={styles.bannerContainer}>
+        <Image
+          source={imagemFarmacia || require('../../../public/cimed.png')}
+          style={styles.bannerImagem}
+          resizeMode="cover"
+        />
+        <Text style={styles.bannerNome}>{nome}</Text>
+      </View>
+
+      {/* Contador de medicamentos */}
       <View style={styles.contadorContainer}>
         <Text style={styles.contadorText}>
           {medicamentosFarmacia.length} medicamento{medicamentosFarmacia.length !== 1 ? 's' : ''} encontrado{medicamentosFarmacia.length !== 1 ? 's' : ''}
         </Text>
       </View>
+
+      {/* Lista de medicamentos */}
       {medicamentosFarmacia.length > 0 ? (
         <FlatList
           data={medicamentosFarmacia}
