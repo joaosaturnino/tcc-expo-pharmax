@@ -3,14 +3,14 @@ import { View, Text, FlatList, TouchableOpacity } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import styles from './styles';
 
-export default function Laboratorio() {
+export default function Farmacia() {
   const route = useRoute();
   const navigation = useNavigation();
   const { nome, medicamentos } = route.params;
 
-  // Filtrar medicamentos por laboratório (marca)
-  const medicamentosLaboratorio = medicamentos.filter(
-    medicamento => medicamento.marca.toLowerCase().includes(nome.toLowerCase())
+  // Filtrar medicamentos por farmácia (marca)
+  const medicamentosFarmacia = medicamentos.filter(
+    medicamento => medicamento.farmacia?.toLowerCase().includes(nome.toLowerCase())
   );
 
   const renderMedicamento = ({ item }) => (
@@ -31,17 +31,14 @@ export default function Laboratorio() {
 
   return (
     <View style={styles.container}>
-      {/* Contador de medicamentos */}
       <View style={styles.contadorContainer}>
         <Text style={styles.contadorText}>
-          {medicamentosLaboratorio.length} medicamento{medicamentosLaboratorio.length !== 1 ? 's' : ''} encontrado{medicamentosLaboratorio.length !== 1 ? 's' : ''}
+          {medicamentosFarmacia.length} medicamento{medicamentosFarmacia.length !== 1 ? 's' : ''} encontrado{medicamentosFarmacia.length !== 1 ? 's' : ''}
         </Text>
       </View>
-
-      {/* Lista de medicamentos */}
-      {medicamentosLaboratorio.length > 0 ? (
+      {medicamentosFarmacia.length > 0 ? (
         <FlatList
-          data={medicamentosLaboratorio}
+          data={medicamentosFarmacia}
           renderItem={renderMedicamento}
           keyExtractor={item => item.id}
           showsVerticalScrollIndicator={false}
@@ -49,7 +46,7 @@ export default function Laboratorio() {
         />
       ) : (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>Nenhum medicamento encontrado para este laboratório</Text>
+          <Text style={styles.emptyText}>Nenhum medicamento encontrado para esta farmácia</Text>
         </View>
       )}
     </View>

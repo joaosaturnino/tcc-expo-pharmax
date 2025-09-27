@@ -84,7 +84,19 @@ function handlePesquisar() {
   </TouchableOpacity>
   );
 
-  const renderMarca = ({ item }) => (
+  const renderLaboratorio = ({ item }) => (
+    <TouchableOpacity
+      style={styles.marcaCard}
+      onPress={() => navigation.navigate('Laboratorio', { nome: item.nome, medicamentos: produtosPromocao })}
+    >
+      <View style={styles.marcaLogo}>
+        <Text style={styles.marcaLogoTexto}>{item.logo}</Text>
+      </View>
+      <Text style={styles.marcaNome}>{item.nome}</Text>
+    </TouchableOpacity>
+  );
+
+   const renderFarmacia = ({ item }) => (
     <TouchableOpacity
       style={styles.marcaCard}
       onPress={() => navigation.navigate('Laboratorio', { nome: item.nome, medicamentos: produtosPromocao })}
@@ -161,12 +173,25 @@ function handlePesquisar() {
           />
         </View>
 
-        {/* Marcas Populares */}
+        {/* laboratorios Populares */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Laboratórios Populares</Text>
           <FlatList
             data={marcas}
-            renderItem={renderMarca}
+            renderItem={renderLaboratorio}
+            keyExtractor={item => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.marcasList}
+          />
+        </View>
+        {/* farmacias Populares */}
+
+         <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Farmácias Populares</Text>
+          <FlatList
+            data={marcas}
+            renderItem={renderFarmacia}
             keyExtractor={item => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}

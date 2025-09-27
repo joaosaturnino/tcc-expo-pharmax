@@ -135,19 +135,7 @@ export default function Produto() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Text style={styles.backButtonText}>←</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Detalhes do Produto</Text>
-        {/* Botão de coração */}
-        <TouchableOpacity onPress={adicionarFavorito} style={{marginRight: 16}}>
-          <Text style={{fontSize: 24, color: isFavorito ? 'red' : 'gray'}}>
-            {isFavorito ? '❤️' : '🤍'}
-          </Text>
-        </TouchableOpacity>
-      </View>
+      {/* Removido o header com "Detalhes do Produto" */}
 
       <ScrollView style={styles.content}>
         {/* Imagem e Informações Básicas */}
@@ -161,7 +149,14 @@ export default function Produto() {
           </View>
           
           <View style={styles.produtoInfoBasica}>
-            <Text style={styles.produtoNome}>{produto.nome}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Text style={styles.produtoNome}>{produto.nome}</Text>
+              <TouchableOpacity onPress={adicionarFavorito} style={{ marginLeft: 12 }}>
+                <Text style={{ fontSize: 24, color: isFavorito ? 'red' : 'gray' }}>
+                  {isFavorito ? '❤️' : '🤍'}
+                </Text>
+              </TouchableOpacity>
+            </View>
             <Text style={styles.produtoMarca}>{produto.marca}</Text>
             <Text style={styles.produtoCategoria}>{produto.categoria || 'Medicamento'}</Text>
           </View>
@@ -199,31 +194,11 @@ export default function Produto() {
             renderItem={renderFarmacia}
             keyExtractor={item => item.id}
             scrollEnabled={false}
-          />
+            />
         </View>
-
-        {/* Espaço no final */}
+        {/* Espaço final para evitar corte */}
         <View style={styles.espacoFinal} />
       </ScrollView>
-
-      {/* Bottom Tab Navigation */}
-      {/* <View style={styles.bottomTab}>
-        <TouchableOpacity style={styles.tabItem} onPress={() => navigation.navigate('Home')}>
-          <Text style={[styles.tabIcon, styles.tabActive]}>🏠</Text>
-          <Text style={[styles.tabText, styles.tabActive]}>Home</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.tabItem} onPress={() => navigation.navigate('Favoritos')}>
-          <Text style={styles.tabIcon}>❤️</Text>
-          <Text style={styles.tabText}>Favoritos</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity style={styles.tabItem} onPress={() => navigation.navigate('Perfil')}>
-          <Text style={styles.tabIcon}>👤</Text>
-          <Text style={styles.tabText}>Perfil</Text>
-        </TouchableOpacity>
-      </View>
-    </View> */}
     </View>
   );
 }
