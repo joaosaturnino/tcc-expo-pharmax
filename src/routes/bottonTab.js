@@ -24,7 +24,7 @@ export default function BottomTab() {
                     
                     return <Ionicons name={iconName} size={size} color={color} />;
                 },
-                tabBarActiveTintColor: '#2A7CC7', // Azul do PharmaX
+                tabBarActiveTintColor: '#A2CD5A', // Azul do PharmaX
                 tabBarInactiveTintColor: '#888',
                 tabBarStyle: {
                     backgroundColor: 'white',

@@ -5,24 +5,24 @@ const { width } = Dimensions.get('window');
 export default StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f8f9fa',
+        backgroundColor: '#EEE9E9',
     },
     header: {
         paddingTop: 50,
-        paddingHorizontal: 16,
-        paddingBottom: 10,
-        backgroundColor: '#fff',
+        paddingHorizontal: 10,
+        paddingBottom: 15,
+        backgroundColor: '#EEE9E9',
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
     },
     headerTitle: {
-        fontSize: 24,
+        fontSize: 27,
         fontWeight: 'bold',
         color: '#2c3e50',
         textAlign: 'center',
     },
     subtitle: {
-        fontSize: 14,
+        fontSize: 15,
         color: '#7f8c8d',
         textAlign: 'center',
         marginTop: 5,
@@ -72,7 +72,7 @@ export default StyleSheet.create({
     produtoPreco: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#27ae60',
+        color: '#458B00',
     },
     removerButton: {
         width: 40,

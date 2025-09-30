@@ -1,13 +1,12 @@
 import React from 'react';
-import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import styles from './styles';
 
 export default function BaseLista() {
   const route = useRoute();
   const navigation = useNavigation();
-  // Recebe nome (ex: laboratório, farmácia, categoria) e lista de medicamentos
-  const { nome, medicamentos, tipo = 'item' } = route.params;
+  const { nome, medicamentos, tipo = 'item', imagemLaboratorio } = route.params;
 
   // Exemplo de filtro genérico (ajuste conforme o tipo)
   const itensFiltrados = medicamentos.filter(
@@ -22,7 +21,13 @@ export default function BaseLista() {
   const renderItem = ({ item }) => (
     <TouchableOpacity 
       style={styles.medicamentoCard}
-      onPress={() => navigation.navigate('Produto', { produto: item })}
+      onPress={() => {
+        if (tipo === 'laboratorio') {
+          navigation.navigate('Laboratorio', { nome: item.nome, medicamentos: produtosPromocao, imagemLaboratorio: item.banner });
+        } else {
+          navigation.navigate('Produto', { produto: item });
+        }
+      }}
     >
       <View style={styles.medicamentoImagem}>
         <Text style={styles.medicamentoImagemTexto}>💊</Text>
@@ -39,7 +44,11 @@ export default function BaseLista() {
     <View style={styles.container}>
       {/* Banner/Perfil do Laboratório */}
       <View style={styles.bannerContainer}>
-        <Text style={styles.bannerIcon}>🏭</Text>
+        <Image
+          source={imagemLaboratorio || require('../../../public/cimed.png')}
+          style={styles.bannerImagem}
+          resizeMode="cover"
+        />
         <Text style={styles.bannerNome}>{nome}</Text>
       </View>
 

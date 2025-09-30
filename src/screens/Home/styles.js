@@ -5,13 +5,13 @@ const { width } = Dimensions.get('window');
 export default StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f8f9fa',
+        backgroundColor: '#EEE9E9',
     },
     header: {
         paddingTop: 0,           // diminuído para aproximar do topo
         paddingHorizontal: 16,
         paddingBottom: 0,         // diminuído para aproximar da barra de pesquisa
-        backgroundColor: '#fff',
+        backgroundColor: '#EEE9E9',
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
     },
@@ -23,7 +23,7 @@ export default StyleSheet.create({
     },
     searchContainer: {
         padding: 16,
-        backgroundColor: '#fff',
+        backgroundColor: '#EEE9E9',
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
     },
@@ -52,7 +52,7 @@ export default StyleSheet.create({
     },
     verTudo: {
         fontSize: 14,
-        color: '#3498db',
+        color: '#006400',
         fontWeight: '500',
     },
     categoriasList: {
@@ -119,7 +119,7 @@ export default StyleSheet.create({
     produtoPreco: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#27ae60',
+        color: '#458B00',
     },
     marcasList: {
         paddingBottom: 15,
@@ -132,11 +132,17 @@ export default StyleSheet.create({
     marcaLogo: {
         width: 60,
         height: 60,
-        backgroundColor: '#3498db',
+        backgroundColor: '#3A5FCD',
         borderRadius: 30,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 8,
+        marginBottom: 6,
+    },
+    marcaLogoImagem: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: '#fff',
     },
     marcaLogoTexto: {
         fontSize: 20,
@@ -145,7 +151,7 @@ export default StyleSheet.create({
     },
     marcaNome: {
         fontSize: 12,
-        color: '#2c3e50',
+        color: '#000',
         fontWeight: '500',
         textAlign: 'center',
     },
@@ -158,5 +164,31 @@ export default StyleSheet.create({
         resizeMode: 'contain',
         alignSelf: 'center',
         marginBottom: 0,
+    },
+    bannerFarmaciaCard: {
+        width: 200,
+        height: 110,
+        marginRight: 16,
+        borderRadius: 12,
+        overflow: 'hidden',
+        backgroundColor: '#fff',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        shadowColor: '#000',
+        shadowOpacity: 0.08,
+        shadowRadius: 4,
+        elevation: 2,
+    },
+    bannerFarmaciaImagem: {
+        width: '100%',
+        height: 80,
+        borderTopLeftRadius: 12,
+        borderTopRightRadius: 12,
+    },
+    bannerFarmaciaNome: {
+        fontSize: 15,
+        fontWeight: 'bold',
+        color: '#2c3e50',
+        marginVertical: 6,
     },
 });

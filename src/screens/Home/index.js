@@ -44,10 +44,29 @@ export default function Home() {
   ];
 
   const marcas = [
-    { id: '1', nome: 'Cimed', logo: 'P' },
-    { id: '2', nome: 'EuroPharma', logo: 'G' },
-    { id: '3', nome: 'NeoQuímica', logo: 'Z' },
-    { id: '4', nome: 'Generico', logo: 'H' },
+    { id: '1', nome: 'Cimed', logo: require('../../../public/cimed.png') },
+    { id: '2', nome: 'EuroPharma', logo: require('../../../public/europharma.png') },
+    { id: '3', nome: 'Ems', logo: require('../../../public/ems.png') },
+    { id: '4', nome: 'Medley', logo: require('../../../public/medley.png') },
+  ];
+
+  const farmaciasPopulares = [
+    {
+      id: '1',
+      nome: 'Drogasil',
+      banner: require('../../../public/drogasil.png'),
+    },
+    {
+      id: '2',
+      nome: 'Pague Menos',
+      banner: require('../../../public/paguemenos.png'),
+    },
+    {
+      id: '3',
+      nome: 'Drogaria São Paulo',
+      banner: require('../../../public/drogariasaopaulo.png'),
+    },
+    // Adicione mais farmácias conforme desejar
   ];
 
   // Ao clicar na categoria, navega para a tela Categoria passando o nome
@@ -87,10 +106,10 @@ function handlePesquisar() {
   const renderLaboratorio = ({ item }) => (
     <TouchableOpacity
       style={styles.marcaCard}
-      onPress={() => navigation.navigate('Laboratorio', { nome: item.nome, medicamentos: produtosPromocao })}
+      onPress={() => navigation.navigate('Laboratorio', { nome: item.nome, medicamentos: produtosPromocao, imagemLaboratorio: item.logo })}
     >
       <View style={styles.marcaLogo}>
-        <Text style={styles.marcaLogoTexto}>{item.logo}</Text>
+        <Image source={item.logo} style={styles.marcaLogoImagem} resizeMode="contain" />
       </View>
       <Text style={styles.marcaNome}>{item.nome}</Text>
     </TouchableOpacity>
@@ -105,6 +124,16 @@ function handlePesquisar() {
         <Text style={styles.marcaLogoTexto}>{item.logo}</Text>
       </View>
       <Text style={styles.marcaNome}>{item.nome}</Text>
+    </TouchableOpacity>
+  );
+
+  const renderBannerFarmacia = ({ item }) => (
+    <TouchableOpacity
+      style={styles.bannerFarmaciaCard}
+      onPress={() => navigation.navigate('Farmacia', { nome: item.nome, medicamentos: produtosPromocao, imagemFarmacia: item.banner })}
+    >
+      <Image source={item.banner} style={styles.bannerFarmaciaImagem} resizeMode="cover" />
+      <Text style={styles.bannerFarmaciaNome}>{item.nome}</Text>
     </TouchableOpacity>
   );
 
@@ -172,26 +201,26 @@ function handlePesquisar() {
             contentContainerStyle={styles.produtosList}
           />
         </View>
+        {/* farmacias Populares */}
 
-        {/* laboratorios Populares */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Laboratórios Populares</Text>
+         <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Farmácias Populares</Text>
           <FlatList
-            data={marcas}
-            renderItem={renderLaboratorio}
+            data={farmaciasPopulares}
+            renderItem={renderBannerFarmacia}
             keyExtractor={item => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.marcasList}
           />
         </View>
-        {/* farmacias Populares */}
 
-         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Farmácias Populares</Text>
+                {/* laboratorios Populares */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Laboratórios Populares</Text>
           <FlatList
             data={marcas}
-            renderItem={renderFarmacia}
+            renderItem={renderLaboratorio}
             keyExtractor={item => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
