@@ -15,7 +15,7 @@ export default function Home() {
     { id: '4', nome: 'Antibióticos', imagem: require('../../../public/antibiotico.png') },
   ];
 
-  // Produtos com imagens - ADICIONE A IMAGEM EM CADA PRODUTO
+  // Produtos com imagens
   const produtosPromocao = [
     { 
       id: '1', 
@@ -23,7 +23,7 @@ export default function Home() {
       preco: 'R$ 15,00', 
       marca: 'Medley', 
       categoria: 'Analgésicos',
-      imagem: require('../../../public/paracetamol.png') // Adicione a imagem
+      imagem: require('../../../public/paracetamol.png')
     },
     { 
       id: '2', 
@@ -31,7 +31,7 @@ export default function Home() {
       preco: 'R$ 12,50', 
       marca: 'Neo Química', 
       categoria: 'Analgésicos',
-      imagem: require('../../../public/dipirona.png') // Adicione a imagem
+      imagem: require('../../../public/dipirona.png')
     },
     { 
       id: '3', 
@@ -39,7 +39,7 @@ export default function Home() {
       preco: 'R$ 18,90', 
       marca: 'EMS', 
       categoria: 'Vitaminas',
-      imagem: require('../../../public/omeprazol.png') // Adicione a imagem
+      imagem: require('../../../public/omeprazol.png')
     },
     { 
       id: '4', 
@@ -47,7 +47,7 @@ export default function Home() {
       preco: 'R$ 14,75', 
       marca: 'Eurofarma', 
       categoria: 'Analgésicos',
-      imagem: require('../../../public/ibuprofeno.png') // Adicione a imagem
+      imagem: require('../../../public/ibuprofeno.png')
     },
     { 
       id: '5', 
@@ -55,7 +55,7 @@ export default function Home() {
       preco: 'R$ 9,90', 
       marca: 'Aché', 
       categoria: 'Antialérgicos',
-      imagem: require('../../../public/loratadina.png') // Adicione a imagem
+      imagem: require('../../../public/loratadina.png')
     },
     { 
       id: '6', 
@@ -63,7 +63,7 @@ export default function Home() {
       preco: 'R$ 22,00', 
       marca: 'Novartis', 
       categoria: 'Antibióticos',
-      imagem: require('../../../public/amoxilina.png') // Adicione a imagem
+      imagem: require('../../../public/amoxilina.png')
     },
   ];
 
@@ -74,21 +74,25 @@ export default function Home() {
     { id: '4', nome: 'Medley', logo: require('../../../public/medley.png') },
   ];
 
+  // Farmácias com imagens diferentes para Home e para tela de Farmácia
   const farmaciasPopulares = [
     {
       id: '1',
       nome: 'Drogasil',
-      banner: require('../../../public/drogasil.png'),
+      banner: require('../../../public/drogasil.png'), // Imagem para card na Home
+      imagemPerfil: require('../../../public/drogasil.png'), // Imagem diferente para tela Farmácia
     },
     {
       id: '2',
       nome: 'Pague Menos',
-      banner: require('../../../public/paguemenos.png'),
+      banner: require('../../../public/paguemenos.png'), // Imagem para card na Home
+      imagemPerfil: require('../../../public/paguemenos.png'), // Imagem diferente para tela Farmácia
     },
     {
       id: '3',
       nome: 'Drogaria São Paulo',
-      banner: require('../../../public/drogariasaopaulo.png'),
+      banner: require('../../../public/drogariasaopaulo.png'), // Imagem para card na Home
+      imagemPerfil: require('../../../public/drogariasaopaulo.png'), // Imagem diferente para tela Farmácia
     },
   ];
 
@@ -103,14 +107,13 @@ export default function Home() {
     </TouchableOpacity>
   );
 
-  // Renderizar Produto - ATUALIZADO PARA USAR IMAGEM
+  // Renderizar Produto
   const renderProduto = ({ item }) => (
     <TouchableOpacity 
       style={styles.produtoCard}
       onPress={() => navigation.navigate('Produto', { produto: item })}
     >
       <View style={styles.produtoImagem}>
-        {/* USANDO IMAGEM REAL EM VEZ DE EMOJI */}
         <Image source={item.imagem} style={styles.produtoImagemReal} resizeMode="contain" />
       </View>
       <Text style={styles.produtoNome} numberOfLines={1}>{item.nome}</Text>
@@ -132,11 +135,15 @@ export default function Home() {
     </TouchableOpacity>
   );
 
-  // Renderizar Banner Farmácia
+  // Renderizar Banner Farmácia - NA HOME
   const renderBannerFarmacia = ({ item }) => (
     <TouchableOpacity
       style={styles.bannerFarmaciaCard}
-      onPress={() => navigation.navigate('Farmacia', { nome: item.nome, medicamentos: produtosPromocao, imagemFarmacia: item.banner })}
+      onPress={() => navigation.navigate('Farmacia', { 
+        nome: item.nome, 
+        medicamentos: produtosPromocao, 
+        imagemFarmacia: item.imagemPerfil // Passa a imagem específica para tela Farmácia
+      })}
     >
       <Image source={item.banner} style={styles.bannerFarmaciaImagem} resizeMode="cover" />
       <Text style={styles.bannerFarmaciaNome}>{item.nome}</Text>

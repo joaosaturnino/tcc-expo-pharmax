@@ -5,7 +5,7 @@ const { width } = Dimensions.get('window');
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#EEE9E9',
   },
   header: {
     backgroundColor: '#2A7CC7',
@@ -44,7 +44,7 @@ export default StyleSheet.create({
   produtoImagemContainer: {
     width: 100,
     height: 100,
-    backgroundColor: '#eef5ff',
+    backgroundColor: '#EEE9E9',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
@@ -82,7 +82,7 @@ export default StyleSheet.create({
     backgroundColor: 'white',
     marginTop: 1,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#EEE9E9',
   },
   quantidadeTitulo: {
     fontSize: 16,
@@ -102,7 +102,7 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   quantidadeBotaoTexto: {
-    color: 'white',
+    color: '#EEE9E9',
     fontSize: 18,
     fontWeight: 'bold',
   },
@@ -114,8 +114,8 @@ export default StyleSheet.create({
   },
   descricaoContainer: {
     padding: 16,
-    backgroundColor: 'white',
-    marginTop: 10,
+    backgroundColor: '#FFF',
+    marginTop: 30,
   },
   secaoTitulo: {
     fontSize: 18,
@@ -130,7 +130,7 @@ export default StyleSheet.create({
   },
   farmaciasContainer: {
     padding: 16,
-    backgroundColor: 'white',
+    backgroundColor: '#EEE9E9',
     marginTop: 10,
   },
   farmaciaCard: {

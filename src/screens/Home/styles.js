@@ -8,9 +8,9 @@ export default StyleSheet.create({
         backgroundColor: '#EEE9E9',
     },
     header: {
-        paddingTop: 0,           // diminuído para aproximar do topo
+        paddingTop: 0,
         paddingHorizontal: 16,
-        paddingBottom: 0,         // diminuído para aproximar da barra de pesquisa
+        paddingBottom: 0,
         backgroundColor: '#EEE9E9',
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
@@ -159,8 +159,8 @@ export default StyleSheet.create({
         height: 30,
     },
     logo: {
-        width: 250,         // ajuste conforme necessário
-        height: 150,         // ajuste conforme necessário
+        width: 250,
+        height: 150,
         resizeMode: 'contain',
         alignSelf: 'center',
         marginBottom: 0,
@@ -196,5 +196,5 @@ export default StyleSheet.create({
         width: 80,
         height: 80,
         borderRadius: 8,
-     },
+    },
 });
