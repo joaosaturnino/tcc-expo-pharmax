@@ -159,11 +159,12 @@ export default StyleSheet.create({
         height: 30,
     },
     logo: {
-        width: 300,         // ajuste conforme necessário
+        width: 250,         // ajuste conforme necessário
         height: 150,         // ajuste conforme necessário
         resizeMode: 'contain',
         alignSelf: 'center',
         marginBottom: 0,
+        marginTop: 10,
     },
     bannerFarmaciaCard: {
         width: 200,
@@ -191,4 +192,9 @@ export default StyleSheet.create({
         color: '#2c3e50',
         marginVertical: 6,
     },
+    produtoImagemReal: {
+        width: 80,
+        height: 80,
+        borderRadius: 8,
+     },
 });

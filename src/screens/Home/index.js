@@ -3,30 +3,11 @@ import { View, Text, TextInput, TouchableOpacity, FlatList, ScrollView, Image } 
 import { useNavigation } from '@react-navigation/native';
 import styles from './styles';
 
-
-const renderMarca = ({ item }) => (
-  <TouchableOpacity
-    style={styles.marcaCard}
-    onPress={() => navigation.navigate('Laboratorio', { 
-      nome: item.nome, 
-      medicamentos: produtosPromocao 
-    })}
-  >
-    <View style={styles.marcaLogo}>
-      <Text style={styles.marcaLogoTexto}>{item.logo}</Text>
-    </View>
-    <Text style={styles.marcaNome}>{item.nome}</Text>
-  </TouchableOpacity>
-);
-
-
 export default function Home() {
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
 
-  
-
-  // Categorias com imagens (ajuste os caminhos conforme sua pasta)
+  // Categorias com imagens
   const categorias = [
     { id: '1', nome: 'Antialérgicos', imagem: require('../../../public/alergia.png') },
     { id: '2', nome: 'Analgésicos', imagem: require('../../../public/dor-de-cabeca.png') },
@@ -34,13 +15,56 @@ export default function Home() {
     { id: '4', nome: 'Antibióticos', imagem: require('../../../public/antibiotico.png') },
   ];
 
+  // Produtos com imagens - ADICIONE A IMAGEM EM CADA PRODUTO
   const produtosPromocao = [
-    { id: '1', nome: 'Paracetamol', preco: 'R$ 15,00', marca: 'Medley', categoria: 'Analgésicos' },
-    { id: '2', nome: 'Dipirona', preco: 'R$ 12,50', marca: 'Neo Química', categoria: 'Analgésicos' },
-    { id: '3', nome: 'Omeprazol', preco: 'R$ 18,90', marca: 'EMS', categoria: 'Vitaminas' },
-    { id: '4', nome: 'Ibuprofeno', preco: 'R$ 14,75', marca: 'Eurofarma', categoria: 'Analgésicos' },
-    { id: '5', nome: 'Loratadina', preco: 'R$ 9,90', marca: 'Aché', categoria: 'Antialérgicos' },
-    { id: '6', nome: 'Amoxilina', preco: 'R$ 22,00', marca: 'Novartis', categoria: 'Antibióticos' },
+    { 
+      id: '1', 
+      nome: 'Paracetamol', 
+      preco: 'R$ 15,00', 
+      marca: 'Medley', 
+      categoria: 'Analgésicos',
+      imagem: require('../../../public/paracetamol.png') // Adicione a imagem
+    },
+    { 
+      id: '2', 
+      nome: 'Dipirona', 
+      preco: 'R$ 12,50', 
+      marca: 'Neo Química', 
+      categoria: 'Analgésicos',
+      imagem: require('../../../public/dipirona.png') // Adicione a imagem
+    },
+    { 
+      id: '3', 
+      nome: 'Omeprazol', 
+      preco: 'R$ 18,90', 
+      marca: 'EMS', 
+      categoria: 'Vitaminas',
+      imagem: require('../../../public/omeprazol.png') // Adicione a imagem
+    },
+    { 
+      id: '4', 
+      nome: 'Ibuprofeno', 
+      preco: 'R$ 14,75', 
+      marca: 'Eurofarma', 
+      categoria: 'Analgésicos',
+      imagem: require('../../../public/ibuprofeno.png') // Adicione a imagem
+    },
+    { 
+      id: '5', 
+      nome: 'Loratadina', 
+      preco: 'R$ 9,90', 
+      marca: 'Aché', 
+      categoria: 'Antialérgicos',
+      imagem: require('../../../public/loratadina.png') // Adicione a imagem
+    },
+    { 
+      id: '6', 
+      nome: 'Amoxilina', 
+      preco: 'R$ 22,00', 
+      marca: 'Novartis', 
+      categoria: 'Antibióticos',
+      imagem: require('../../../public/amoxilina.png') // Adicione a imagem
+    },
   ];
 
   const marcas = [
@@ -66,10 +90,9 @@ export default function Home() {
       nome: 'Drogaria São Paulo',
       banner: require('../../../public/drogariasaopaulo.png'),
     },
-    // Adicione mais farmácias conforme desejar
   ];
 
-  // Ao clicar na categoria, navega para a tela Categoria passando o nome
+  // Renderizar Categoria
   const renderCategoria = ({ item }) => (
     <TouchableOpacity
       style={styles.categoriaItem}
@@ -79,30 +102,24 @@ export default function Home() {
       <Text style={styles.categoriaNome}>{item.nome}</Text>
     </TouchableOpacity>
   );
-function handlePesquisar() {
-  const resultado = produtosPromocao.find(p => 
-    p.nome.toLowerCase().includes(searchText.trim().toLowerCase())
-  );
-  if (resultado) {
-    navigation.navigate('Produto', { produto: resultado });
-  } else {
-    // Exibir alerta ou mensagem de não encontrado
-  }
-}
+
+  // Renderizar Produto - ATUALIZADO PARA USAR IMAGEM
   const renderProduto = ({ item }) => (
-  <TouchableOpacity 
-    style={styles.produtoCard}
-    onPress={() => navigation.navigate('Produto', { produto: item })}
-  >
-    <View style={styles.produtoImagem}>
-      <Text style={styles.produtoImagemTexto}>📦</Text>
-    </View>
-    <Text style={styles.produtoNome} numberOfLines={1}>{item.nome}</Text>
-    <Text style={styles.produtoMarca}>{item.marca}</Text>
-    <Text style={styles.produtoPreco}>{item.preco}</Text>
-  </TouchableOpacity>
+    <TouchableOpacity 
+      style={styles.produtoCard}
+      onPress={() => navigation.navigate('Produto', { produto: item })}
+    >
+      <View style={styles.produtoImagem}>
+        {/* USANDO IMAGEM REAL EM VEZ DE EMOJI */}
+        <Image source={item.imagem} style={styles.produtoImagemReal} resizeMode="contain" />
+      </View>
+      <Text style={styles.produtoNome} numberOfLines={1}>{item.nome}</Text>
+      <Text style={styles.produtoMarca}>{item.marca}</Text>
+      <Text style={styles.produtoPreco}>{item.preco}</Text>
+    </TouchableOpacity>
   );
 
+  // Renderizar Laboratório
   const renderLaboratorio = ({ item }) => (
     <TouchableOpacity
       style={styles.marcaCard}
@@ -115,18 +132,7 @@ function handlePesquisar() {
     </TouchableOpacity>
   );
 
-   const renderFarmacia = ({ item }) => (
-    <TouchableOpacity
-      style={styles.marcaCard}
-      onPress={() => navigation.navigate('Farmacia', { nome: item.nome, medicamentos: produtosPromocao })}
-    >
-      <View style={styles.marcaLogo}>
-        <Text style={styles.marcaLogoTexto}>{item.logo}</Text>
-      </View>
-      <Text style={styles.marcaNome}>{item.nome}</Text>
-    </TouchableOpacity>
-  );
-
+  // Renderizar Banner Farmácia
   const renderBannerFarmacia = ({ item }) => (
     <TouchableOpacity
       style={styles.bannerFarmaciaCard}
@@ -152,7 +158,7 @@ function handlePesquisar() {
       {/* Header */}
       <View style={styles.header}>
         <Image
-          source={require('../../../public/LogoEscrita.png')} // ajuste o caminho conforme sua logo
+          source={require('../../../public/LogoEscrita2.png')}
           style={styles.logo}
         />
       </View>
@@ -201,9 +207,9 @@ function handlePesquisar() {
             contentContainerStyle={styles.produtosList}
           />
         </View>
-        {/* farmacias Populares */}
 
-         <View style={styles.section}>
+        {/* Farmácias Populares */}
+        <View style={styles.section}>
           <Text style={styles.sectionTitle}>Farmácias Populares</Text>
           <FlatList
             data={farmaciasPopulares}
@@ -215,7 +221,7 @@ function handlePesquisar() {
           />
         </View>
 
-                {/* laboratorios Populares */}
+        {/* Laboratórios Populares */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Laboratórios Populares</Text>
           <FlatList
