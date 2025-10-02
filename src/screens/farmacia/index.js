@@ -38,22 +38,6 @@ export default function Farmacia() {
     verificarFavorito();
   }, [nome]);
 
-  const toggleFavorito = async () => {
-    const farmaciasFavoritas = await AsyncStorage.getItem('farmaciasFavoritas');
-    let lista = farmaciasFavoritas ? JSON.parse(farmaciasFavoritas) : [];
-    
-    if (isFavorito) {
-      // Remover dos favoritos
-      lista = lista.filter(item => item.nome !== nome);
-    } else {
-      // Adicionar aos favoritos
-      lista.push({ nome, imagem: imagemFarmacia });
-    }
-    
-    await AsyncStorage.setItem('farmaciasFavoritas', JSON.stringify(lista));
-    setIsFavorito(!isFavorito);
-  };
-
   const renderMedicamento = ({ item }) => (
     <TouchableOpacity 
       style={styles.medicamentoCard}
@@ -90,16 +74,6 @@ export default function Farmacia() {
             resizeMode="cover"
           />
           <View style={styles.bannerOverlay} />
-          
-          {/* Botão Favoritar no canto superior direito */}
-          <TouchableOpacity 
-            style={styles.favoritarButton}
-            onPress={toggleFavorito}
-          >
-            <Text style={styles.favoritarIcon}>
-              {isFavorito ? '❤️' : '🤍'}
-            </Text>
-          </TouchableOpacity>
           
           {/* Container do Perfil sobre o Banner */}
           <View style={styles.perfilContainer}>
