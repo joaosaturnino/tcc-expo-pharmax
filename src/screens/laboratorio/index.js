@@ -19,7 +19,7 @@ export default function BaseLista() {
   );
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={styles.medicamentoCard}
       onPress={() => {
         if (tipo === 'laboratorio') {
@@ -42,7 +42,7 @@ export default function BaseLista() {
 
   return (
     <View style={styles.container}>
-      {/* Banner/Perfil do Laboratório */}
+      {/* Banner do Laboratório */}
       <View style={styles.bannerContainer}>
         <Image
           source={imagemLaboratorio || require('../../../public/cimed.png')}

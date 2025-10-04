@@ -109,20 +109,15 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
     },
-    bannerIcon: {
-        fontSize: 48,
-        marginBottom: 8,
-    },
     bannerNome: {
         fontSize: 22,
         fontWeight: 'bold',
         color: '#2c3e50',
+        marginTop: 8,
     },
     bannerImagem: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-        marginBottom: 8,
+        width: '100%',
+        height: 120,
         backgroundColor: '#eaf1fa',
     },
 });

@@ -21,30 +21,6 @@ const styles = StyleSheet.create({
         ...StyleSheet.absoluteFillObject,
         backgroundColor: 'rgba(0,0,0,0.4)',
     },
-    // Botão Favoritar
-    favoritarButton: {
-        position: 'absolute',
-        top: 50,
-        right: 20,
-        zIndex: 10,
-        backgroundColor: 'rgba(255,255,255,0.9)',
-        borderRadius: 20,
-        width: 40,
-        height: 40,
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5,
-    },
-    favoritarIcon: {
-        fontSize: 20,
-    },
     // Perfil sobre o Banner
     perfilContainer: {
         position: 'absolute',
@@ -56,7 +32,7 @@ const styles = StyleSheet.create({
     perfilImagemWrapper: {
         width: 80,
         height: 80,
-        backgroundColor: '#fff',
+        backgroundColor: 'transparent', // Fundo transparente
         borderRadius: 40,
         justifyContent: 'center',
         alignItems: 'center',
@@ -69,13 +45,12 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 8,
         elevation: 8,
-        borderWidth: 3,
-        borderColor: '#fff',
+        borderWidth: 0, // Sem borda
     },
     perfilImagem: {
-        width: 60,
-        height: 60,
-        borderRadius: 30,
+        width: 80, // Tamanho igual ao wrapper
+        height: 80,
+        borderRadius: 40, // Metade da largura/altura
     },
     favoritosContainer: {
         flexDirection: 'row',
