@@ -1,56 +1,108 @@
 import React, { useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-
+import api from '../../services/api'; 
 import styles from './styles';
 
 export default function Favoritos() {
     const navigation = useNavigation();
     const [favoritos, setFavoritos] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    // Este ID deve ser dinâmico, vindo do estado de login do usuário
+    const USUARIO_ID = 1;
 
     useFocusEffect(
         React.useCallback(() => {
             const carregarFavoritos = async () => {
-                const fav = await AsyncStorage.getItem('favoritos');
-                setFavoritos(fav ? JSON.parse(fav) : []);
+                setLoading(true);
+                try {
+                    // Assumindo que a API já retorna a URL completa no campo med_imagem
+                    const response = await api.get(`/favoritos/usuario/${USUARIO_ID}`);
+
+                    if (response.data.sucesso) {
+                        setFavoritos(response.data.dados);
+                    } else {
+                        Alert.alert('Erro', 'Não foi possível carregar os favoritos.');
+                    }
+                } catch (error) {
+                    const mensagem = error.response?.data?.mensagem || 'Ocorreu um erro. Tente novamente.';
+                    Alert.alert('Erro na Requisição', mensagem);
+                } finally {
+                    setLoading(false);
+                }
             };
             carregarFavoritos();
         }, [])
     );
 
-    const removerFavorito = async (id, nome) => {
-        const novaLista = favoritos.filter(item => item.id !== id);
-        setFavoritos(novaLista);
-        await AsyncStorage.setItem('favoritos', JSON.stringify(novaLista));
-        Alert.alert('Removido', `${nome} foi removido dos favoritos`);
+    const removerFavorito = async (fav_id, farmacia_id, nome) => {
+        try {
+            const response = await api.delete(`/favoritos/${fav_id}`, {
+                data: { farmacia_id: farmacia_id } 
+            });
+
+            if (response.data.sucesso) {
+                const novaLista = favoritos.filter(item => item.fav_id !== fav_id);
+                setFavoritos(novaLista);
+                Alert.alert('Removido', `${nome} foi removido dos favoritos.`);
+            } else {
+                Alert.alert('Erro', response.data.mensagem || 'Não foi possível remover o favorito.');
+            }
+        } catch (error) {
+            const mensagem = error.response?.data?.mensagem || 'Ocorreu um erro ao remover. Tente novamente.';
+            Alert.alert('Erro na Requisição', mensagem);
+        }
     };
 
-    const renderProduto = ({ item }) => (
-        <TouchableOpacity
-            style={styles.produtoCard}
-            onPress={() => navigation.navigate('Produto', { produto: item })}
-        >
-            <View style={styles.produtoImagem}>
-                <Image
-                    source={item.imagem || require('../../../public/alergia.png')}
-                    style={styles.produtoImagem}
-                    resizeMode="contain"
-                />
-            </View>
-            <View style={styles.produtoInfo}>
-                <Text style={styles.produtoNome} numberOfLines={2}>{item.nome}</Text>
-                <Text style={styles.produtoMarca}>{item.marca}</Text>
-                <Text style={styles.produtoPreco}>{item.preco}</Text>
-            </View>
+    // --- FUNÇÃO COM A LÓGICA DA IMAGEM CORRIGIDA ---
+    const renderProduto = ({ item }) => {
+        // CORREÇÃO: A API já envia a URL completa.
+        // Apenas verificamos se a URL existe. Se não, usamos a imagem local padrão.
+        const imageSource = item.med_imagem
+            ? { uri: item.med_imagem } 
+            : require('../../../public/alergia.png');
+
+        return (
             <TouchableOpacity
-                style={styles.removerButton}
-                onPress={() => removerFavorito(item.id, item.nome)}
+                style={styles.produtoCard}
+                onPress={() => navigation.navigate('Produto', { produto: item })}
             >
-                <Text style={styles.removerIcon}>✕</Text>
+                <View style={styles.produtoImagemContainer}>
+                    {/* A imagem agora usa a 'imageSource' corrigida */}
+                    <Image
+                        source={imageSource}
+                        style={styles.produtoImagem}
+                        resizeMode="contain"
+                    />
+                </View>
+                <View style={styles.produtoInfo}>
+                    <Text style={styles.produtoNome} numberOfLines={2}>{item.med_nome}</Text>
+                    <Text style={styles.produtoMarca}>{item.fabricante_nome}</Text>
+                    <Text style={styles.produtoDosagem}>{item.med_dosagem}</Text>
+                </View>
+                <TouchableOpacity
+                    style={styles.removerButton}
+                    onPress={() => removerFavorito(item.fav_id, item.farmacia_id, item.med_nome)}
+                >
+                    <Text style={styles.removerIcon}>✕</Text>
+                </TouchableOpacity>
             </TouchableOpacity>
-        </TouchableOpacity>
-    );
+        );
+    };
+    
+    if (loading) {
+        return (
+             <View style={styles.container}>
+                <View style={styles.header}>
+                    <Text style={styles.headerTitle}>Meus Favoritos</Text>
+                </View>
+                <View style={styles.vazioContainer}>
+                    <Text style={styles.vazioTexto}>Carregando...</Text>
+                </View>
+            </View>
+        );
+    }
 
     if (favoritos.length === 0) {
         return (
@@ -78,7 +130,7 @@ export default function Favoritos() {
             <FlatList
                 data={favoritos}
                 renderItem={renderProduto}
-                keyExtractor={item => item.id}
+                keyExtractor={item => item.fav_id.toString()}
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.listaContainer}
                 ListFooterComponent={<View style={styles.espacoFinal} />}
