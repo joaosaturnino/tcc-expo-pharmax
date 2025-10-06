@@ -1,38 +1,62 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
+
+const { width } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f8f9fa',
+        backgroundColor: '#EEE9E9',
     },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 16,
+    // Banner Grande
+    bannerGrandeContainer: {
+        height: 200,
+        position: 'relative',
         backgroundColor: '#fff',
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
     },
-    backButton: {
-        padding: 8,
-        marginRight: 16,
+    bannerGrandeImagem: {
+        width: '100%',
+        height: '100%',
     },
-    backButtonText: {
-        fontSize: 24,
-        color: '#3498db',
+    bannerOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.4)',
     },
-    headerTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#2c3e50',
-        flex: 1,
+    // Perfil sobre o Banner
+    perfilContainer: {
+        position: 'absolute',
+        bottom: 20,
+        left: 0,
+        right: 0,
+        alignItems: 'center',
     },
-    headerRight: {
-        width: 40,
+    perfilImagemWrapper: {
+        width: 80,
+        height: 80,
+        backgroundColor: '#fff',
+        borderRadius: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 8,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 8,
+        borderWidth: 3,
+        borderColor: '#fff',
     },
+    perfilImagem: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+    },
+    // Contador
     contadorContainer: {
         padding: 16,
-        backgroundColor: '#fff',
+        backgroundColor: '#EEE9E9',
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
     },
@@ -40,6 +64,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#7f8c8d',
     },
+    // Lista de medicamentos
     medicamentosList: {
         padding: 16,
     },
@@ -67,6 +92,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginRight: 16,
     },
+    medicamentoImagemReal: {
+        width: 50,
+        height: 50,
+        borderRadius: 6,
+    },
     medicamentoImagemTexto: {
         fontSize: 24,
     },
@@ -90,6 +120,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#27ae60',
     },
+    // Estados vazios
     emptyContainer: {
         flex: 1,
         justifyContent: 'center',
@@ -100,30 +131,11 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#7f8c8d',
         textAlign: 'center',
+        marginTop: 16,
     },
-    bannerContainer: {
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        paddingBottom: 16,
-        paddingTop: 24,
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
-    },
-    bannerIcon: {
-        fontSize: 48,
-        marginBottom: 8,
-    },
-    bannerNome: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        color: '#2c3e50',
-    },
-    bannerImagem: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-        marginBottom: 8,
-        backgroundColor: '#eaf1fa',
+    // Espaço final
+    espacoFinal: {
+        height: 20,
     },
 });
 
