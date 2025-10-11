@@ -17,51 +17,51 @@ export default function Home() {
 
   // Produtos com imagens
   const produtosPromocao = [
-    { 
-      id: '1', 
-      nome: 'Paracetamol', 
-      preco: 'R$ 15,00', 
-      marca: 'Medley', 
+    {
+      id: '1',
+      nome: 'Paracetamol',
+      preco: 'R$ 15,00',
+      marca: 'Medley',
       categoria: 'Analgésicos',
       imagem: require('../../../public/paracetamol.png')
     },
-    { 
-      id: '2', 
-      nome: 'Dipirona', 
-      preco: 'R$ 12,50', 
-      marca: 'Neo Química', 
+    {
+      id: '2',
+      nome: 'Dipirona',
+      preco: 'R$ 12,50',
+      marca: 'Neo Química',
       categoria: 'Analgésicos',
       imagem: require('../../../public/dipirona.png')
     },
-    { 
-      id: '3', 
-      nome: 'Omeprazol', 
-      preco: 'R$ 18,90', 
-      marca: 'EMS', 
+    {
+      id: '3',
+      nome: 'Omeprazol',
+      preco: 'R$ 18,90',
+      marca: 'EMS',
       categoria: 'Vitaminas',
       imagem: require('../../../public/omeprazol.png')
     },
-    { 
-      id: '4', 
-      nome: 'Ibuprofeno', 
-      preco: 'R$ 14,75', 
-      marca: 'Eurofarma', 
+    {
+      id: '4',
+      nome: 'Ibuprofeno',
+      preco: 'R$ 14,75',
+      marca: 'Eurofarma',
       categoria: 'Analgésicos',
       imagem: require('../../../public/ibuprofeno.png')
     },
-    { 
-      id: '5', 
-      nome: 'Loratadina', 
-      preco: 'R$ 9,90', 
-      marca: 'Aché', 
+    {
+      id: '5',
+      nome: 'Loratadina',
+      preco: 'R$ 9,90',
+      marca: 'Aché',
       categoria: 'Antialérgicos',
       imagem: require('../../../public/loratadina.png')
     },
-    { 
-      id: '6', 
-      nome: 'Amoxilina', 
-      preco: 'R$ 22,00', 
-      marca: 'Novartis', 
+    {
+      id: '6',
+      nome: 'Amoxilina',
+      preco: 'R$ 22,00',
+      marca: 'Novartis',
       categoria: 'Antibióticos',
       imagem: require('../../../public/amoxilina.png')
     },
@@ -109,7 +109,7 @@ export default function Home() {
 
   // Renderizar Produto
   const renderProduto = ({ item }) => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={styles.produtoCard}
       onPress={() => navigation.navigate('Produto', { produto: item })}
     >
@@ -139,9 +139,9 @@ export default function Home() {
   const renderBannerFarmacia = ({ item }) => (
     <TouchableOpacity
       style={styles.bannerFarmaciaCard}
-      onPress={() => navigation.navigate('Farmacia', { 
-        nome: item.nome, 
-        medicamentos: produtosPromocao, 
+      onPress={() => navigation.navigate('Farmacia', {
+        nome: item.nome,
+        medicamentos: produtosPromocao,
         imagemFarmacia: item.imagemPerfil // Passa a imagem específica para tela Farmácia
       })}
     >
