@@ -1,11 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, ScrollView, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import styles from './styles';
+import api from '../../services/api';
 
 export default function Home() {
   const navigation = useNavigation();
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState(''); 
+  const [farmaciasPopulares, setFarmaciasPopulares] = useState([]);
+
+  useEffect(() => { 
+    // Simulação de fetch de farmácias populares
+    fetchFarmaciasPopulares();
+  }, []);
+
+    // console.log(axios);
+
+  async function fetchFarmaciasPopulares() {
+    try {
+      const response = await api.get('/farmacias?qtde=4');
+      setFarmaciasPopulares(response.data.dados);
+    } catch (error) {
+      console.error('Erro ao buscar farmácias populares:', error);
+    }
+  }
+
+  console.log(farmaciasPopulares);
+  
 
   // Categorias com imagens
   const categorias = [
@@ -75,26 +96,23 @@ export default function Home() {
   ];
 
   // Farmácias com imagens diferentes para Home e para tela de Farmácia
-  const farmaciasPopulares = [
-    {
-      id: '1',
-      nome: 'Drogasil',
-      banner: require('../../../public/drogasil.png'), // Imagem para card na Home
-      imagemPerfil: require('../../../public/drogasil.png'), // Imagem diferente para tela Farmácia
-    },
-    {
-      id: '2',
-      nome: 'Pague Menos',
-      banner: require('../../../public/paguemenos.png'), // Imagem para card na Home
-      imagemPerfil: require('../../../public/paguemenos.png'), // Imagem diferente para tela Farmácia
-    },
-    {
-      id: '3',
-      nome: 'Drogaria São Paulo',
-      banner: require('../../../public/drogariasaopaulo.png'), // Imagem para card na Home
-      imagemPerfil: require('../../../public/drogariasaopaulo.png'), // Imagem diferente para tela Farmácia
-    },
-  ];
+  // const farmaciasPopulares = [
+  //   {
+  //     farm_id: '1',
+  //     farm_nome: 'Drogasil',
+  //     farm_logo_url: require('../../../public/drogasil.png'), // Imagem para card na Home
+  //   },
+  //   {
+  //     farm_id: '2',
+  //     farm_nome: 'Pague Menos',
+  //     farm_logo_url: require('../../../public/paguemenos.png'), // Imagem para card na Home
+  //   },
+  //   {
+  //     farm_id: '3',
+  //     farm_nome: 'Drogaria São Paulo',
+  //     farm_logo_url: require('../../../public/drogariasaopaulo.png'), // Imagem para card na Home
+  //   },
+  // ];
 
   // Renderizar Categoria
   const renderCategoria = ({ item }) => (
@@ -136,19 +154,27 @@ export default function Home() {
   );
 
   // Renderizar Banner Farmácia - NA HOME
-  const renderBannerFarmacia = ({ item }) => (
-    <TouchableOpacity
-      style={styles.bannerFarmaciaCard}
-      onPress={() => navigation.navigate('Farmacia', { 
-        nome: item.nome, 
-        medicamentos: produtosPromocao, 
-        imagemFarmacia: item.imagemPerfil // Passa a imagem específica para tela Farmácia
-      })}
-    >
-      <Image source={item.banner} style={styles.bannerFarmaciaImagem} resizeMode="cover" />
-      <Text style={styles.bannerFarmaciaNome}>{item.nome}</Text>
-    </TouchableOpacity>
-  );
+  const renderBannerFarmacia = ({ item }) => {
+    // suporta tanto URL remoto (string) quanto require(...) (number)
+    const imageSource = typeof item.farm_logo_url === 'string'
+      ? { uri: item.farm_logo_url }
+      : item.farm_logo_url;
+
+    return (
+      <TouchableOpacity
+        style={styles.bannerFarmaciaCard}
+        key={item.farm_id || item.id}
+        onPress={() => navigation.navigate('Farmacia', {
+          nome: item.farm_nome,
+          medicamentos: produtosPromocao,
+          imagemFarmacia: item.farm_logo_url // passe a URL cru; a tela Farmacia deve transformar em {uri: ...} ao usar
+        })}
+      >
+        <Image source={imageSource} style={styles.bannerFarmaciaImagem} resizeMode="stretch" />
+        <Text style={styles.bannerFarmaciaNome}>{item.farm_nome}</Text>
+      </TouchableOpacity>
+    );
+  };
 
   // Pesquisa
   function handlePesquisar() {
@@ -221,7 +247,7 @@ export default function Home() {
           <FlatList
             data={farmaciasPopulares}
             renderItem={renderBannerFarmacia}
-            keyExtractor={item => item.id}
+            keyExtractor={item => item.farm_id || item.id || String(item.nome)}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.marcasList}
@@ -234,7 +260,7 @@ export default function Home() {
           <FlatList
             data={marcas}
             renderItem={renderLaboratorio}
-            keyExtractor={item => item.id}
+            keyExtractor={item => item.id || String(item.nome)}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.marcasList}

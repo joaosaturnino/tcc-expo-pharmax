@@ -8,8 +8,8 @@ import styles from './styles';
 export default function Login() {
     const navigation = useNavigation();
 
-    const [email, setEmail] = useState('');
-    const [senha, setSenha] = useState('');
+    const [email, setEmail] = useState('anaclara@email.com');
+    const [senha, setSenha] = useState('123456');
 
     async function Acesso() {
         if (!email || !senha) {
