@@ -9,6 +9,21 @@ export default function Home() {
   const [searchText, setSearchText] = useState(''); 
   const [farmaciasPopulares, setFarmaciasPopulares] = useState([]);
 
+  useEffect(() => {
+  fetchFarmaciasPopulares();
+  }, []);
+
+  async function fetchFarmaciasPopulares() {
+      try {
+        const response = await api.get('/farmacias?qtde=4');
+        setFarmaciasPopulares(response.data.dados);
+      } catch (error) {
+        console.error('Erro ao buscar farmácias populares:', error);
+      } 
+  }
+
+    console.log(farmaciasPopulares);
+
   useEffect(() => { 
     // Simulação de fetch de farmácias populares
     fetchFarmaciasPopulares();
@@ -89,10 +104,10 @@ export default function Home() {
   ];
 
   const marcas = [
-    { id: '1', nome: 'Cimed', logo: require('../../../public/cimed.png') },
-    { id: '2', nome: 'EuroPharma', logo: require('../../../public/europharma.png') },
-    { id: '3', nome: 'Ems', logo: require('../../../public/ems.png') },
-    { id: '4', nome: 'Medley', logo: require('../../../public/medley.png') },
+    { lab_id: '1', lab_nome: 'Cimed', lab_logo: require('../../../public/cimed.png') },
+    { lab_id: '2', lab_nome: 'EuroPharma', lab_logo: require('../../../public/europharma.png') },
+    { lab_id: '3', lab_nome: 'Ems', lab_logo: require('../../../public/ems.png') },
+    { lab_id: '4', Lab_nome: 'Medley', lab_logo: require('../../../public/medley.png') },
   ];
 
   // Farmácias com imagens diferentes para Home e para tela de Farmácia

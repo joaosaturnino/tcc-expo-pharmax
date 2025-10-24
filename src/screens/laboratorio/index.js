@@ -17,6 +17,8 @@ export default function BaseLista() {
       return true;
     }
   );
+  
+  
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
