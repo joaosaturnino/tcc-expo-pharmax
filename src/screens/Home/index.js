@@ -6,30 +6,15 @@ import api from '../../services/api';
 
 export default function Home() {
   const navigation = useNavigation();
-  const [searchText, setSearchText] = useState(''); 
+  const [searchText, setSearchText] = useState('');
   const [farmaciasPopulares, setFarmaciasPopulares] = useState([]);
+  const [laboratorios, setLaboratorios] = useState([]); // novo estado para laboratórios
+  const [loadingLaboratorios, setLoadingLaboratorios] = useState(false); // opcional
 
   useEffect(() => {
-  fetchFarmaciasPopulares();
-  }, []);
-
-  async function fetchFarmaciasPopulares() {
-      try {
-        const response = await api.get('/farmacias?qtde=4');
-        setFarmaciasPopulares(response.data.dados);
-      } catch (error) {
-        console.error('Erro ao buscar farmácias populares:', error);
-      } 
-  }
-
-    console.log(farmaciasPopulares);
-
-  useEffect(() => { 
-    // Simulação de fetch de farmácias populares
     fetchFarmaciasPopulares();
+    fetchLaboratorios();
   }, []);
-
-    // console.log(axios);
 
   async function fetchFarmaciasPopulares() {
     try {
@@ -40,8 +25,37 @@ export default function Home() {
     }
   }
 
-  console.log(farmaciasPopulares);
-  
+  // nova função para buscar laboratórios
+  async function fetchLaboratorios() {
+    try {
+      const response = await api.get('/laboratorios?qtde=4'); // mesma forma que farmacias
+      const dados = response?.data?.dados ?? response?.data ?? [];
+
+      // normaliza para lab_logo_url (igual farmacias usa farm_logo_url)
+      const mapped = Array.isArray(dados)
+        ? dados.map(item => {
+            const url =
+              item.lab_logo_url ??
+              item.logo_url ??
+              item.logo ??
+              item.imagem_url ??
+              // item.imagem ??
+              item.lab_logo ??
+              null;
+
+            return {
+              ...item,
+              lab_logo_url: typeof url === 'string' && url.length ? url : null,
+            };
+          })
+        : [];
+
+      setLaboratorios(mapped);
+    } catch (error) {
+      console.error('Erro ao buscar laboratórios:', error);
+      setLaboratorios([]);
+    }
+  }
 
   // Categorias com imagens
   const categorias = [
@@ -53,51 +67,51 @@ export default function Home() {
 
   // Produtos com imagens
   const produtosPromocao = [
-    { 
-      id: '1', 
-      nome: 'Paracetamol', 
-      preco: 'R$ 15,00', 
-      marca: 'Medley', 
+    {
+      id: '1',
+      nome: 'Paracetamol',
+      preco: 'R$ 15,00',
+      marca: 'Medley',
       categoria: 'Analgésicos',
       imagem: require('../../../public/paracetamol.png')
     },
-    { 
-      id: '2', 
-      nome: 'Dipirona', 
-      preco: 'R$ 12,50', 
-      marca: 'Neo Química', 
+    {
+      id: '2',
+      nome: 'Dipirona',
+      preco: 'R$ 12,50',
+      marca: 'Neo Química',
       categoria: 'Analgésicos',
       imagem: require('../../../public/dipirona.png')
     },
-    { 
-      id: '3', 
-      nome: 'Omeprazol', 
-      preco: 'R$ 18,90', 
-      marca: 'EMS', 
+    {
+      id: '3',
+      nome: 'Omeprazol',
+      preco: 'R$ 18,90',
+      marca: 'EMS',
       categoria: 'Vitaminas',
       imagem: require('../../../public/omeprazol.png')
     },
-    { 
-      id: '4', 
-      nome: 'Ibuprofeno', 
-      preco: 'R$ 14,75', 
-      marca: 'Eurofarma', 
+    {
+      id: '4',
+      nome: 'Ibuprofeno',
+      preco: 'R$ 14,75',
+      marca: 'Eurofarma',
       categoria: 'Analgésicos',
       imagem: require('../../../public/ibuprofeno.png')
     },
-    { 
-      id: '5', 
-      nome: 'Loratadina', 
-      preco: 'R$ 9,90', 
-      marca: 'Aché', 
+    {
+      id: '5',
+      nome: 'Loratadina',
+      preco: 'R$ 9,90',
+      marca: 'Aché',
       categoria: 'Antialérgicos',
       imagem: require('../../../public/loratadina.png')
     },
-    { 
-      id: '6', 
-      nome: 'Amoxilina', 
-      preco: 'R$ 22,00', 
-      marca: 'Novartis', 
+    {
+      id: '6',
+      nome: 'Amoxilina',
+      preco: 'R$ 22,00',
+      marca: 'Novartis',
       categoria: 'Antibióticos',
       imagem: require('../../../public/amoxilina.png')
     },
@@ -107,27 +121,8 @@ export default function Home() {
     { lab_id: '1', lab_nome: 'Cimed', lab_logo: require('../../../public/cimed.png') },
     { lab_id: '2', lab_nome: 'EuroPharma', lab_logo: require('../../../public/europharma.png') },
     { lab_id: '3', lab_nome: 'Ems', lab_logo: require('../../../public/ems.png') },
-    { lab_id: '4', Lab_nome: 'Medley', lab_logo: require('../../../public/medley.png') },
+    { lab_id: '4', lab_nome: 'Medley', lab_logo: require('../../../public/medley.png') },
   ];
-
-  // Farmácias com imagens diferentes para Home e para tela de Farmácia
-  // const farmaciasPopulares = [
-  //   {
-  //     farm_id: '1',
-  //     farm_nome: 'Drogasil',
-  //     farm_logo_url: require('../../../public/drogasil.png'), // Imagem para card na Home
-  //   },
-  //   {
-  //     farm_id: '2',
-  //     farm_nome: 'Pague Menos',
-  //     farm_logo_url: require('../../../public/paguemenos.png'), // Imagem para card na Home
-  //   },
-  //   {
-  //     farm_id: '3',
-  //     farm_nome: 'Drogaria São Paulo',
-  //     farm_logo_url: require('../../../public/drogariasaopaulo.png'), // Imagem para card na Home
-  //   },
-  // ];
 
   // Renderizar Categoria
   const renderCategoria = ({ item }) => (
@@ -142,7 +137,7 @@ export default function Home() {
 
   // Renderizar Produto
   const renderProduto = ({ item }) => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={styles.produtoCard}
       onPress={() => navigation.navigate('Produto', { produto: item })}
     >
@@ -155,22 +150,36 @@ export default function Home() {
     </TouchableOpacity>
   );
 
-  // Renderizar Laboratório
-  const renderLaboratorio = ({ item }) => (
-    <TouchableOpacity
-      style={styles.marcaCard}
-      onPress={() => navigation.navigate('Laboratorio', { nome: item.nome, medicamentos: produtosPromocao, imagemLaboratorio: item.logo })}
-    >
-      <View style={styles.marcaLogo}>
-        <Image source={item.logo} style={styles.marcaLogoImagem} resizeMode="contain" />
-      </View>
-      <Text style={styles.marcaNome}>{item.nome}</Text>
-    </TouchableOpacity>
-  );
+  // Renderizar Laboratório (usa lab_logo_url como farmacias usa farm_logo_url)
+  const renderLaboratorio = ({ item }) => {
+    const imageSource =
+      typeof item.lab_logo_url === 'string' && item.lab_logo_url.startsWith('http')
+        ? { uri: item.lab_logo_url }
+        : // se não houver lab_logo_url, tenta campos locais (require) ou fallback
+          (item.lab_logo && (typeof item.lab_logo === 'string' ? { uri: item.lab_logo_url } : item.lab_logo)) ||
+          require('../../../public/cimed.png');
+
+    return (
+      <TouchableOpacity
+        style={styles.marcaCard}
+        onPress={() =>
+          navigation.navigate('Laboratorio', {
+            nome: item.lab_nome || item.nome,
+            medicamentos: produtosPromocao,
+            imagemLaboratorio: item.lab_logo_url || item.lab_logo,
+          })
+        }
+      >
+        <View style={styles.marcaLogo}>
+          <Image source={imageSource} style={styles.marcaLogoImagem} resizeMode="contain" />
+        </View>
+        <Text style={styles.marcaNome}>{item.lab_nome || item.nome}</Text>
+      </TouchableOpacity>
+    );
+  };
 
   // Renderizar Banner Farmácia - NA HOME
   const renderBannerFarmacia = ({ item }) => {
-    // suporta tanto URL remoto (string) quanto require(...) (number)
     const imageSource = typeof item.farm_logo_url === 'string'
       ? { uri: item.farm_logo_url }
       : item.farm_logo_url;
@@ -182,7 +191,7 @@ export default function Home() {
         onPress={() => navigation.navigate('Farmacia', {
           nome: item.farm_nome,
           medicamentos: produtosPromocao,
-          imagemFarmacia: item.farm_logo_url // passe a URL cru; a tela Farmacia deve transformar em {uri: ...} ao usar
+          imagemFarmacia: item.farm_logo_url
         })}
       >
         <Image source={imageSource} style={styles.bannerFarmaciaImagem} resizeMode="stretch" />
@@ -262,7 +271,7 @@ export default function Home() {
           <FlatList
             data={farmaciasPopulares}
             renderItem={renderBannerFarmacia}
-            keyExtractor={item => item.farm_id || item.id || String(item.nome)}
+            keyExtractor={item => item.farm_id || item.id || String(item.farm_nome)}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.marcasList}
@@ -273,9 +282,9 @@ export default function Home() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Laboratórios Populares</Text>
           <FlatList
-            data={marcas}
+            data={laboratorios.length ? laboratorios : marcas} // usa dados da API com fallback para `marcas`
             renderItem={renderLaboratorio}
-            keyExtractor={item => item.id || String(item.nome)}
+            keyExtractor={item => item.lab_id || item.id || String(item.lab_nome || item.nome)}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.marcasList}
