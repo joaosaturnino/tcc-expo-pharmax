@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, ScrollView, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import styles from './styles';
@@ -10,11 +10,15 @@ export default function Home() {
   const [farmaciasPopulares, setFarmaciasPopulares] = useState([]);
   const [laboratorios, setLaboratorios] = useState([]); // novo estado para laboratórios
   const [loadingLaboratorios, setLoadingLaboratorios] = useState(false); // opcional
+  const [ tipo, setTipo ] = useState(3);
 
   useEffect(() => {
     fetchFarmaciasPopulares();
     fetchLaboratorios();
+
   }, []);
+
+
 
   async function fetchFarmaciasPopulares() {
     try {
@@ -24,6 +28,9 @@ export default function Home() {
       console.error('Erro ao buscar farmácias populares:', error);
     }
   }
+
+
+
 
   // nova função para buscar laboratórios
   async function fetchLaboratorios() {
@@ -128,7 +135,7 @@ export default function Home() {
   const renderCategoria = ({ item }) => (
     <TouchableOpacity
       style={styles.categoriaItem}
-      onPress={() => navigation.navigate('Categoria', { nome: item.nome, medicamentos: produtosPromocao })}
+      onPress={() => navigation.navigate('Categoria', { nome: item.nome, medicamentos: produtosPromocao, tipo:tipo })}
     >
       <Image source={item.imagem} style={styles.categoriaIcon} resizeMode="contain" />
       <Text style={styles.categoriaNome}>{item.nome}</Text>

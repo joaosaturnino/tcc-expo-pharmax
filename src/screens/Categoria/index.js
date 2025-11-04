@@ -1,20 +1,37 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import api from '../../services/api';
 
 export default function Categoria({ route, navigation }) {
-    const { nome, medicamentos = [] } = route.params;
+    const { nome, medicamentos = [] , tipo } = route.params;
 
     // Filtra os medicamentos pela categoria selecionada
     const filtrados = medicamentos.filter(med => med.categoria === nome);
+
+  const [ categoriasSelecionadas, setCategoriasSelecionadas ] = useState([]);
+    useEffect(() => {
+        fetchCategoriasSelecionadas();
+        
+    }, [tipo]);
+    async function  fetchCategoriasSelecionadas(){
+    try {
+        const response = await api.get(`/medicamentos/tipo/${tipo}`)
+        console.log(tipo);
+        
+        setCategoriasSelecionadas(response.data.dados);
+        } catch (error) {
+        console.error('Erro ao buscar categorias:', error);
+        }
+    }
 
     const renderMedicamento = ({ item }) => (
         <TouchableOpacity
             style={styles.card}
             onPress={() => navigation.navigate('Produto', { produto: item })}
         >
-            <Text style={styles.nome}>{item.nome}</Text>
-            <Text style={styles.marca}>{item.marca}</Text>
-            <Text style={styles.preco}>R$ {item.preco}</Text>
+            <Text style={styles.nome}>{item.med_nome}</Text>
+            <Text style={styles.marca}>{item.lab_nome}</Text>
+            <Text style={styles.preco}>R$ {item.medp_preco}</Text>
         </TouchableOpacity>
     );
 
@@ -22,7 +39,7 @@ export default function Categoria({ route, navigation }) {
         <View style={styles.container}>
             <Text style={styles.title}>Categoria: {nome}</Text>
             <FlatList
-                data={filtrados}
+                data={categoriasSelecionadas}
                 renderItem={renderMedicamento}
                 keyExtractor={item => item.id}
                 contentContainerStyle={{ padding: 16 }}
