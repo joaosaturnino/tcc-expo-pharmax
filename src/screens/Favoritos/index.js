@@ -17,7 +17,6 @@ export default function Favoritos() {
             const carregarFavoritos = async () => {
                 setLoading(true);
                 try {
-                    // Assumindo que a API já retorna a URL completa no campo med_imagem
                     const response = await api.get(`/favoritos/usuario/${USUARIO_ID}`);
 
                     if (response.data.sucesso) {
@@ -36,10 +35,12 @@ export default function Favoritos() {
         }, [])
     );
 
-    const removerFavorito = async (fav_id, farmacia_id, nome) => {
+    const removerFavorito = async (fav_id, nome) => {
         try {
+            // --- CORREÇÃO APLICADA ---
+            // Enviando o 'usuario_id' no corpo, conforme a nova lógica do backend.
             const response = await api.delete(`/favoritos/${fav_id}`, {
-                data: { farmacia_id: farmacia_id } 
+                data: { usuario_id: USUARIO_ID } 
             });
 
             if (response.data.sucesso) {
@@ -55,12 +56,12 @@ export default function Favoritos() {
         }
     };
 
-    // --- FUNÇÃO COM A LÓGICA DA IMAGEM CORRIGIDA ---
     const renderProduto = ({ item }) => {
-        // CORREÇÃO: A API já envia a URL completa.
-        // Apenas verificamos se a URL existe. Se não, usamos a imagem local padrão.
-        const imageSource = item.med_imagem
-            ? { uri: item.med_imagem } 
+        
+        // --- CORREÇÃO APLICADA ---
+        // Lendo 'item.med_imagem_url' (enviado pelo backend) em vez de 'item.med_imagem'.
+        const imageSource = item.med_imagem_url
+            ? { uri: item.med_imagem_url } 
             : require('../../../public/alergia.png');
 
         return (
@@ -69,7 +70,6 @@ export default function Favoritos() {
                 onPress={() => navigation.navigate('Produto', { produto: item })}
             >
                 <View style={styles.produtoImagemContainer}>
-                    {/* A imagem agora usa a 'imageSource' corrigida */}
                     <Image
                         source={imageSource}
                         style={styles.produtoImagem}
@@ -83,7 +83,8 @@ export default function Favoritos() {
                 </View>
                 <TouchableOpacity
                     style={styles.removerButton}
-                    onPress={() => removerFavorito(item.fav_id, item.farmacia_id, item.med_nome)}
+                    // Passando os parâmetros corretos (não precisa mais do farmacia_id aqui)
+                    onPress={() => removerFavorito(item.fav_id, item.med_nome)}
                 >
                     <Text style={styles.removerIcon}>✕</Text>
                 </TouchableOpacity>
@@ -138,3 +139,5 @@ export default function Favoritos() {
         </View>
     );
 }
+// --- CORREÇÃO DE SINTAXE APLICADA ---
+// Chave extra removida

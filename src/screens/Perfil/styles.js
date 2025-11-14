@@ -54,6 +54,16 @@ export default StyleSheet.create({
         marginBottom: 20,
         fontSize: 16,
     },
+    // Adicionei este estilo para quando estiver editando (se desejar)
+    inputEditing: { 
+        backgroundColor: '#FFF',
+        borderWidth: 1,
+        borderColor: '#66CD00', // Borda verde para indicar edição
+        borderRadius: 8,
+        padding: 15,
+        marginBottom: 20,
+        fontSize: 16,
+    },
     buttons: {
         marginTop: 20,
     },
@@ -68,6 +78,21 @@ export default StyleSheet.create({
         padding: 15,
         borderRadius: 8,
         alignItems: 'center',
+    },
+    // Estilo para o botão de salvar desabilitado
+    saveButtonDisabled: {
+        backgroundColor: '#A5D6A7', // Verde mais claro
+        padding: 15,
+        borderRadius: 8,
+        alignItems: 'center',
+    },
+    // NOVO ESTILO ADICIONADO
+    logoutButton: {
+        backgroundColor: '#E53935', // Vermelho para "sair"
+        padding: 15,
+        borderRadius: 8,
+        alignItems: 'center',
+        marginTop: 10, // Espaço entre os botões
     },
     buttonText: {
         color: 'white',

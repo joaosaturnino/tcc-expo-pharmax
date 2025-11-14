@@ -1,12 +1,24 @@
 import { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Alert, ScrollView, Image, ActivityIndicator, StyleSheet } from 'react-native';
+import { 
+    View, 
+    Text, 
+    TouchableOpacity, 
+    TextInput, 
+    Alert, 
+    ScrollView, 
+    Image, 
+    ActivityIndicator, 
+    StyleSheet 
+} from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { useRoute } from '@react-navigation/native';
+// IMPORTAÇÕES DO NAVIGATION ATUALIZADAS
+import { useRoute, useNavigation } from '@react-navigation/native';
 
 import api from '../../services/api'; 
 import styles from './styles'; 
 
 export default function Perfil() {
+    const navigation = useNavigation(); // <-- ADICIONADO
     const route = useRoute();
     const { userId } = route.params || {};
 
@@ -20,6 +32,36 @@ export default function Perfil() {
         telefone: '', 
         foto: null    
     });
+
+    // NOVA FUNÇÃO DE LOGOUT
+    const handleLogout = () => {
+        Alert.alert(
+            "Sair", // Título
+            "Tem certeza que deseja sair da sua conta?", // Mensagem
+            [
+                {
+                    text: "Cancelar",
+                    onPress: () => console.log("Logout cancelado"),
+                    style: "cancel"
+                },
+                { 
+                    text: "Sair", 
+                    onPress: () => {
+                        // **Atenção**: Adicione sua lógica de limpeza aqui
+                        // (ex: limpar AsyncStorage, resetar estado global)
+                        
+                        // Navega para a tela de Login e limpa o histórico
+                        // Garanta que 'Login' é o nome da sua rota de login.
+                        navigation.reset({
+                            index: 0,
+                            routes: [{ name: 'Login' }], 
+                        });
+                    },
+                    style: "destructive"
+                }
+            ]
+        );
+    };
 
     async function carregarDadosUsuario() {
         if (!userId) {
@@ -36,6 +78,7 @@ export default function Perfil() {
                         ...prevState,
                         nome: usuarioAtual.usu_nome || '',
                         email: usuarioAtual.usu_email || '',
+                        // Você também pode carregar o telefone se a API o retornar
                     }));
                 } else {
                      Alert.alert('Erro de Dados', `Os dados para o usuário ${userId} não foram recebidos corretamente.`);
@@ -70,6 +113,8 @@ export default function Perfil() {
             const dadosParaApi = {
                 usu_nome: userData.nome,
                 usu_email: userData.email,
+                // Adicione o telefone se a API permitir salvá-lo
+                // usu_telefone: userData.telefone
             };
             const response = await api.put(`/usuarios/${userId}`, dadosParaApi);
             if (response.data.sucesso) {
@@ -80,15 +125,11 @@ export default function Perfil() {
                 Alert.alert('Erro ao Salvar', response.data.mensagem);
             }
         } catch (error) {
-            // --- CORREÇÃO PARA DEPURAÇÃO ---
             if (error.response) {
-                // Transforma a resposta de erro completa da API em texto
                 const errorData = JSON.stringify(error.response.data, null, 2);
-                
-                // Exibe o erro completo no alerta
                 Alert.alert(
-                    'Erro Recebido da API', // Título mais claro
-                    errorData // Corpo do alerta agora mostra o erro real
+                    'Erro Recebido da API', 
+                    errorData 
                 );
             } else {
                 Alert.alert('Erro de Conexão', 'Não foi possível conectar ao servidor.');
@@ -125,7 +166,6 @@ export default function Perfil() {
     }
 
     return (
-        // O seu JSX permanece o mesmo
         <ScrollView style={styles.container}>
             <View style={styles.header}>
                 <Text style={styles.title}>O meu Perfil</Text>
@@ -145,6 +185,7 @@ export default function Perfil() {
                 <View style={styles.form}>
                     <Text style={styles.label}>Nome</Text>
                     <TextInput
+                        // Usei o estilo 'inputEditing' que adicionei ao styles.js
                         style={editing ? styles.inputEditing : styles.input}
                         value={userData.nome}
                         onChangeText={(text) => setUserData({ ...userData, nome: text })}
@@ -170,6 +211,7 @@ export default function Perfil() {
                     <View style={styles.buttons}>
                         {editing ? (
                             <TouchableOpacity
+                                // Usei o estilo 'saveButtonDisabled' que adicionei
                                 style={isSaving ? styles.saveButtonDisabled : styles.saveButton}
                                 onPress={handleSave}
                                 disabled={isSaving}
@@ -184,6 +226,14 @@ export default function Perfil() {
                                 <Text style={styles.buttonText}>Editar Perfil</Text>
                             </TouchableOpacity>
                         )}
+
+                        {/* --- BOTÃO DE LOGOUT ADICIONADO --- */}
+                        <TouchableOpacity
+                            style={styles.logoutButton}
+                            onPress={handleLogout}
+                        >
+                            <Text style={styles.buttonText}>Sair</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
             </View>
@@ -191,6 +241,7 @@ export default function Perfil() {
     );
 }
 
+// Estilos para o Loading (sem alteração)
 const loadingStyles = StyleSheet.create({
     container: {
         flex: 1,
