@@ -15,9 +15,20 @@ export default function Home() {
   useEffect(() => {
     fetchFarmaciasPopulares();
     fetchLaboratorios();
+    fetchDestaques();
+
 
   }, []);
 
+
+  async function fetchDestaques() {
+    try {
+      const response = await api.get('/destaques?qtde=4');  
+      // você pode armazenar os destaques em um estado se necessário
+    } catch (error) {
+      console.error('Erro ao buscar destaques:', error);
+    } 
+  }
 
 
   async function fetchFarmaciasPopulares() {
@@ -75,52 +86,52 @@ export default function Home() {
   // Produtos com imagens
   const produtosPromocao = [
     {
-      id: '1',
-      nome: 'Paracetamol',
-      preco: 'R$ 15,00',
-      marca: 'Medley',
+      med_id: '1',
+      med_nome: 'Paracetamol',
+      medp_preco: 'R$ 15,00',
+      lab_nome: 'Medley',
       categoria: 'Analgésicos',
-      imagem: require('../../../public/paracetamol.png')
+      med_imagem: require('../../../public/paracetamol.png')
     },
     {
-      id: '2',
-      nome: 'Dipirona',
-      preco: 'R$ 12,50',
-      marca: 'Neo Química',
+      med_id: '2',
+      med_nome: 'Dipirona',
+      med_preco: 'R$ 12,50',
+      lab_nome: 'Neo Química',
       categoria: 'Analgésicos',
-      imagem: require('../../../public/dipirona.png')
+      med_imagem: require('../../../public/dipirona.png')
     },
     {
-      id: '3',
-      nome: 'Omeprazol',
-      preco: 'R$ 18,90',
-      marca: 'EMS',
+      med_id: '3',
+      med_nome: 'Omeprazol',
+      med_preco: 'R$ 18,90',
+      lab_nome: 'EMS',
       categoria: 'Vitaminas',
-      imagem: require('../../../public/omeprazol.png')
+      med_imagem: require('../../../public/omeprazol.png')
     },
     {
-      id: '4',
-      nome: 'Ibuprofeno',
-      preco: 'R$ 14,75',
-      marca: 'Eurofarma',
+      med_id: '4',
+      med_nome: 'Ibuprofeno',
+      med_preco: 'R$ 14,75',
+      lab_nome: 'Eurofarma',
       categoria: 'Analgésicos',
-      imagem: require('../../../public/ibuprofeno.png')
+      med_imagem: require('../../../public/ibuprofeno.png')
     },
     {
-      id: '5',
-      nome: 'Loratadina',
-      preco: 'R$ 9,90',
-      marca: 'Aché',
+      med_id: '5',
+      med_nome: 'Loratadina',
+      med_preco: 'R$ 9,90',
+      lab_nome: 'Aché',
       categoria: 'Antialérgicos',
-      imagem: require('../../../public/loratadina.png')
+      med_imagem: require('../../../public/loratadina.png')
     },
     {
-      id: '6',
-      nome: 'Amoxilina',
-      preco: 'R$ 22,00',
-      marca: 'Novartis',
+      med_id: '6',
+      med_nome: 'Amoxilina',
+      med_preco: 'R$ 22,00',
+      lab_med: 'Novartis',
       categoria: 'Antibióticos',
-      imagem: require('../../../public/amoxilina.png')
+      med_imagem: require('../../../public/amoxilina.png')
     },
   ];
 
