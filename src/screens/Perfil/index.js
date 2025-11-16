@@ -200,14 +200,7 @@ export default function Perfil() {
                         keyboardType="email-address"
                         autoCapitalize="none"
                     />
-                    <Text style={styles.label}>Telefone</Text>
-                    <TextInput
-                        style={editing ? styles.inputEditing : styles.input}
-                        value={userData.telefone}
-                        onChangeText={(text) => setUserData({ ...userData, telefone: text })}
-                        editable={editing}
-                        keyboardType="phone-pad"
-                    />
+                    
                     <View style={styles.buttons}>
                         {editing ? (
                             <TouchableOpacity
