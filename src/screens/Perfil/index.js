@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
     View, 
     Text, 
@@ -11,17 +11,18 @@ import {
     StyleSheet 
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-// IMPORTAÇÕES DO NAVIGATION ATUALIZADAS
-import { useRoute, useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+// CORREÇÃO 1: Importar a biblioteca de ícones
+import { Ionicons } from '@expo/vector-icons'; 
 
 import api from '../../services/api'; 
 import styles from './styles'; 
 
 export default function Perfil() {
-    const navigation = useNavigation(); // <-- ADICIONADO
-    const route = useRoute();
-    const { userId } = route.params || {};
-
+    const navigation = useNavigation();
+    
+    const [usuarioId, setUsuarioId] = useState(null);
     const [loading, setLoading] = useState(true); 
     const [editing, setEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false); 
@@ -33,25 +34,17 @@ export default function Perfil() {
         foto: null    
     });
 
-    // NOVA FUNÇÃO DE LOGOUT
+    // Função de Logout (sem alteração)
     const handleLogout = () => {
         Alert.alert(
-            "Sair", // Título
-            "Tem certeza que deseja sair da sua conta?", // Mensagem
+            "Sair",
+            "Tem certeza que deseja sair da sua conta?",
             [
-                {
-                    text: "Cancelar",
-                    onPress: () => console.log("Logout cancelado"),
-                    style: "cancel"
-                },
+                { text: "Cancelar", style: "cancel" },
                 { 
                     text: "Sair", 
-                    onPress: () => {
-                        // **Atenção**: Adicione sua lógica de limpeza aqui
-                        // (ex: limpar AsyncStorage, resetar estado global)
-                        
-                        // Navega para a tela de Login e limpa o histórico
-                        // Garanta que 'Login' é o nome da sua rota de login.
+                    onPress: async () => {
+                        await AsyncStorage.removeItem('usuario_info');
                         navigation.reset({
                             index: 0,
                             routes: [{ name: 'Login' }], 
@@ -63,14 +56,15 @@ export default function Perfil() {
         );
     };
 
-    async function carregarDadosUsuario() {
-        if (!userId) {
+    // Função carregarDadosDaApi (sem alteração)
+    async function carregarDadosDaApi(id) {
+        if (!id) {
             Alert.alert("Erro", "ID do usuário não fornecido.");
             setLoading(false);
             return;
         }
         try {
-            const response = await api.get(`/usuarios/${userId}`);
+            const response = await api.get(`/usuarios/${id}`);
             if (response.data && response.data.sucesso) {
                 const usuarioAtual = response.data.dados[0]; 
                 if (usuarioAtual && typeof usuarioAtual === 'object') {
@@ -78,17 +72,16 @@ export default function Perfil() {
                         ...prevState,
                         nome: usuarioAtual.usu_nome || '',
                         email: usuarioAtual.usu_email || '',
-                        // Você também pode carregar o telefone se a API o retornar
                     }));
                 } else {
-                     Alert.alert('Erro de Dados', `Os dados para o usuário ${userId} não foram recebidos corretamente.`);
+                     Alert.alert('Erro de Dados', `Os dados para o usuário ${id} não foram recebidos corretamente.`);
                 }
             } else {
                 Alert.alert('Erro da API', response.data.mensagem || 'Não foi possível obter os dados do usuário.');
             }
         } catch (error) {
             if (error.response && error.response.status === 404) {
-                 Alert.alert('Erro', `Usuário com ID ${userId} não foi encontrado na API.`);
+                 Alert.alert('Erro', `Usuário com ID ${id} não foi encontrado na API.`);
             } else {
                 Alert.alert('Erro de Conexão', 'Não foi possível carregar os dados do perfil.');
             }
@@ -97,40 +90,59 @@ export default function Perfil() {
         }
     }
 
-    useEffect(() => {
-        carregarDadosUsuario();
-    }, [userId]);
+    // useFocusEffect para buscar o usuário (sem alteração)
+    useFocusEffect(
+        useCallback(() => {
+            async function carregarDadosDoStorage() {
+                setLoading(true);
+                try {
+                    const userDataString = await AsyncStorage.getItem('usuario_info');
+                    if (userDataString) {
+                        const usuario = JSON.parse(userDataString);
+                        if (usuario && usuario.usu_id) {
+                            setUsuarioId(usuario.usu_id);
+                            carregarDadosDaApi(usuario.usu_id); 
+                        } else {
+                            Alert.alert("Erro", "Não foi possível ler seus dados. Por favor, faça login novamente.");
+                            navigation.navigate('Login');
+                        }
+                    } else {
+                        Alert.alert("Acesso Negado", "Você precisa estar logado para ver seu perfil.");
+                        navigation.navigate('Login');
+                    }
+                } catch (e) {
+                    console.error("Erro ao ler AsyncStorage", e);
+                    setLoading(false);
+                }
+            }
+            carregarDadosDoStorage();
+        }, [navigation])
+    );
 
+    // handleSave (sem alteração)
     const handleSave = async () => {
         if (!userData.nome || !userData.email) {
             Alert.alert('Atenção', 'Nome e E-mail são campos obrigatórios.');
             return;
         }
-
         setIsSaving(true);
-
         try {
             const dadosParaApi = {
                 usu_nome: userData.nome,
                 usu_email: userData.email,
-                // Adicione o telefone se a API permitir salvá-lo
-                // usu_telefone: userData.telefone
             };
-            const response = await api.put(`/usuarios/${userId}`, dadosParaApi);
+            const response = await api.put(`/usuarios/${usuarioId}`, dadosParaApi);
             if (response.data.sucesso) {
                 Alert.alert('Sucesso!', 'Os seus dados foram salvos.');
                 setEditing(false);
-                await carregarDadosUsuario();
+                await carregarDadosDaApi(usuarioId); 
             } else {
                 Alert.alert('Erro ao Salvar', response.data.mensagem);
             }
         } catch (error) {
             if (error.response) {
                 const errorData = JSON.stringify(error.response.data, null, 2);
-                Alert.alert(
-                    'Erro Recebido da API', 
-                    errorData 
-                );
+                Alert.alert('Erro Recebido da API', errorData);
             } else {
                 Alert.alert('Erro de Conexão', 'Não foi possível conectar ao servidor.');
             }
@@ -139,6 +151,7 @@ export default function Perfil() {
         }
     };
 
+    // trocarFoto (sem alteração)
     const trocarFoto = async () => {
         const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (permissionResult.granted === false) {
@@ -173,11 +186,14 @@ export default function Perfil() {
             <View style={styles.profileContainer}>
                 <View style={styles.photoContainer}>
                     <TouchableOpacity onPress={editing ? trocarFoto : null} disabled={!editing}>
+                        {/* CORREÇÃO 2: Lógica do Ícone Estático */}
                         {userData.foto ? (
+                            // Se tiver foto (vinda da API ou selecionada)
                             <Image source={{ uri: userData.foto }} style={styles.profilePhoto}/>
                         ) : (
+                            // Se não tiver foto, mostra o ícone estático
                             <View style={styles.profilePhoto}>
-                                <Text style={styles.photoText}>{userData.nome ? userData.nome.charAt(0).toUpperCase() : '?'}</Text>
+                                <Ionicons name="person" size={50} color="white" />
                             </View>
                         )}
                     </TouchableOpacity>
@@ -185,7 +201,6 @@ export default function Perfil() {
                 <View style={styles.form}>
                     <Text style={styles.label}>Nome</Text>
                     <TextInput
-                        // Usei o estilo 'inputEditing' que adicionei ao styles.js
                         style={editing ? styles.inputEditing : styles.input}
                         value={userData.nome}
                         onChangeText={(text) => setUserData({ ...userData, nome: text })}
@@ -204,7 +219,6 @@ export default function Perfil() {
                     <View style={styles.buttons}>
                         {editing ? (
                             <TouchableOpacity
-                                // Usei o estilo 'saveButtonDisabled' que adicionei
                                 style={isSaving ? styles.saveButtonDisabled : styles.saveButton}
                                 onPress={handleSave}
                                 disabled={isSaving}
@@ -220,7 +234,6 @@ export default function Perfil() {
                             </TouchableOpacity>
                         )}
 
-                        {/* --- BOTÃO DE LOGOUT ADICIONADO --- */}
                         <TouchableOpacity
                             style={styles.logoutButton}
                             onPress={handleLogout}

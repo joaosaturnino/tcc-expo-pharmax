@@ -1,180 +1,201 @@
-import { useState, useEffect, use } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, ScrollView, Image } from 'react-native';
+import { useState, useEffect, useCallback } from 'react';
+import { View, Text, TextInput, TouchableOpacity, FlatList, ScrollView, Image, RefreshControl } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import styles from './styles';
 import api from '../../services/api';
+
+// --- Função Helper de Promoção (sem alteração) ---
+function calcularPrecoPromocional(item) {
+  const precoOriginal = parseFloat(item.preco || item.medp_preco);
+  const desconto = parseFloat(item.promo_desconto);
+  if (isNaN(precoOriginal) || !desconto || desconto <= 0 || !item.promo_inicio || !item.promo_fim) {
+    return { precoOriginal: isNaN(precoOriginal) ? ' --,--' : precoOriginal.toFixed(2).replace('.', ','), precoComDesconto: null, estaEmPromocao: false, descontoPorcento: 0 };
+  }
+  const hoje = new Date();
+  const inicio = new Date(item.promo_inicio);
+  const fim = new Date(item.promo_fim);
+  hoje.setHours(0, 0, 0, 0);
+  inicio.setHours(0, 0, 0, 0);
+  fim.setHours(0, 0, 0, 0);
+  const estaEmPromocao = (hoje >= inicio && hoje <= fim);
+  if (estaEmPromocao) {
+    const precoComDesconto = precoOriginal * (1 - desconto / 100);
+    return { precoOriginal: precoOriginal.toFixed(2).replace('.', ','), precoComDesconto: precoComDesconto.toFixed(2).replace('.', ','), estaEmPromocao: true, descontoPorcento: desconto };
+  }
+  return { precoOriginal: precoOriginal.toFixed(2).replace('.', ','), precoComDesconto: null, estaEmPromocao: false, descontoPorcento: 0 };
+}
+// ---------------------------------------------------
+
 
 export default function Home() {
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState('');
   const [farmaciasPopulares, setFarmaciasPopulares] = useState([]);
-  const [laboratorios, setLaboratorios] = useState([]); // novo estado para laboratórios
-  const [loadingLaboratorios, setLoadingLaboratorios] = useState(false); // opcional
-  const [ tipo, setTipo ] = useState(3);
-
+  const [laboratorios, setLaboratorios] = useState([]);
+  const [produtosDestaque, setProdutosDestaque] = useState([]); 
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  
   useEffect(() => {
     fetchFarmaciasPopulares();
     fetchLaboratorios();
-    fetchDestaques();
-
-
+    fetchDestaques(); 
   }, []);
 
+  const onRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      await Promise.all([
+        fetchDestaques(), // Esta é a função que vamos mudar
+        fetchFarmaciasPopulares(),
+        fetchLaboratorios()
+      ]);
+    } catch (error) {
+      console.error("Erro ao recarregar:", error);
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, []);
 
+  // --- CORREÇÃO: Lógica de Destaques Aleatórios ---
   async function fetchDestaques() {
     try {
-      const response = await api.get('/destaques?qtde=4');  
-      // você pode armazenar os destaques em um estado se necessário
+      // 1. Pede 20 itens para a API (em vez de 4)
+      const response = await api.get('/medicamentos/todos?limit=20');
+      const allDados = response?.data?.dados?.filter(item => item) ?? [];
+
+      // 2. Embaralha a lista (Algoritmo Fisher-Yates)
+      let shuffled = [...allDados];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+
+      // 3. Pega os primeiros 4 itens da lista embaralhada
+      const dados = shuffled.slice(0, 4);
+
+      setProdutosDestaque(dados);
     } catch (error) {
       console.error('Erro ao buscar destaques:', error);
-    } 
+      setProdutosDestaque([]);
+    }
   }
-
+  // ---------------------------------------------
 
   async function fetchFarmaciasPopulares() {
     try {
       const response = await api.get('/farmacias?qtde=4');
-      setFarmaciasPopulares(response.data.dados);
+      const dados = response?.data?.dados?.filter(item => item) ?? [];
+      setFarmaciasPopulares(dados);
     } catch (error) {
       console.error('Erro ao buscar farmácias populares:', error);
     }
   }
 
-
-
-
-  // nova função para buscar laboratórios
   async function fetchLaboratorios() {
     try {
-      const response = await api.get('/laboratorios?qtde=4'); // mesma forma que farmacias
-      const dados = response?.data?.dados ?? response?.data ?? [];
-
-      // normaliza para lab_logo_url (igual farmacias usa farm_logo_url)
+      const response = await api.get('/laboratorios?qtde=4');
+      let dados = response?.data?.dados?.filter(item => item) ?? response?.data?.filter(item => item) ?? [];
       const mapped = Array.isArray(dados)
         ? dados.map(item => {
             const url =
-              item.lab_logo_url ??
-              item.logo_url ??
-              item.logo ??
-              item.imagem_url ??
-              // item.imagem ??
-              item.lab_logo ??
+              item?.lab_logo_url ??
+              item?.logo_url ??
+              item?.logo ??
+              item?.imagem_url ??
+              item?.lab_logo ??
               null;
-
             return {
               ...item,
               lab_logo_url: typeof url === 'string' && url.length ? url : null,
             };
           })
         : [];
-
       setLaboratorios(mapped);
-    } catch (error) {
+    } catch (error)
+    {
       console.error('Erro ao buscar laboratórios:', error);
       setLaboratorios([]);
     }
   }
 
-  // Categorias com imagens
+  // --- DADOS ESTÁTICOS E MOCK (sem alteração) ---
   const categorias = [
     { id: '1', nome: 'Antialérgicos', imagem: require('../../../public/alergia.png') },
     { id: '2', nome: 'Analgésicos', imagem: require('../../../public/dor-de-cabeca.png') },
     { id: '3', nome: 'Vitaminas', imagem: require('../../../public/vitaminas.png') },
-    { id: '4', nome: 'Antibióticos', imagem: require('../../../public/antibiotico.png') },
+    { id: '4. ', nome: 'Antibióticos', imagem: require('../../../public/antibiotico.png') },
   ];
-
-  // Produtos com imagens
-  const produtosPromocao = [
-    {
-      med_id: '1',
-      med_nome: 'Paracetamol',
-      medp_preco: 'R$ 15,00',
-      lab_nome: 'Medley',
-      categoria: 'Analgésicos',
-      med_imagem: require('../../../public/paracetamol.png')
-    },
-    {
-      med_id: '2',
-      med_nome: 'Dipirona',
-      med_preco: 'R$ 12,50',
-      lab_nome: 'Neo Química',
-      categoria: 'Analgésicos',
-      med_imagem: require('../../../public/dipirona.png')
-    },
-    {
-      med_id: '3',
-      med_nome: 'Omeprazol',
-      med_preco: 'R$ 18,90',
-      lab_nome: 'EMS',
-      categoria: 'Vitaminas',
-      med_imagem: require('../../../public/omeprazol.png')
-    },
-    {
-      med_id: '4',
-      med_nome: 'Ibuprofeno',
-      med_preco: 'R$ 14,75',
-      lab_nome: 'Eurofarma',
-      categoria: 'Analgésicos',
-      med_imagem: require('../../../public/ibuprofeno.png')
-    },
-    {
-      med_id: '5',
-      med_nome: 'Loratadina',
-      med_preco: 'R$ 9,90',
-      lab_nome: 'Aché',
-      categoria: 'Antialérgicos',
-      med_imagem: require('../../../public/loratadina.png')
-    },
-    {
-      med_id: '6',
-      med_nome: 'Amoxilina',
-      med_preco: 'R$ 22,00',
-      lab_med: 'Novartis',
-      categoria: 'Antibióticos',
-      med_imagem: require('../../../public/amoxilina.png')
-    },
+  const produtosPromocaoMock = [
+    { med_id: '1', med_nome: 'Paracetamol', medp_preco: 'R$ 15,00', lab_nome: 'Medley', categoria: 'Analgésicos', med_imagem: require('../../../public/paracetamol.png') },
+    { med_id: '2', med_nome: 'Dipirona', med_preco: 'R$ 12,50', lab_nome: 'Neo Química', categoria: 'Analgésicos', med_imagem: require('../../../public/dipirona.png') },
   ];
-
   const marcas = [
     { lab_id: '1', lab_nome: 'Cimed', lab_logo: require('../../../public/cimed.png') },
     { lab_id: '2', lab_nome: 'EuroPharma', lab_logo: require('../../../public/europharma.png') },
-    { lab_id: '3', lab_nome: 'Ems', lab_logo: require('../../../public/ems.png') },
-    { lab_id: '4', lab_nome: 'Medley', lab_logo: require('../../../public/medley.png') },
   ];
 
-  // Renderizar Categoria
-  const renderCategoria = ({ item }) => (
-    <TouchableOpacity
-      style={styles.categoriaItem}
-      onPress={() => navigation.navigate('Categoria', { nome: item.nome, medicamentos: produtosPromocao, tipo:tipo })}
-    >
-      <Image source={item.imagem} style={styles.categoriaIcon} resizeMode="contain" />
-      <Text style={styles.categoriaNome}>{item.nome}</Text>
-    </TouchableOpacity>
-  );
+  // --- FUNÇÕES DE RENDERIZAÇÃO (sem alteração) ---
+  const renderCategoria = ({ item }) => {
+    if (!item) return null; 
+    return (
+      <TouchableOpacity
+        style={styles.categoriaItem}
+        onPress={() => navigation.navigate('Categoria', { 
+            nome: item.nome, 
+            tipo_id: item.id
+        })}
+      >
+        <Image source={item.imagem} style={styles.categoriaIcon} resizeMode="contain" />
+        <Text style={styles.categoriaNome}>{item.nome}</Text>
+      </TouchableOpacity>
+    );
+  };
 
-  // Renderizar Produto
-  const renderProduto = ({ item }) => (
-    <TouchableOpacity
-      style={styles.produtoCard}
-      onPress={() => navigation.navigate('Produto', { produto: item })}
-    >
-      <View style={styles.produtoImagem}>
-        <Image source={item.imagem} style={styles.produtoImagemReal} resizeMode="contain" />
-      </View>
-      <Text style={styles.produtoNome} numberOfLines={1}>{item.nome}</Text>
-      <Text style={styles.produtoMarca}>{item.marca}</Text>
-      <Text style={styles.produtoPreco}>{item.preco}</Text>
-    </TouchableOpacity>
-  );
+  const renderProduto = ({ item }) => {
+    if (!item) return null; 
+    const nome = item?.med_nome || item?.nome;
+    const marca = item?.lab_nome || item?.lab_med || item?.marca;
+    
+    const promo = calcularPrecoPromocional(item);
+    
+    const imagemOrigem = item?.med_imagem || item?.imagem;
+    const imageSource = typeof imagemOrigem === 'string'
+      ? { uri: imagemOrigem } 
+      : imagemOrigem;
 
-  // Renderizar Laboratório (usa lab_logo_url como farmacias usa farm_logo_url)
+    return (
+      <TouchableOpacity
+        style={[styles.produtoCard, promo.estaEmPromocao && styles.produtoCardEmPromocao]}
+        onPress={() => navigation.navigate('Produto', { produto: item })}
+      >
+        {promo.estaEmPromocao && (
+          <View style={styles.promoBadge}>
+            <Text style={styles.promoBadgeTexto}>{promo.descontoPorcento}% OFF</Text>
+          </View>
+        )}
+        <View style={styles.produtoImagem}>
+          <Image source={imageSource} style={styles.produtoImagemReal} resizeMode="contain" />
+        </View>
+        <Text style={styles.produtoNome} numberOfLines={1}>{nome}</Text>
+        <Text style={styles.produtoMarca}>{marca}</Text>
+        {promo.estaEmPromocao ? (
+          <>
+            <Text style={styles.produtoPrecoAntigo}>R$ {promo.precoOriginal}</Text>
+            <Text style={styles.produtoPreco}>R$ {promo.precoComDesconto}</Text>
+          </>
+        ) : (
+          <Text style={styles.produtoPreco}>R$ {promo.precoOriginal}</Text>
+        )}
+      </TouchableOpacity>
+    );
+  };
+
   const renderLaboratorio = ({ item }) => {
+    if (!item) return null; 
     const imageSource =
-      typeof item.lab_logo_url === 'string' && item.lab_logo_url.startsWith('http')
+      typeof item?.lab_logo_url === 'string' && item?.lab_logo_url.startsWith('http')
         ? { uri: item.lab_logo_url }
-        : // se não houver lab_logo_url, tenta campos locais (require) ou fallback
-          (item.lab_logo && (typeof item.lab_logo === 'string' ? { uri: item.lab_logo_url } : item.lab_logo)) ||
+        : (item?.lab_logo && (typeof item?.lab_logo === 'string' ? { uri: item.lab_logo_url } : item.lab_logo)) ||
           require('../../../public/cimed.png');
 
     return (
@@ -182,63 +203,59 @@ export default function Home() {
         style={styles.marcaCard}
         onPress={() =>
           navigation.navigate('Laboratorio', {
-            nome: item.lab_nome || item.nome,
-            medicamentos: produtosPromocao,
-            imagemLaboratorio: item.lab_logo_url || item.lab_logo,
+            lab_id: item?.lab_id,
+            nome: item?.lab_nome || item?.nome,
+            imagemLaboratorio: item?.lab_logo_url || item?.lab_logo,
           })
         }
       >
         <View style={styles.marcaLogo}>
           <Image source={imageSource} style={styles.marcaLogoImagem} resizeMode="contain" />
         </View>
-        <Text style={styles.marcaNome}>{item.lab_nome || item.nome}</Text>
+        <Text style={styles.marcaNome}>{item?.lab_nome || item?.nome}</Text>
       </TouchableOpacity>
     );
   };
 
-  // Renderizar Banner Farmácia - NA HOME
   const renderBannerFarmacia = ({ item }) => {
-    const imageSource = typeof item.farm_logo_url === 'string'
+    if (!item) return null; 
+    const imageSource = typeof item?.farm_logo_url === 'string'
       ? { uri: item.farm_logo_url }
-      : item.farm_logo_url;
+      : item?.farm_logo_url;
 
     return (
       <TouchableOpacity
         style={styles.bannerFarmaciaCard}
-        key={item.farm_id || item.id}
         onPress={() => navigation.navigate('Farmacia', {
-          nome: item.farm_nome,
-          medicamentos: produtosPromocao,
-          imagemFarmacia: item.farm_logo_url
+          farm_id: item?.farm_id,
+          nome: item?.farm_nome,
+          imagemFarmacia: item?.farm_logo_url
         })}
       >
         <Image source={imageSource} style={styles.bannerFarmaciaImagem} resizeMode="stretch" />
-        <Text style={styles.bannerFarmaciaNome}>{item.farm_nome}</Text>
+        <Text style={styles.bannerFarmaciaNome}>{item?.farm_nome}</Text>
       </TouchableOpacity>
     );
   };
 
-  // Pesquisa
   function handlePesquisar() {
     if (searchText.trim().length > 0) {
       navigation.navigate('Pesquisa', {
         termo: searchText,
-        produtos: produtosPromocao,
       });
+      setSearchText(''); 
     }
   }
 
+  // --- RENDERIZAÇÃO PRINCIPAL DA HOME ---
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <Image
           source={require('../../../public/LogoEscrita2.png')}
           style={styles.logo}
         />
       </View>
-
-      {/* Barra de Pesquisa */}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
@@ -251,65 +268,78 @@ export default function Home() {
         />
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={onRefresh}
+            colors={['#006400']}
+            tintColor={'#006400'}
+          />
+        }
+      >
         {/* Categorias */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Categorias</Text>
           <FlatList
             data={categorias}
             renderItem={renderCategoria}
-            keyExtractor={item => item.id}
+            keyExtractor={item => String(item?.id)} 
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.categoriasList}
           />
         </View>
-
-        {/* Promoção */}
+        
+        {/* Destaques */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Destaques</Text>
-            <TouchableOpacity>
+            <TouchableOpacity 
+              onPress={() => navigation.navigate('Categoria', { 
+                nome: 'Todos os Medicamentos' 
+              })}
+            >
               <Text style={styles.verTudo}>Todas</Text>
             </TouchableOpacity>
           </View>
           <FlatList
-            data={produtosPromocao}
+            data={produtosDestaque.length > 0 ? produtosDestaque : produtosPromocaoMock}
             renderItem={renderProduto}
-            keyExtractor={item => item.id}
+            keyExtractor={item => String(item?.med_id)} 
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.produtosList}
           />
         </View>
-
+        
         {/* Farmácias Populares */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Farmácias Populares</Text>
           <FlatList
             data={farmaciasPopulares}
             renderItem={renderBannerFarmacia}
-            keyExtractor={item => item.farm_id || item.id || String(item.farm_nome)}
+            keyExtractor={item => String(item?.farm_id || item?.id || item?.farm_nome)}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.marcasList}
           />
         </View>
-
+        
         {/* Laboratórios Populares */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Laboratórios Populares</Text>
           <FlatList
-            data={laboratorios.length ? laboratorios : marcas} // usa dados da API com fallback para `marcas`
+            data={laboratorios.length ? laboratorios : marcas}
             renderItem={renderLaboratorio}
-            keyExtractor={item => item.lab_id || item.id || String(item.lab_nome || item.nome)}
+            keyExtractor={item => String(item?.lab_id || item?.id || item?.lab_nome)}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.marcasList}
           />
         </View>
-
-        {/* Espaço no final */}
+        
         <View style={styles.espacoFinal} />
       </ScrollView>
     </View>

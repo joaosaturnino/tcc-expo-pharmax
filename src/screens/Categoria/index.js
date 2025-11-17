@@ -1,59 +1,194 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { 
+  View, 
+  Text, 
+  FlatList, 
+  TouchableOpacity, 
+  Image, 
+  ActivityIndicator,
+  ScrollView 
+} from 'react-native';
+import { useRoute, useNavigation } from '@react-navigation/native';
+import styles from './styles';
 import api from '../../services/api';
 
-export default function Categoria({ route, navigation }) {
-    const { nome, medicamentos = [] , tipo } = route.params;
+// --- Copie esta função para o topo dos seus arquivos ---
 
-    // Filtra os medicamentos pela categoria selecionada
-    const filtrados = medicamentos.filter(med => med.categoria === nome);
+// Função Helper de Promoção
+function calcularPrecoPromocional(item) {
+  const precoOriginal = parseFloat(item.preco || item.medp_preco);
+  const desconto = parseFloat(item.promo_desconto);
+  
+  if (isNaN(precoOriginal) || !desconto || desconto <= 0 || !item.promo_inicio || !item.promo_fim) {
+    return { 
+      precoOriginal: isNaN(precoOriginal) ? ' --,--' : precoOriginal.toFixed(2).replace('.', ','), 
+      precoComDesconto: null, 
+      estaEmPromocao: false,
+      descontoPorcento: 0
+    };
+  }
 
-  const [ categoriasSelecionadas, setCategoriasSelecionadas ] = useState([]);
-    useEffect(() => {
-        fetchCategoriasSelecionadas();
-        
-    }, [tipo]);
-    async function  fetchCategoriasSelecionadas(){
-    try {
-        const response = await api.get(`/medicamentos/tipo/${tipo}`)
-        console.log(tipo);
-        
-        setCategoriasSelecionadas(response.data.dados);
-        } catch (error) {
-        console.error('Erro ao buscar categorias:', error);
-        }
+  const hoje = new Date();
+  const inicio = new Date(item.promo_inicio);
+  const fim = new Date(item.promo_fim);
+  
+  hoje.setHours(0, 0, 0, 0);
+  inicio.setHours(0, 0, 0, 0);
+  fim.setHours(0, 0, 0, 0);
+
+  const estaEmPromocao = (hoje >= inicio && hoje <= fim);
+
+  if (estaEmPromocao) {
+    const precoComDesconto = precoOriginal * (1 - desconto / 100);
+    return { 
+      precoOriginal: precoOriginal.toFixed(2).replace('.', ','), 
+      precoComDesconto: precoComDesconto.toFixed(2).replace('.', ','), 
+      estaEmPromocao: true,
+      descontoPorcento: desconto
+    };
+  }
+
+  return { 
+    precoOriginal: precoOriginal.toFixed(2).replace('.', ','), 
+    precoComDesconto: null, 
+    estaEmPromocao: false,
+    descontoPorcento: 0
+  };
+}
+// ---------------------------------------------------
+
+export default function Categoria() {
+  const route = useRoute();
+  const navigation = useNavigation();
+  
+  const { nome, tipo_id } = route.params;
+
+  const [medicamentos, setMedicamentos] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (nome) {
+        navigation.setOptions({ title: nome });
+    } else {
+        navigation.setOptions({ title: 'Medicamentos' });
     }
+  }, [navigation, nome]);
 
-    const renderMedicamento = ({ item }) => (
-        <TouchableOpacity
-            style={styles.card}
-            onPress={() => navigation.navigate('Produto', { produto: item })}
-        >
-            <Text style={styles.nome}>{item.med_nome}</Text>
-            <Text style={styles.marca}>{item.lab_nome}</Text>
-            <Text style={styles.preco}>R$ {item.medp_preco}</Text>
-        </TouchableOpacity>
-    );
+  useEffect(() => {
+    async function fetchMedicamentos() {
+      setLoading(true);
+      try {
+        let response;
+        if (tipo_id) {
+          response = await api.get(`/medicamentos/tipo/${tipo_id}`);
+        } else {
+          response = await api.get('/medicamentos/todos?limit=1000');
+        }
+        setMedicamentos(response.data.dados || []);
+      } catch (error) {
+        console.error('Erro ao buscar medicamentos:', error);
+        setMedicamentos([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    fetchMedicamentos();
+  }, [tipo_id]);
+
+  
+  // --- renderItem ATUALIZADO ---
+  const renderItem = ({ item }) => {
+    const nomeMed = item.med_nome || item.nome;
+    const marca = item.lab_nome || item.marca;
+    
+    const promo = calcularPrecoPromocional(item);
+
+    const imagemOrigem = item.med_imagem || item.imagem;
+    const imageSource = typeof imagemOrigem === 'string'
+      ? { uri: imagemOrigem } 
+      : imagemOrigem || require('../../../public/paracetamol.png');
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Categoria: {nome}</Text>
-            <FlatList
-                data={categoriasSelecionadas}
-                renderItem={renderMedicamento}
-                keyExtractor={item => item.id}
-                contentContainerStyle={{ padding: 16 }}
-                ListEmptyComponent={<Text>Nenhum medicamento nesta categoria.</Text>}
-            />
+      <TouchableOpacity
+        style={[styles.medicamentoCard, promo.estaEmPromocao && styles.produtoCardEmPromocao]}
+        onPress={() => navigation.navigate('Produto', { produto: item })}
+      >
+        {promo.estaEmPromocao && (
+          <View style={styles.promoBadge}>
+            <Text style={styles.promoBadgeTexto}>{promo.descontoPorcento}% OFF</Text>
+          </View>
+        )}
+        <View style={styles.medicamentoImagem}>
+          <Image 
+            source={imageSource} 
+            style={{width: '100%', height: '100%'}}
+            resizeMode="contain"
+          />
         </View>
+        <View style={styles.medicamentoInfo}>
+          <Text style={styles.medicamentoNome} numberOfLines={2}>{nomeMed}</Text>
+          <Text style={styles.medicamentoCategoria}>{marca}</Text>
+          
+          {promo.estaEmPromocao ? (
+            <>
+              <Text style={styles.produtoPrecoAntigo}>R$ {promo.precoOriginal}</Text>
+              <Text style={styles.medicamentoPreco}>R$ {promo.precoComDesconto}</Text>
+            </>
+          ) : (
+            <Text style={styles.medicamentoPreco}>R$ {promo.precoOriginal}</Text>
+          )}
+        </View>
+      </TouchableOpacity>
     );
-}
+  };
+  // ------------------------------
+  
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <View style={styles.emptyContainer}>
+          <ActivityIndicator size="large" color="#2A7CC7" />
+          <Text style={styles.emptyText}>Buscando medicamentos...</Text>
+        </View>
+      );
+    }
+    
+    if (medicamentos.length === 0) {
+      return (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.medicamentoImagemTexto}>💊</Text>
+          <Text style={styles.emptyText}>Nenhum medicamento encontrado</Text>
+        </View>
+      );
+    }
 
-const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#fff' },
-    title: { fontSize: 22, fontWeight: 'bold', margin: 16 },
-    card: { backgroundColor: '#f5f5f5', padding: 16, borderRadius: 8, marginBottom: 12 },
-    nome: { fontSize: 18, fontWeight: 'bold' },
-    marca: { fontSize: 14, color: '#555' },
-    preco: { fontSize: 16, color: '#2A7CC7', marginTop: 4 },
-});
+    return (
+      <FlatList
+        data={medicamentos}
+        renderItem={renderItem}
+        keyExtractor={item => String(item.med_id || item.medp_id)}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.medicamentosList}
+        numColumns={2} 
+        scrollEnabled={false}
+      />
+    );
+  };
+
+  return (
+    <View style={styles.container}>
+      <ScrollView> 
+        <View style={styles.contadorContainer}>
+          <Text style={styles.contadorText}>
+            {medicamentos.length} medicamento{medicamentos.length !== 1 ? 's' : ''} encontrado{medicamentos.length !== 1 ? 's' : ''}
+          </Text>
+        </View>
+        
+        {renderContent()}
+
+        <View style={styles.espacoFinal} />
+      </ScrollView>
+    </View>
+  );
+}

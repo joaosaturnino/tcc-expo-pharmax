@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     perfilImagemWrapper: {
         width: 80,
         height: 80,
-        backgroundColor: 'transparent', // Fundo transparente
+        backgroundColor: 'transparent',
         borderRadius: 40,
         justifyContent: 'center',
         alignItems: 'center',
@@ -45,12 +45,12 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 8,
         elevation: 8,
-        borderWidth: 0, // Sem borda
+        borderWidth: 0,
     },
     perfilImagem: {
-        width: 80, // Tamanho igual ao wrapper
+        width: 80,
         height: 80,
-        borderRadius: 40, // Metade da largura/altura
+        borderRadius: 40,
     },
     favoritosContainer: {
         flexDirection: 'row',
@@ -95,6 +95,12 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 3,
         elevation: 3,
+        // --- CORREÇÕES AQUI ---
+        position: 'relative', // Necessário para o Badge
+        borderWidth: 2,
+        borderColor: '#fff', // Borda padrão
+        overflow: 'hidden', // Para o Badge
+        // ----------------------
     },
     medicamentoImagem: {
         width: 60,
@@ -131,8 +137,37 @@ const styles = StyleSheet.create({
     medicamentoPreco: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#27ae60',
+        color: '#27ae60', // Verde
     },
+
+    // --- CORREÇÃO: NOVOS ESTILOS DE PROMOÇÃO ---
+    medicamentoCardEmPromocao: {
+        backgroundColor: '#fffbeb',
+        borderColor: '#e74c3c', // Borda vermelha
+    },
+    promoBadge: {
+        position: 'absolute',
+        top: -1,
+        right: -1,
+        backgroundColor: '#e74c3c',
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderTopRightRadius: 12,
+        borderBottomLeftRadius: 12,
+        zIndex: 1,
+    },
+    promoBadgeTexto: {
+        color: '#fff',
+        fontSize: 11,
+        fontWeight: 'bold',
+    },
+    medicamentoPrecoAntigo: {
+        fontSize: 14, // Tamanho menor
+        color: '#7f8c8d',
+        textDecorationLine: 'line-through', // Riscado
+    },
+    // ------------------------------------------
+
     // Estados vazios
     emptyContainer: {
         flex: 1,

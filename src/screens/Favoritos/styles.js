@@ -1,6 +1,7 @@
 import { StyleSheet, Dimensions } from 'react-native';
 
 const { width } = Dimensions.get('window');
+const cardWidth = (width / 2) - 24; 
 
 export default StyleSheet.create({
     container: {
@@ -28,14 +29,16 @@ export default StyleSheet.create({
         marginTop: 5,
     },
     listaContainer: {
-        padding: 16,
+        paddingHorizontal: 8,
+        paddingTop: 16,
     },
     produtoCard: {
-        flexDirection: 'row',
+        width: cardWidth,
         backgroundColor: 'white',
-        borderRadius: 12,
-        padding: 16,
+        borderRadius: 14,
+        padding: 12,
         marginBottom: 16,
+        marginHorizontal: 8,
         shadowColor: '#000',
         shadowOffset: {
             width: 0,
@@ -45,49 +48,90 @@ export default StyleSheet.create({
         shadowRadius: 3,
         elevation: 3,
         alignItems: 'center',
+        borderWidth: 2,
+        borderColor: '#fff',
+        overflow: 'hidden',
+        position: 'relative',
     },
-    produtoImagem: {
-        width: 60,
-        height: 60,
+    produtoImagemContainer: {
+        width: 100,
+        height: 100,
         borderRadius: 8,
         backgroundColor: '#f1f2f6',
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 16,
+        marginBottom: 12,
+    },
+    produtoImagem: {
+        width: 90,
+        height: 90,
     },
     produtoInfo: {
         flex: 1,
+        alignItems: 'center',
     },
     produtoNome: {
-        fontSize: 16,
+        fontSize: 15,
         fontWeight: '600',
         color: '#2c3e50',
         marginBottom: 4,
+        textAlign: 'center',
     },
     produtoMarca: {
-        fontSize: 14,
+        fontSize: 13,
         color: '#7f8c8d',
         marginBottom: 4,
+        textAlign: 'center',
     },
-    produtoPreco: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#458B00',
+    produtoDosagem: {
+        fontSize: 13,
+        color: '#7f8c8d',
+        marginBottom: 6,
+        textAlign: 'center',
     },
     removerButton: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
+        position: 'absolute',
+        top: -1,
+        left: -1,
         backgroundColor: '#e74c3c',
+        width: 30,
+        height: 30,
+        borderRadius: 0,
+        borderTopLeftRadius: 12,
+        borderBottomRightRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',
-        marginLeft: 10,
+        zIndex: 2,
     },
-    removerIcon: {
-        color: 'white',
-        fontSize: 18,
+    
+    // --- ESTILOS DE PREÇO REMOVIDOS ---
+    // produtoPreco (removido)
+    // produtoPrecoAntigo (removido)
+    // produtoSemPreco (removido)
+
+    // --- ESTILOS DE PROMOÇÃO (Visuais) MANTIDOS ---
+    produtoCardEmPromocao: {
+        backgroundColor: '#fffbeb',
+        borderColor: '#e74c3c',
+    },
+    promoBadge: {
+        position: 'absolute',
+        top: -1,
+        right: -1,
+        backgroundColor: '#e74c3c',
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderTopRightRadius: 12,
+        borderBottomLeftRadius: 12,
+        zIndex: 1,
+    },
+    promoBadgeTexto: {
+        color: '#fff',
+        fontSize: 11,
         fontWeight: 'bold',
     },
+    // ------------------------------------------
+    
     vazioContainer: {
         flex: 1,
         justifyContent: 'center',

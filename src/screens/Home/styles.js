@@ -15,11 +15,13 @@ export default StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
     },
-    headerTitle: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#2c3e50',
-        textAlign: 'center',
+    logo: {
+        width: 250,
+        height: 150,
+        resizeMode: 'contain',
+        alignSelf: 'center',
+        marginBottom: 0,
+        marginTop: 10,
     },
     searchContainer: {
         padding: 16,
@@ -91,6 +93,9 @@ export default StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 3,
         elevation: 3,
+        borderWidth: 2, 
+        borderColor: '#fff', 
+        overflow: 'hidden',
     },
     produtoImagem: {
         width: 60,
@@ -101,6 +106,11 @@ export default StyleSheet.create({
         alignItems: 'center',
         alignSelf: 'center',
         marginBottom: 10,
+    },
+    produtoImagemReal: {
+        width: 80,
+        height: 80,
+        borderRadius: 8,
     },
     produtoImagemTexto: {
         fontSize: 24,
@@ -121,6 +131,35 @@ export default StyleSheet.create({
         fontWeight: 'bold',
         color: '#458B00',
     },
+    
+    // --- ESTILOS DE PROMOÇÃO ---
+    produtoCardEmPromocao: {
+        backgroundColor: '#fffbeb',
+        borderColor: '#e74c3c',
+    },
+    promoBadge: {
+        position: 'absolute',
+        top: -1,
+        right: -1,
+        backgroundColor: '#e74c3c',
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderTopRightRadius: 12,
+        borderBottomLeftRadius: 12,
+        zIndex: 1,
+    },
+    promoBadgeTexto: {
+        color: '#fff',
+        fontSize: 11,
+        fontWeight: 'bold',
+    },
+    produtoPrecoAntigo: {
+        fontSize: 13,
+        color: '#7f8c8d',
+        textDecorationLine: 'line-through',
+    },
+    // ---------------------------------
+    
     marcasList: {
         paddingBottom: 15,
     },
@@ -158,14 +197,6 @@ export default StyleSheet.create({
     espacoFinal: {
         height: 30,
     },
-    logo: {
-        width: 250,
-        height: 150,
-        resizeMode: 'contain',
-        alignSelf: 'center',
-        marginBottom: 0,
-        marginTop: 10,
-    },
     bannerFarmaciaCard: {
         width: 200,
         height: 110,
@@ -191,10 +222,5 @@ export default StyleSheet.create({
         fontWeight: 'bold',
         color: '#2c3e50',
         marginVertical: 6,
-    },
-    produtoImagemReal: {
-        width: 80,
-        height: 80,
-        borderRadius: 8,
     },
 });

@@ -1,38 +1,74 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
+
+const { width } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f8f9fa',
+        backgroundColor: '#EEE9E9',
     },
-    header: {
+    // Banner Grande
+    bannerGrandeContainer: {
+        height: 200,
+        position: 'relative',
+        backgroundColor: '#fff',
+    },
+    bannerGrandeImagem: {
+        width: '100%',
+        height: '100%',
+    },
+    bannerOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.4)', // Escurece o fundo para destacar o perfil
+    },
+    // Perfil sobre o Banner
+    perfilContainer: {
+        position: 'absolute',
+        bottom: 20,
+        left: 0,
+        right: 0,
+        alignItems: 'center',
+    },
+    perfilImagemWrapper: {
+        width: 80,
+        height: 80,
+        backgroundColor: '#fff', // Fundo branco para a logo
+        borderRadius: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 8,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 8,
+    },
+    perfilImagem: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+    },
+    favoritosContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 16,
-        backgroundColor: '#fff',
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
+        backgroundColor: 'rgba(255,255,255,0.9)',
+        borderRadius: 12,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
     },
-    backButton: {
-        padding: 8,
-        marginRight: 16,
-    },
-    backButtonText: {
-        fontSize: 24,
-        color: '#3498db',
-    },
-    headerTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
+    favoritosText: {
+        fontSize: 14,
+        fontWeight: '600',
         color: '#2c3e50',
-        flex: 1,
+        // marginLeft: 6, // Removido margem pois não teremos ícone de coração aqui
     },
-    headerRight: {
-        width: 40,
-    },
+    // Contador
     contadorContainer: {
         padding: 16,
-        backgroundColor: '#fff',
+        backgroundColor: '#EEE9E9',
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
     },
@@ -40,6 +76,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#7f8c8d',
     },
+    // Lista de medicamentos
     medicamentosList: {
         padding: 16,
     },
@@ -57,6 +94,14 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 3,
         elevation: 3,
+        position: 'relative',
+        borderWidth: 2,
+        borderColor: '#fff',
+        overflow: 'hidden',
+    },
+    medicamentoCardEmPromocao: {
+        backgroundColor: '#fffbeb',
+        borderColor: '#e74c3c',
     },
     medicamentoImagem: {
         width: 60,
@@ -66,6 +111,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 16,
+    },
+    medicamentoImagemReal: {
+        width: 50,
+        height: 50,
+        borderRadius: 6,
     },
     medicamentoImagemTexto: {
         fontSize: 24,
@@ -90,6 +140,29 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#27ae60',
     },
+    medicamentoPrecoAntigo: {
+        fontSize: 14,
+        color: '#7f8c8d',
+        textDecorationLine: 'line-through',
+    },
+    // Badge
+    promoBadge: {
+        position: 'absolute',
+        top: -1,
+        right: -1,
+        backgroundColor: '#e74c3c',
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderTopRightRadius: 12,
+        borderBottomLeftRadius: 12,
+        zIndex: 1,
+    },
+    promoBadgeTexto: {
+        color: '#fff',
+        fontSize: 11,
+        fontWeight: 'bold',
+    },
+    // Estados vazios
     emptyContainer: {
         flex: 1,
         justifyContent: 'center',
@@ -100,25 +173,10 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#7f8c8d',
         textAlign: 'center',
+        marginTop: 16,
     },
-    bannerContainer: {
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        paddingBottom: 16,
-        paddingTop: 24,
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
-    },
-    bannerNome: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        color: '#2c3e50',
-        marginTop: 8,
-    },
-    bannerImagem: {
-        width: '100%',
-        height: 120,
-        backgroundColor: '#eaf1fa',
+    espacoFinal: {
+        height: 20,
     },
 });
 

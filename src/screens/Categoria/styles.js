@@ -1,83 +1,36 @@
 import { StyleSheet, Dimensions } from 'react-native';
 
 const { width } = Dimensions.get('window');
-const cardWidth = (width / 2) - 24;
+const cardWidth = (width / 2) - 24; 
 
 export default StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f8f9fa',
     },
-    header: {
-        paddingTop: 50, 
-        paddingHorizontal: 16,
-        paddingBottom: 12,
-        backgroundColor: '#fff',
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    backButton: {
-        position: 'absolute',
-        left: 16,
-        top: 50, 
-        bottom: 12,
-        justifyContent: 'center',
-        zIndex: 1,
-    },
-    headerTitle: {
-        fontSize: 20,
-        fontWeight: '600',
-        color: '#2c3e50',
-    },
-    searchContainer: {
-        padding: 16,
-        backgroundColor: '#fff',
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    searchInput: {
-        flex: 1,
-        backgroundColor: '#f1f2f6',
-        borderRadius: 25,
-        paddingHorizontal: 20,
+    contadorContainer: {
         paddingVertical: 12,
-        paddingRight: 40,
+        paddingHorizontal: 16,
+        backgroundColor: '#fff',
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+    },
+    contadorText: {
         fontSize: 16,
-        color: '#2c3e50',
+        fontWeight: '600',
+        color: '#555',
     },
-    clearButton: {
-        position: 'absolute',
-        right: 25,
-        height: 50,
-        justifyContent: 'center',
-    },
-    listContainer: {
+    medicamentosList: {
         paddingHorizontal: 8,
         paddingTop: 16,
     },
-    section: {
-        marginTop: 20,
-        paddingHorizontal: 16,
-    },
-    sectionTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#2c3e50',
-        marginBottom: 16,
-    },
-    produtoCard: {
+    medicamentoCard: {
         width: cardWidth,
         backgroundColor: '#fff',
         borderRadius: 14,
         padding: 12,
         marginHorizontal: 8,
         marginBottom: 16,
-        alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.08,
@@ -87,7 +40,7 @@ export default StyleSheet.create({
         borderColor: '#fff',
         overflow: 'hidden',
     },
-    produtoImagem: {
+    medicamentoImagem: {
         width: 100,
         height: 100,
         backgroundColor: '#f1f2f6',
@@ -95,29 +48,30 @@ export default StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 12,
+        alignSelf: 'center',
     },
-    produtoImagemReal: {
-        width: '100%',
-        height: '100%',
+    medicamentoImagemTexto: {
+        fontSize: 30,
     },
-    produtoNome: {
+    medicamentoInfo: {
+        flex: 1,
+    },
+    medicamentoNome: {
         fontSize: 15,
         fontWeight: '600',
         color: '#2c3e50',
         marginBottom: 4,
-        textAlign: 'center',
     },
-    produtoMarca: {
+    medicamentoCategoria: {
         fontSize: 13,
         color: '#7f8c8d',
         marginBottom: 6,
-        textAlign: 'center',
     },
-    produtoPreco: {
+    medicamentoPreco: {
         fontSize: 17,
         fontWeight: 'bold',
         color: '#27ae60',
-        textAlign: 'center',
+        marginTop: 'auto',
     },
     
     // --- ESTILOS DE PROMOÇÃO ---
@@ -145,6 +99,7 @@ export default StyleSheet.create({
         fontSize: 13,
         color: '#7f8c8d',
         textDecorationLine: 'line-through',
+        marginTop: 'auto',
     },
     // ---------------------------------
     
@@ -155,20 +110,12 @@ export default StyleSheet.create({
         padding: 20,
         marginTop: 50,
     },
-    emptyIcon: {
-        fontSize: 48,
-        marginBottom: 16,
-    },
     emptyText: {
         fontSize: 16,
         color: '#7f8c8d',
         textAlign: 'center',
     },
-    skeletonCard: {
-        backgroundColor: '#fff',
-    },
-    skeletonElement: {
-        backgroundColor: '#f1f2f6',
-        borderRadius: 4,
+    espacoFinal: {
+        height: 40,
     },
 });
