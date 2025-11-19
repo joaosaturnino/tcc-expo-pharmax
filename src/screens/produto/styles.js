@@ -1,34 +1,57 @@
-import { StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet, Dimensions, Platform } from 'react-native';
 
 const { width } = Dimensions.get('window');
+
+// Paleta de cores para facilitar manutenção
+const COLORS = {
+    background: '#F2F4F7', // Cinza bem claro e moderno
+    white: '#FFFFFF',
+    primary: '#2A7CC7',    // Azul principal
+    textDark: '#1E293B',   // Quase preto, mais suave
+    textGray: '#64748B',   // Cinza médio
+    success: '#059669',    // Verde para preços
+    danger: '#EF4444',     // Vermelho para promoções
+    border: '#E2E8F0',     // Bordas sutis
+    cardPromoBg: '#FFF7ED' // Fundo laranja bem clarinho para promo
+};
 
 export default StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f8f9fa',
+        backgroundColor: COLORS.background,
     },
     content: {
         flex: 1,
     },
+
     // --- Header do Produto ---
     produtoHeader: {
         flexDirection: 'row',
-        padding: 16,
-        backgroundColor: '#fff',
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
+        padding: 20,
+        backgroundColor: COLORS.white,
+        borderBottomLeftRadius: 24,
+        borderBottomRightRadius: 24,
+        // Sombra suave
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.05,
+        shadowRadius: 10,
+        elevation: 5,
+        marginBottom: 16,
     },
     produtoImagemContainer: {
-        width: 120,
-        height: 120,
-        backgroundColor: '#f1f2f6',
-        borderRadius: 12,
+        width: 110,
+        height: 110,
+        backgroundColor: '#F8FAFC',
+        borderRadius: 16,
         justifyContent: 'center',
         alignItems: 'center',
+        borderWidth: 1,
+        borderColor: COLORS.border,
     },
     produtoImagem: {
-        width: 100,
-        height: 100,
+        width: 90,
+        height: 90,
     },
     produtoInfoBasica: {
         flex: 1,
@@ -36,157 +59,196 @@ export default StyleSheet.create({
         justifyContent: 'center',
     },
     produtoNome: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        color: '#2c3e50',
-        marginBottom: 4,
-        flexShrink: 1,
+        fontSize: 20,
+        fontWeight: '800', // Extra bold
+        color: COLORS.textDark,
+        marginBottom: 6,
+        lineHeight: 26,
     },
     produtoMarca: {
-        fontSize: 15,
-        color: '#7f8c8d',
-        marginBottom: 2,
+        fontSize: 14,
+        fontWeight: '600',
+        color: COLORS.primary,
+        backgroundColor: '#E0F2FE', // Fundo azul claro
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 6,
+        alignSelf: 'flex-start', // Ocupa apenas o tamanho do texto
+        overflow: 'hidden',
+        marginRight: 6,
+        marginBottom: 4,
     },
     produtoCategoria: {
-        fontSize: 15,
-        color: '#7f8c8d',
+        fontSize: 14,
+        color: COLORS.textGray,
+        marginTop: 4,
     },
 
-    // --- Conteúdo ---
-    conteudoContainer: {
-        padding: 16,
-        backgroundColor: '#fff',
-        marginTop: 8,
-    },
-    conteudoTexto: {
-        fontSize: 16,
-        color: '#34495e',
-        lineHeight: 22,
-    },
-
-    // --- Descrição ---
-    descricaoContainer: {
-        padding: 16,
-        backgroundColor: '#fff',
-        marginTop: 8,
-    },
+    // --- Títulos das Seções ---
     secaoTitulo: {
         fontSize: 18,
-        fontWeight: 'bold',
-        color: '#2c3e50',
-        marginBottom: 8,
+        fontWeight: '700',
+        color: COLORS.textDark,
+        marginBottom: 12,
+        marginTop: 8,
+    },
+
+    // --- Conteúdo e Descrição (Estilo Card) ---
+    conteudoContainer: {
+        backgroundColor: COLORS.white,
+        marginHorizontal: 16,
+        marginBottom: 16,
+        padding: 16,
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: COLORS.border,
+    },
+    conteudoTexto: {
+        fontSize: 15,
+        color: COLORS.textDark,
+        fontWeight: '500',
+    },
+    descricaoContainer: {
+        backgroundColor: COLORS.white,
+        marginHorizontal: 16,
+        marginBottom: 16,
+        padding: 16,
+        borderRadius: 16,
+        borderWidth: 1,
+        borderColor: COLORS.border,
     },
     descricaoTexto: {
         fontSize: 15,
-        color: '#34495e',
-        lineHeight: 22,
+        color: COLORS.textGray,
+        lineHeight: 24, // Melhor leitura
+        textAlign: 'justify',
     },
 
     // --- Lista de Farmácias ---
     farmaciasContainer: {
-        padding: 16,
-        marginTop: 8,
-        backgroundColor: '#fff',
+        paddingHorizontal: 16,
+        paddingBottom: 20,
     },
+    
+    // --- CARD FARMÁCIA ---
     farmaciaCard: {
-        backgroundColor: '#f8f9fa',
-        borderRadius: 12,
-        padding: 14,
-        marginBottom: 12,
+        backgroundColor: COLORS.white,
+        borderRadius: 16,
+        padding: 16,
+        marginBottom: 16,
+        // Sombra para destacar o card
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 6,
+        elevation: 3,
         borderWidth: 1,
-        borderColor: '#eee', // Borda padrão
-        position: 'relative',
-        overflow: 'hidden',
+        borderColor: 'transparent', // Padrão sem borda
     },
-    // --- CORREÇÃO: Estilo de Destaque ---
+    
+    // Estilo quando em promoção
     farmaciaCardEmPromocao: {
-        backgroundColor: '#fffbeb', // Fundo amarelo claro
-        borderColor: '#e74c3c', // Borda vermelha
-        borderWidth: 2, // Borda mais grossa
+        backgroundColor: COLORS.cardPromoBg,
+        borderColor: '#FDBA74', // Laranja suave
+        borderWidth: 1,
     },
-    // ------------------------------------
-    farmaciaNome: {
-        fontSize: 17,
+
+    // --- Badge de Promoção ---
+    promoBadge: {
+        position: 'absolute',
+        top: 12,
+        right: 12,
+        backgroundColor: COLORS.danger,
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 8,
+        zIndex: 10,
+    },
+    promoBadgeTexto: {
+        color: COLORS.white,
+        fontSize: 12,
         fontWeight: 'bold',
-        color: '#2c3e50',
+    },
+
+    // --- Informações da Farmácia ---
+    farmaciaNome: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: COLORS.textDark,
+        marginBottom: 4,
+        maxWidth: '80%', // Para não ficar em cima do badge
     },
     farmaciaEndereco: {
-        fontSize: 14,
-        color: '#7f8c8d',
-        marginTop: 4,
+        fontSize: 13,
+        color: COLORS.textGray,
+        marginBottom: 2,
     },
     farmaciaDistancia: {
-        fontSize: 14,
-        color: '#7f8c8d',
-        marginTop: 2,
+        fontSize: 13,
+        fontWeight: '600',
+        color: COLORS.primary,
+        marginBottom: 12,
     },
+
+    // --- Área de Preço e Ações ---
     farmaciaInfo: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'flex-end',
-        marginTop: 12,
+        alignItems: 'center',
         borderTopWidth: 1,
-        borderTopColor: '#eee',
+        borderTopColor: COLORS.border,
         paddingTop: 12,
+        marginTop: 8,
     },
 
-    // --- Estilos de Preço e Promoção ---
-    farmaciaPreco: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#2c3e50',
-    },
+    // Preços
     farmaciaPrecoAntigo: {
-        fontSize: 15,
-        color: '#7f8c8d',
+        fontSize: 14,
+        color: '#94A3B8',
         textDecorationLine: 'line-through',
+        marginBottom: -2,
+    },
+    farmaciaPreco: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: COLORS.textDark, // Preço normal
     },
     farmaciaPrecoPromocional: {
-        fontSize: 20,
+        fontSize: 24,
         fontWeight: 'bold',
-        color: '#27ae60',
+        color: COLORS.success, // Verde chamativo
     },
-    // --- CORREÇÃO: Badge Atualizado ---
-    promoBadge: {
-        position: 'absolute',
-        top: -1,
-        right: -1,
-        backgroundColor: '#e74c3c', // Vermelho
-        paddingHorizontal: 12, // Mais espaço para o texto
-        paddingVertical: 4, // Mais espaço para o texto
-        borderTopRightRadius: 12,
-        borderBottomLeftRadius: 12,
-    },
-    promoBadgeTexto: {
-        color: '#fff',
-        fontSize: 12, // Fonte um pouco maior
-        fontWeight: 'bold',
-    },
-    // ------------------------------------
-
     farmaciaQuantidade: {
-        fontSize: 13,
-        color: '#7f8c8d',
-        marginTop: 2,
+        fontSize: 12,
+        color: COLORS.textGray,
+        marginTop: 4,
     },
+
+    // Botões
     farmaciaAcoes: {
         flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8, // Espaço entre botões (funciona no RN mais novo)
     },
     farmaciaBotao: {
-        marginLeft: 10,
-        backgroundColor: '#e9f3fd',
-        paddingVertical: 8,
-        paddingHorizontal: 12,
-        borderRadius: 8,
+        backgroundColor: '#EFF6FF', // Azul bem claro
+        paddingVertical: 10,
+        paddingHorizontal: 14,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#DBEAFE',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     farmaciaBotaoTexto: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: '#2A7CC7',
+        fontSize: 13,
+        fontWeight: '700',
+        color: COLORS.primary,
     },
 
-    // --- Espaço no Final ---
+    // Espaço final para scroll
     espacoFinal: {
-        height: 40,
+        height: 60,
     }
 });

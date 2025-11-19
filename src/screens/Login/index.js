@@ -1,7 +1,17 @@
-import { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, Alert, Image, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { 
+    View, 
+    Text, 
+    TouchableOpacity, 
+    TextInput, 
+    Alert, 
+    Image, 
+    KeyboardAvoidingView, 
+    ScrollView, 
+    Platform,
+    ActivityIndicator // Importado para mostrar o loading
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-// CORREÇÃO 1: Importar o AsyncStorage
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import api from '../../services/api'; 
@@ -10,8 +20,11 @@ import styles from './styles';
 export default function Login() {
     const navigation = useNavigation();
 
-    const [email, setEmail] = useState('ana.silva@email.com');
-    const [senha, setSenha] = useState('123456');
+    const [email, setEmail] = useState('');
+    const [senha, setSenha] = useState('');
+    
+    // Estado para controlar o carregamento do botão
+    const [loading, setLoading] = useState(false);
 
     async function Acesso() {
         if (!email || !senha) {
@@ -19,41 +32,41 @@ export default function Login() {
             return;
         }
 
+        // Inicia o loading
+        setLoading(true);
+
         try {
             const requestData = {
                 usu_email: email,
                 usu_senha: senha
             };
             
-            // Rota de login (está correta)
             const response = await api.post('/usuarios/login', requestData);
 
             if (response.data.sucesso) {
-                // CORREÇÃO 2: Obter os dados do usuário da resposta.
                 const usuarioLogado = response.data.dados;
 
-                // CORREÇÃO 3: Salvar o usuário no AsyncStorage
-                // A chave 'usuario_info' é a mesma que a tela Produto (Favoritos) espera!
                 await AsyncStorage.setItem('usuario_info', JSON.stringify(usuarioLogado));
 
-                // Limpa os campos após o sucesso
                 setEmail('');
                 setSenha('');
                 
-                // CORREÇÃO 4: Navegar para a tela principal
-                // Não precisamos mais enviar o ID, pois ele está salvo no AsyncStorage
                 navigation.navigate('BottonTab'); 
 
             } else {
-                Alert.alert('Erro no Login', response.data.mensagem);
+                Alert.alert('Erro no Login', response.data.mensagem || 'Verifique suas credenciais.');
             }
 
         } catch (error) {
+            console.error("Erro login:", error);
             if (error.response) {
-                Alert.alert('Erro!', error.response.data.mensagem);
+                Alert.alert('Erro!', error.response.data.mensagem || 'Erro desconhecido do servidor.');
             } else {
-                Alert.alert('Erro de Conexão', 'Não foi possível conectar ao servidor. Verifique sua rede.');
+                Alert.alert('Erro de Conexão', 'Não foi possível conectar ao servidor. Verifique sua internet.');
             }
+        } finally {
+            // Para o loading independente do resultado (sucesso ou erro)
+            setLoading(false);
         }
     }
 
@@ -62,7 +75,7 @@ export default function Login() {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.container}
         >
-            <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
+            <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <View style={styles.logoContainer}>
                     <Image
                         source={require('../../../public/LogoEscrita.png')}
@@ -80,6 +93,7 @@ export default function Login() {
                         onChangeText={setEmail}
                         keyboardType="email-address"
                         autoCapitalize="none"
+                        returnKeyType="next"
                     />
                     <TextInput
                         style={styles.input}
@@ -88,18 +102,29 @@ export default function Login() {
                         value={senha}
                         secureTextEntry
                         onChangeText={setSenha}
+                        returnKeyType="send"
+                        onSubmitEditing={Acesso} // Tenta logar ao dar Enter na senha
                     />
 
-                    <TouchableOpacity style={styles.loginButton} onPress={Acesso}>
-                        <Text style={styles.loginButtonText}>Acessar sistema</Text>
+                    <TouchableOpacity 
+                        style={[styles.loginButton, loading && { opacity: 0.7 }]} 
+                        onPress={Acesso}
+                        disabled={loading} // Evita múltiplos cliques
+                    >
+                        {loading ? (
+                            <ActivityIndicator size="small" color="#FFF" />
+                        ) : (
+                            <Text style={styles.loginButtonText}>Acessar sistema</Text>
+                        )}
                     </TouchableOpacity>
 
                     <View style={styles.linksContainer}>
-                        <TouchableOpacity onPress={() => navigation.navigate('CadUsuario')}>
+                        {/* CORREÇÃO: Nome da rota ajustado para CadUsuario */}
+                        <TouchableOpacity onPress={() => navigation.navigate('Usuario')}>
                             <Text style={styles.link}>Cadastro de Usuários</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity onPress={() => navigation.navigate('EsqSenha')}>
+                        <TouchableOpacity onPress={() => navigation.navigate('Senha')}>
                             <Text style={styles.link}>Esqueceu a senha?</Text>
                         </TouchableOpacity>
                     </View>

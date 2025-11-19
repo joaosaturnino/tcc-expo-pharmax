@@ -1,102 +1,144 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
+
+const { width } = Dimensions.get('window');
 
 export default StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#EEE9E9',
-        padding: 20,
+        backgroundColor: '#f8f9fa',
+    },
+    scrollContainer: {
+        paddingBottom: 40,
+        paddingHorizontal: 20,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#f8f9fa',
+    },
+    loadingText: {
+        marginTop: 10,
+        color: '#7f8c8d',
+        fontSize: 16,
     },
     header: {
         alignItems: 'center',
-        marginBottom: 30,
-        marginTop: 20,
+        marginTop: 30,
+        marginBottom: 20,
     },
     title: {
-        fontSize: 26,
+        fontSize: 28,
         fontWeight: 'bold',
-        color: '#333',
+        color: '#2c3e50',
     },
     profileContainer: {
         alignItems: 'center',
     },
-    photoContainer: {
+    photoWrapper: {
         marginBottom: 30,
+        position: 'relative',
     },
     profilePhoto: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        backgroundColor: '#3498db',
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        borderWidth: 4,
+        borderColor: '#fff',
+    },
+    profilePhotoPlaceholder: {
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        backgroundColor: '#bdc3c7',
         justifyContent: 'center',
         alignItems: 'center',
+        borderWidth: 4,
+        borderColor: '#fff',
     },
-    photoText: {
-        color: 'white',
-        fontSize: 40,
-        fontWeight: 'bold',
+    editIconBadge: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        backgroundColor: '#66CD00',
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 3,
+        borderColor: '#fff',
+        elevation: 5,
     },
     form: {
         width: '100%',
-        maxWidth: 400,
     },
     label: {
         fontSize: 16,
-        color: '#333',
+        color: '#34495e',
         marginBottom: 5,
         fontWeight: '600',
+        marginLeft: 2,
     },
-    input: {
-        backgroundColor: 'white',
+    inputReadonly: {
+        backgroundColor: '#e9ecef',
         borderWidth: 1,
-        borderColor: '#ddd',
-        borderRadius: 8,
+        borderColor: '#ced4da',
+        borderRadius: 10,
         padding: 15,
         marginBottom: 20,
         fontSize: 16,
+        color: '#7f8c8d', 
     },
-    // Adicionei este estilo para quando estiver editando (se desejar)
-    inputEditing: { 
+    inputEditing: {
         backgroundColor: '#FFF',
-        borderWidth: 1,
-        borderColor: '#66CD00', // Borda verde para indicar edição
-        borderRadius: 8,
+        borderWidth: 1.5,
+        borderColor: '#66CD00', 
+        borderRadius: 10,
         padding: 15,
         marginBottom: 20,
         fontSize: 16,
+        color: '#2c3e50', 
+        shadowColor: "#66CD00",
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 2,
     },
-    buttons: {
-        marginTop: 20,
+    buttonsContainer: {
+        marginTop: 10,
+        gap: 15, 
     },
     editButton: {
-        backgroundColor: '#66CD00',
-        padding: 15,
-        borderRadius: 8,
+        backgroundColor: '#3498db', 
+        paddingVertical: 15,
+        borderRadius: 10,
         alignItems: 'center',
+        elevation: 3,
     },
     saveButton: {
-        backgroundColor: '#66CD00',
-        padding: 15,
-        borderRadius: 8,
+        backgroundColor: '#66CD00', 
+        paddingVertical: 15,
+        borderRadius: 10,
         alignItems: 'center',
+        elevation: 3,
     },
-    // Estilo para o botão de salvar desabilitado
-    saveButtonDisabled: {
-        backgroundColor: '#A5D6A7', // Verde mais claro
-        padding: 15,
-        borderRadius: 8,
-        alignItems: 'center',
-    },
-    // NOVO ESTILO ADICIONADO
     logoutButton: {
-        backgroundColor: '#E53935', // Vermelho para "sair"
-        padding: 15,
-        borderRadius: 8,
+        backgroundColor: '#fff',
+        borderWidth: 1,
+        borderColor: '#e74c3c',
+        paddingVertical: 15,
+        borderRadius: 10,
         alignItems: 'center',
-        marginTop: 10, // Espaço entre os botões
     },
     buttonText: {
-        color: 'white',
-        fontSize: 16,
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    logoutText: {
+        color: '#e74c3c',
+        fontSize: 18,
         fontWeight: 'bold',
     },
 });

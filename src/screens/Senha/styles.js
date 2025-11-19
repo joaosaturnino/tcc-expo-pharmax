@@ -9,25 +9,33 @@ export default StyleSheet.create({
     },
     scrollContainer: {
         flexGrow: 1,
-        justifyContent: 'center',
         paddingHorizontal: 20,
-        paddingVertical: 20,
+        paddingVertical: 40,
     },
     header: {
-        alignItems: 'center',
+        width: '100%',
         marginBottom: 30,
+        marginTop: 10,
+        alignItems: 'center', // Centraliza o texto, mas o botão back ficará à esquerda via alignSelf
+    },
+    backButton: {
+        alignSelf: 'flex-start', // Joga a seta para a esquerda
+        marginBottom: 10,
+        padding: 5,
     },
     title: {
         fontSize: 28,
         fontWeight: 'bold',
         color: '#2c3e50',
-        marginBottom: 8,
+        marginBottom: 10,
         textAlign: 'center',
     },
     subtitle: {
         fontSize: 16,
         color: '#7f8c8d',
         textAlign: 'center',
+        lineHeight: 22,
+        paddingHorizontal: 10,
     },
     formContainer: {
         width: '100%',
@@ -39,75 +47,39 @@ export default StyleSheet.create({
         borderRadius: 8,
         paddingHorizontal: 15,
         paddingVertical: 12,
-        marginBottom: 15,
+        marginBottom: 20, // Reduzi um pouco para caber melhor
         fontSize: 16,
         color: '#2c3e50',
+        // Sombra
         shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 1,
-        },
+        shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
         shadowRadius: 2,
         elevation: 2,
     },
-    radioContainer: {
-        marginBottom: 20,
-    },
-    radioLabel: {
-        fontSize: 16,
-        color: '#2c3e50',
-        marginBottom: 10,
-        fontWeight: '500',
-    },
-    radioGroup: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-    radioButton: {
-        flex: 1,
-        paddingVertical: 12,
-        paddingHorizontal: 15,
-        borderRadius: 8,
-        backgroundColor: '#f1f2f6',
-        marginHorizontal: 5,
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: '#ddd',
-    },
-    radioButtonSelected: {
-        backgroundColor: '#3498db',
-        borderColor: '#3498db',
-    },
-    radioText: {
-        color: '#7f8c8d',
-        fontWeight: '500',
-    },
-    radioTextSelected: {
-        color: '#fff',
-    },
-    cadastroButton: {
+    recuperarButton: {
         backgroundColor: '#66CD00',
         borderRadius: 8,
         paddingVertical: 15,
         alignItems: 'center',
         marginTop: 10,
         shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
         elevation: 5,
     },
-    cadastroButtonText: {
+    buttonDisabled: {
+        backgroundColor: '#9bd675',
+        elevation: 0,
+    },
+    recuperarButtonText: {
         color: '#fff',
         fontSize: 18,
         fontWeight: 'bold',
     },
     linksContainer: {
-        marginTop: 20,
+        marginTop: 30,
         alignItems: 'center',
     },
     link: {

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  FlatList, 
-  TouchableOpacity, 
-  Image, 
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  Image,
   ActivityIndicator,
-  ScrollView 
+  ScrollView
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import styles from './styles';
@@ -18,11 +18,11 @@ import api from '../../services/api';
 function calcularPrecoPromocional(item) {
   const precoOriginal = parseFloat(item.preco || item.medp_preco);
   const desconto = parseFloat(item.promo_desconto);
-  
+
   if (isNaN(precoOriginal) || !desconto || desconto <= 0 || !item.promo_inicio || !item.promo_fim) {
-    return { 
-      precoOriginal: isNaN(precoOriginal) ? ' --,--' : precoOriginal.toFixed(2).replace('.', ','), 
-      precoComDesconto: null, 
+    return {
+      precoOriginal: isNaN(precoOriginal) ? ' --,--' : precoOriginal.toFixed(2).replace('.', ','),
+      precoComDesconto: null,
       estaEmPromocao: false,
       descontoPorcento: 0
     };
@@ -31,7 +31,7 @@ function calcularPrecoPromocional(item) {
   const hoje = new Date();
   const inicio = new Date(item.promo_inicio);
   const fim = new Date(item.promo_fim);
-  
+
   hoje.setHours(0, 0, 0, 0);
   inicio.setHours(0, 0, 0, 0);
   fim.setHours(0, 0, 0, 0);
@@ -40,17 +40,17 @@ function calcularPrecoPromocional(item) {
 
   if (estaEmPromocao) {
     const precoComDesconto = precoOriginal * (1 - desconto / 100);
-    return { 
-      precoOriginal: precoOriginal.toFixed(2).replace('.', ','), 
-      precoComDesconto: precoComDesconto.toFixed(2).replace('.', ','), 
+    return {
+      precoOriginal: precoOriginal.toFixed(2).replace('.', ','),
+      precoComDesconto: precoComDesconto.toFixed(2).replace('.', ','),
       estaEmPromocao: true,
       descontoPorcento: desconto
     };
   }
 
-  return { 
-    precoOriginal: precoOriginal.toFixed(2).replace('.', ','), 
-    precoComDesconto: null, 
+  return {
+    precoOriginal: precoOriginal.toFixed(2).replace('.', ','),
+    precoComDesconto: null,
     estaEmPromocao: false,
     descontoPorcento: 0
   };
@@ -60,7 +60,7 @@ function calcularPrecoPromocional(item) {
 export default function Categoria() {
   const route = useRoute();
   const navigation = useNavigation();
-  
+
   const { nome, tipo_id } = route.params;
 
   const [medicamentos, setMedicamentos] = useState([]);
@@ -68,9 +68,9 @@ export default function Categoria() {
 
   useEffect(() => {
     if (nome) {
-        navigation.setOptions({ title: nome });
+      navigation.setOptions({ title: nome });
     } else {
-        navigation.setOptions({ title: 'Medicamentos' });
+      navigation.setOptions({ title: 'Medicamentos' });
     }
   }, [navigation, nome]);
 
@@ -92,21 +92,21 @@ export default function Categoria() {
         setLoading(false);
       }
     }
-    
+
     fetchMedicamentos();
   }, [tipo_id]);
 
-  
+
   // --- renderItem ATUALIZADO ---
   const renderItem = ({ item }) => {
     const nomeMed = item.med_nome || item.nome;
     const marca = item.lab_nome || item.marca;
-    
+
     const promo = calcularPrecoPromocional(item);
 
     const imagemOrigem = item.med_imagem || item.imagem;
     const imageSource = typeof imagemOrigem === 'string'
-      ? { uri: imagemOrigem } 
+      ? { uri: imagemOrigem }
       : imagemOrigem || require('../../../public/paracetamol.png');
 
     return (
@@ -120,16 +120,16 @@ export default function Categoria() {
           </View>
         )}
         <View style={styles.medicamentoImagem}>
-          <Image 
-            source={imageSource} 
-            style={{width: '100%', height: '100%'}}
+          <Image
+            source={imageSource}
+            style={{ width: '100%', height: '100%' }}
             resizeMode="contain"
           />
         </View>
         <View style={styles.medicamentoInfo}>
           <Text style={styles.medicamentoNome} numberOfLines={2}>{nomeMed}</Text>
           <Text style={styles.medicamentoCategoria}>{marca}</Text>
-          
+
           {promo.estaEmPromocao ? (
             <>
               <Text style={styles.produtoPrecoAntigo}>R$ {promo.precoOriginal}</Text>
@@ -143,7 +143,7 @@ export default function Categoria() {
     );
   };
   // ------------------------------
-  
+
   const renderContent = () => {
     if (loading) {
       return (
@@ -153,7 +153,7 @@ export default function Categoria() {
         </View>
       );
     }
-    
+
     if (medicamentos.length === 0) {
       return (
         <View style={styles.emptyContainer}>
@@ -170,7 +170,7 @@ export default function Categoria() {
         keyExtractor={item => String(item.med_id || item.medp_id)}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.medicamentosList}
-        numColumns={2} 
+        numColumns={2}
         scrollEnabled={false}
       />
     );
@@ -178,13 +178,13 @@ export default function Categoria() {
 
   return (
     <View style={styles.container}>
-      <ScrollView> 
+      <ScrollView>
         <View style={styles.contadorContainer}>
           <Text style={styles.contadorText}>
             {medicamentos.length} medicamento{medicamentos.length !== 1 ? 's' : ''} encontrado{medicamentos.length !== 1 ? 's' : ''}
           </Text>
         </View>
-        
+
         {renderContent()}
 
         <View style={styles.espacoFinal} />

@@ -19,7 +19,7 @@ export default function BottomTab({ route }) {
             screenOptions={({ route }) => ({
                 tabBarIcon: ({ color, size, focused }) => { // 'focused' pode ser usado para ícones diferentes
                     let iconName;
-                    
+
                     if (route.name === 'Home') {
                         iconName = focused ? 'home' : 'home-outline';
                     } else if (route.name === 'Favoritos') {
@@ -27,7 +27,7 @@ export default function BottomTab({ route }) {
                     } else if (route.name === 'Perfil') {
                         iconName = focused ? 'person' : 'person-outline';
                     }
-                    
+
                     return <Ionicons name={iconName} size={size} color={color} />;
                 },
                 tabBarActiveTintColor: '#A2CD5A',
@@ -46,22 +46,22 @@ export default function BottomTab({ route }) {
                 headerShown: false,
             })}
         >
-            <Tab.Screen 
-                name="Home" 
+            <Tab.Screen
+                name="Home"
                 component={Home}
                 options={{ title: 'Home' }}
                 // 3. Passa o userId para a tela Home
                 initialParams={{ userId: userId }}
             />
-            <Tab.Screen 
-                name="Favoritos" 
+            <Tab.Screen
+                name="Favoritos"
                 component={Favoritos}
                 options={{ title: 'Favoritos' }}
                 // 3. Passa o userId para a tela Favoritos
                 initialParams={{ userId: userId }}
             />
-            <Tab.Screen 
-                name="Perfil" 
+            <Tab.Screen
+                name="Perfil"
                 component={Perfil}
                 options={{ title: 'Perfil' }}
                 // 3. Passa o userId para a tela Perfil

@@ -56,19 +56,75 @@ export default StyleSheet.create({
         height: 50,
         justifyContent: 'center',
     },
-    listContainer: {
-        paddingHorizontal: 8,
-        paddingTop: 16,
-    },
+    
+    // --- SEÇÕES ---
     section: {
-        marginTop: 20,
-        paddingHorizontal: 16,
+        marginTop: 24,
     },
     sectionTitle: {
         fontSize: 18,
         fontWeight: 'bold',
         color: '#2c3e50',
-        marginBottom: 16,
+        marginBottom: 12,
+        paddingHorizontal: 16,
+    },
+
+    // --- CARD DE FARMÁCIA / LABORATÓRIO ---
+    entidadeCard: {
+        width: 140, // Largura fixa para lista horizontal
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        padding: 12,
+        marginRight: 12, // Espaçamento horizontal entre cards
+        alignItems: 'center',
+        // Sombra
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 3,
+        borderWidth: 1,
+        borderColor: '#f0f0f0',
+    },
+    entidadeImagemContainer: {
+        width: 80,
+        height: 80,
+        borderRadius: 40, // Circular
+        backgroundColor: '#fff',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 8,
+        borderWidth: 1,
+        borderColor: '#f1f2f6',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+        elevation: 2,
+    },
+    entidadeImagem: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+    },
+    entidadeNome: {
+        fontSize: 14,
+        fontWeight: '700',
+        color: '#2c3e50',
+        textAlign: 'center',
+        marginBottom: 2,
+    },
+    entidadeTipo: {
+        fontSize: 12,
+        color: '#95a5a6',
+        fontWeight: '500',
+    },
+
+    // --- CARD DE MEDICAMENTO ---
+    gridContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        paddingHorizontal: 8,
     },
     produtoCard: {
         width: cardWidth,
@@ -83,9 +139,12 @@ export default StyleSheet.create({
         shadowOpacity: 0.08,
         shadowRadius: 4,
         elevation: 2,
-        borderWidth: 2,
-        borderColor: '#fff',
-        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: '#f1f2f6',
+    },
+    produtoCardEmPromocao: {
+        backgroundColor: '#fffbeb',
+        borderColor: '#e74c3c',
     },
     produtoImagem: {
         width: 100,
@@ -119,11 +178,10 @@ export default StyleSheet.create({
         color: '#27ae60',
         textAlign: 'center',
     },
-    
-    // --- ESTILOS DE PROMOÇÃO ---
-    produtoCardEmPromocao: {
-        backgroundColor: '#fffbeb',
-        borderColor: '#e74c3c',
+    produtoPrecoAntigo: {
+        fontSize: 13,
+        color: '#7f8c8d',
+        textDecorationLine: 'line-through',
     },
     promoBadge: {
         position: 'absolute',
@@ -141,13 +199,8 @@ export default StyleSheet.create({
         fontSize: 11,
         fontWeight: 'bold',
     },
-    produtoPrecoAntigo: {
-        fontSize: 13,
-        color: '#7f8c8d',
-        textDecorationLine: 'line-through',
-    },
-    // ---------------------------------
     
+    // --- Empty State ---
     emptyContainer: {
         flex: 1,
         justifyContent: 'center',
@@ -163,12 +216,5 @@ export default StyleSheet.create({
         fontSize: 16,
         color: '#7f8c8d',
         textAlign: 'center',
-    },
-    skeletonCard: {
-        backgroundColor: '#fff',
-    },
-    skeletonElement: {
-        backgroundColor: '#f1f2f6',
-        borderRadius: 4,
     },
 });

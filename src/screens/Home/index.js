@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import styles from './styles';
 import api from '../../services/api';
 
-// --- Função Helper de Promoção (sem alteração) ---
+// --- Função Helper de Promoção ---
 function calcularPrecoPromocional(item) {
   const precoOriginal = parseFloat(item.preco || item.medp_preco);
   const desconto = parseFloat(item.promo_desconto);
@@ -24,8 +24,6 @@ function calcularPrecoPromocional(item) {
   }
   return { precoOriginal: precoOriginal.toFixed(2).replace('.', ','), precoComDesconto: null, estaEmPromocao: false, descontoPorcento: 0 };
 }
-// ---------------------------------------------------
-
 
 export default function Home() {
   const navigation = useNavigation();
@@ -45,7 +43,7 @@ export default function Home() {
     setIsRefreshing(true);
     try {
       await Promise.all([
-        fetchDestaques(), // Esta é a função que vamos mudar
+        fetchDestaques(),
         fetchFarmaciasPopulares(),
         fetchLaboratorios()
       ]);
@@ -56,30 +54,24 @@ export default function Home() {
     }
   }, []);
 
-  // --- CORREÇÃO: Lógica de Destaques Aleatórios ---
   async function fetchDestaques() {
     try {
-      // 1. Pede 20 itens para a API (em vez de 4)
       const response = await api.get('/medicamentos/todos?limit=20');
       const allDados = response?.data?.dados?.filter(item => item) ?? [];
 
-      // 2. Embaralha a lista (Algoritmo Fisher-Yates)
       let shuffled = [...allDados];
       for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
       }
 
-      // 3. Pega os primeiros 4 itens da lista embaralhada
       const dados = shuffled.slice(0, 4);
-
       setProdutosDestaque(dados);
     } catch (error) {
       console.error('Erro ao buscar destaques:', error);
       setProdutosDestaque([]);
     }
   }
-  // ---------------------------------------------
 
   async function fetchFarmaciasPopulares() {
     try {
@@ -118,12 +110,19 @@ export default function Home() {
     }
   }
 
-  // --- DADOS ESTÁTICOS E MOCK (sem alteração) ---
+  // --- DADOS ESTÁTICOS ---
   const categorias = [
-    { id: '1', nome: 'Antialérgicos', imagem: require('../../../public/alergia.png') },
-    { id: '2', nome: 'Analgésicos', imagem: require('../../../public/dor-de-cabeca.png') },
-    { id: '3', nome: 'Vitaminas', imagem: require('../../../public/vitaminas.png') },
-    { id: '4. ', nome: 'Antibióticos', imagem: require('../../../public/antibiotico.png') },
+    { id: '4', nome: 'Antialérgicos', imagem: require('../../../public/alergia.png') },
+    { id: '1', nome: 'Analgésicos', imagem: require('../../../public/dor-de-cabeca.png') },
+    { id: '5', nome: 'Vitaminas', imagem: require('../../../public/vitaminas.png') },
+    { id: '2', nome: 'Antibióticos', imagem: require('../../../public/antibiotico.png') }, 
+    { id: '3', nome: 'Anti-inflamatório', imagem: require('../../../public/anti-inflamatorio.png') },
+    { id: '11', nome: 'Cardiovascular', imagem: require('../../../public/coracao.png') },
+    { id: '10', nome: 'Gastrointestinal', imagem: require('../../../public/trato-gastrointestinal.png') },
+    { id: '9', nome: 'Dermatológico', imagem: require('../../../public/dermatologia.png') },
+    { id: '12', nome: 'Respiratório', imagem: require('../../../public/pulmao.png') },
+    { id: '14', nome: 'Antifúngico', imagem: require('../../../public/anti-fungo.png') },
+    { id: '15', nome: 'Hormonal', imagem: require('../../../public/hormonios.png') },
   ];
   const produtosPromocaoMock = [
     { med_id: '1', med_nome: 'Paracetamol', medp_preco: 'R$ 15,00', lab_nome: 'Medley', categoria: 'Analgésicos', med_imagem: require('../../../public/paracetamol.png') },
@@ -134,7 +133,7 @@ export default function Home() {
     { lab_id: '2', lab_nome: 'EuroPharma', lab_logo: require('../../../public/europharma.png') },
   ];
 
-  // --- FUNÇÕES DE RENDERIZAÇÃO (sem alteração) ---
+  // --- RENDERIZAÇÃO ---
   const renderCategoria = ({ item }) => {
     if (!item) return null; 
     return (
@@ -247,7 +246,6 @@ export default function Home() {
     }
   }
 
-  // --- RENDERIZAÇÃO PRINCIPAL DA HOME ---
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -259,7 +257,7 @@ export default function Home() {
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Pesquisar produto..."
+          placeholder="Pesquisar produto, farmácia ou laboratório..."
           placeholderTextColor="#999"
           value={searchText}
           onChangeText={setSearchText}
@@ -279,7 +277,6 @@ export default function Home() {
           />
         }
       >
-        {/* Categorias */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Categorias</Text>
           <FlatList
@@ -292,7 +289,6 @@ export default function Home() {
           />
         </View>
         
-        {/* Destaques */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Destaques</Text>
@@ -301,7 +297,7 @@ export default function Home() {
                 nome: 'Todos os Medicamentos' 
               })}
             >
-              <Text style={styles.verTudo}>Todas</Text>
+              <Text style={styles.verTudo}>Ver Mais</Text>
             </TouchableOpacity>
           </View>
           <FlatList
@@ -314,9 +310,19 @@ export default function Home() {
           />
         </View>
         
-        {/* Farmácias Populares */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Farmácias Populares</Text>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Farmácias Populares</Text>
+            <TouchableOpacity 
+              onPress={() => navigation.navigate('Listagem', { 
+                tipo: 'farmacia',
+                titulo: 'Todas as Farmácias'
+              })}
+            >
+              <Text style={styles.verTudo}>Ver Mais</Text>
+            </TouchableOpacity>
+          </View>
+          
           <FlatList
             data={farmaciasPopulares}
             renderItem={renderBannerFarmacia}
@@ -327,9 +333,21 @@ export default function Home() {
           />
         </View>
         
-        {/* Laboratórios Populares */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Laboratórios Populares</Text>
+          {/* --- ALTERAÇÃO AQUI: Cabeçalho com botão 'Todas' para Laboratórios --- */}
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Laboratórios Populares</Text>
+            <TouchableOpacity 
+              onPress={() => navigation.navigate('Listagem', { 
+                tipo: 'laboratorio',
+                titulo: 'Todos os Laboratórios'
+              })}
+            >
+              <Text style={styles.verTudo}>Ver Mais</Text>
+            </TouchableOpacity>
+          </View>
+          {/* --------------------------------------------------------------------- */}
+
           <FlatList
             data={laboratorios.length ? laboratorios : marcas}
             renderItem={renderLaboratorio}

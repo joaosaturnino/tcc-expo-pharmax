@@ -1,10 +1,10 @@
 import React, { useState, useCallback } from 'react';
-import { 
-    View, 
-    Text, 
-    FlatList, 
-    TouchableOpacity, 
-    Image, 
+import {
+    View,
+    Text,
+    FlatList,
+    TouchableOpacity,
+    Image,
     Alert,
     RefreshControl,
     ActivityIndicator
@@ -12,28 +12,28 @@ import {
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
-import api from '../../services/api'; 
+import api from '../../services/api';
 import styles from './styles';
 
 // --- Função Helper de Promoção (sem alteração) ---
 function calcularPrecoPromocional(item) {
-  const precoOriginal = parseFloat(item.preco || item.medp_preco);
-  const desconto = parseFloat(item.promo_desconto);
-  
-  if (isNaN(precoOriginal) || !desconto || desconto <= 0 || !item.promo_inicio || !item.promo_fim) {
+    const precoOriginal = parseFloat(item.preco || item.medp_preco);
+    const desconto = parseFloat(item.promo_desconto);
+
+    if (isNaN(precoOriginal) || !desconto || desconto <= 0 || !item.promo_inicio || !item.promo_fim) {
+        return { estaEmPromocao: false, descontoPorcento: 0 };
+    }
+    const hoje = new Date();
+    const inicio = new Date(item.promo_inicio);
+    const fim = new Date(item.promo_fim);
+    hoje.setHours(0, 0, 0, 0);
+    inicio.setHours(0, 0, 0, 0);
+    fim.setHours(0, 0, 0, 0);
+    const estaEmPromocao = (hoje >= inicio && hoje <= fim);
+    if (estaEmPromocao) {
+        return { estaEmPromocao: true, descontoPorcento: desconto };
+    }
     return { estaEmPromocao: false, descontoPorcento: 0 };
-  }
-  const hoje = new Date();
-  const inicio = new Date(item.promo_inicio);
-  const fim = new Date(item.promo_fim);
-  hoje.setHours(0, 0, 0, 0);
-  inicio.setHours(0, 0, 0, 0);
-  fim.setHours(0, 0, 0, 0);
-  const estaEmPromocao = (hoje >= inicio && hoje <= fim);
-  if (estaEmPromocao) {
-    return { estaEmPromocao: true, descontoPorcento: desconto };
-  }
-  return { estaEmPromocao: false, descontoPorcento: 0 };
 }
 // ---------------------------------------------------
 
@@ -114,7 +114,7 @@ export default function Favoritos() {
                         }
                         try {
                             const response = await api.delete(`/favoritos/${fav_id}`, {
-                                data: { usuario_id: usuarioId } 
+                                data: { usuario_id: usuarioId }
                             });
                             if (response.data.sucesso) {
                                 const novaLista = favoritos.filter(item => item.fav_id !== fav_id);
@@ -134,9 +134,9 @@ export default function Favoritos() {
 
     // --- renderProduto ---
     const renderProduto = ({ item }) => {
-        
+
         const imageSource = item.med_imagem
-            ? { uri: item.med_imagem } 
+            ? { uri: item.med_imagem }
             : require('../../../public/alergia.png');
 
         const promo = calcularPrecoPromocional(item);
@@ -174,23 +174,23 @@ export default function Favoritos() {
                     <Text style={styles.produtoNome} numberOfLines={2}>{item.med_nome}</Text>
                     <Text style={styles.produtoMarca}>{item.fabricante_nome}</Text>
                     <Text style={styles.produtoDosagem}>{item.med_dosagem}</Text>
-                    
+
                     {/* Bloco de Preço REMOVIDO */}
                 </View>
             </TouchableOpacity>
         );
     };
-    
+
     // (O resto do arquivo - if(loading), return(), etc. - continua igual)
     if (loading) {
         return (
-             <View style={styles.container}>
+            <View style={styles.container}>
                 <View style={styles.header}>
                     <Text style={styles.headerTitle}>Meus Favoritos</Text>
                 </View>
                 <View style={styles.vazioContainer}>
                     <ActivityIndicator size="large" color="#2c3e50" />
-                    <Text style={[styles.vazioTexto, {marginTop: 10}]}>Carregando...</Text>
+                    <Text style={[styles.vazioTexto, { marginTop: 10 }]}>Carregando...</Text>
                 </View>
             </View>
         );
@@ -208,7 +208,7 @@ export default function Favoritos() {
                         {usuarioId ? "Nenhum produto favoritado" : "Você não está logado"}
                     </Text>
                     <Text style={styles.vazioSubtexto}>
-                        {usuarioId 
+                        {usuarioId
                             ? "Os produtos que você favoritar aparecerão aqui"
                             : "Faça login para ver seus favoritos"}
                     </Text>

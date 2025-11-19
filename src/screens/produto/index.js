@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useLayoutEffect } from 'react'; // 1. Importar useLayoutEffect
 import { 
   View, 
   Text, 
@@ -15,11 +15,8 @@ import styles from './styles';
 import api from '../../services/api';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-// --- VERIFIQUE ESTA URL ---
-// Esta é a URL da sua imagem padrão? (baseado nos seus logs era 'sem-imagem.png',
-// mas se for 'alergia.png', troque o nome do arquivo aqui)
+// --- URL da imagem padrão ---
 const DEFAULT_IMAGE_URL = 'http://192.168.200.27:3334/public/medicamentos/caixa-medicamento-padrao5.png';
-// -------------------------
 
 // --- Função Helper de Promoção ---
 function calcularPrecoPromocional(item) {
@@ -69,17 +66,10 @@ export default function Produto() {
   const route = useRoute();
   const { produto } = route.params || {};
 
-  // Estados
-  const [farmacias, setFarmacias] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [isFavorito, setIsFavorito] = useState(false);
-  const [favId, setFavId] = useState(null); 
-  const [loadingFavorito, setLoadingFavorito] = useState(true);
-
-  // Normalização
+  // Normalização dos dados (Definidos antes para usar no Header)
   const med_id = produto?.med_id || produto?.medicamento_id || produto?.id;
   const farm_id = produto?.farmacia_id || produto?.farm_id; 
-  const med_nome = produto?.med_nome || produto?.nome || "Nome Indisponível";
+  const med_nome = produto?.med_nome || produto?.nome || "Detalhes do Produto";
   const med_marca = produto?.lab_nome || produto?.lab_med || produto?.marca || "Marca Desconhecida";
   const med_categoria = produto?.nome_tipo || produto?.tipo_nome || produto?.categoria || "Sem categoria"; 
   const med_descricao = produto?.med_descricao || produto?.descricao || "Descrição não disponível.";
@@ -87,6 +77,21 @@ export default function Produto() {
   const dosagem = produto?.med_dosagem;
   const qtdeProduto = produto?.med_quantidade;
   const formaProduto = produto?.forma_nome; 
+
+  // 2. Configura o Título da Tela dinamicamente com o Nome do Medicamento
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: med_nome, // Define o título como o nome do remédio
+      headerBackTitleVisible: false, // Opcional: remove texto "Voltar" no iOS
+    });
+  }, [navigation, med_nome]);
+
+  // Estados
+  const [farmacias, setFarmacias] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isFavorito, setIsFavorito] = useState(false);
+  const [favId, setFavId] = useState(null); 
+  const [loadingFavorito, setLoadingFavorito] = useState(true);
 
   let med_info_display = "";
   if (qtdeProduto) {
@@ -102,7 +107,7 @@ export default function Produto() {
       med_info_display = "Informação não disponível";
   }
   
-  // Lógica da Imagem (Correta)
+  // Lógica da Imagem
   const imagemOrigem = produto?.med_imagem || produto?.imagem;
   const med_imagem_source = (typeof imagemOrigem === 'string' && imagemOrigem.startsWith('http'))
     ? { uri: imagemOrigem }
@@ -130,7 +135,7 @@ export default function Produto() {
   }, [med_id]);
 
   
-  // useFocusEffect
+  // useFocusEffect - Verificar Favorito
   useFocusEffect(
     useCallback(() => {
       const verificarFavorito = async () => {
@@ -222,7 +227,7 @@ export default function Produto() {
   };
 
 
-  // Ações
+  // Ações (Placeholders)
   const fazerChamada = (telefone) => {/* ... */};
   const abrirMapa = (coordenadas) => {/* ... */};
 

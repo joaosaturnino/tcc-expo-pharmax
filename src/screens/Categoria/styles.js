@@ -1,7 +1,7 @@
 import { StyleSheet, Dimensions } from 'react-native';
 
 const { width } = Dimensions.get('window');
-const cardWidth = (width / 2) - 24; 
+const cardWidth = (width / 2) - 24;
 
 export default StyleSheet.create({
     container: {
@@ -73,7 +73,7 @@ export default StyleSheet.create({
         color: '#27ae60',
         marginTop: 'auto',
     },
-    
+
     // --- ESTILOS DE PROMOÇÃO ---
     produtoCardEmPromocao: {
         backgroundColor: '#fffbeb',
@@ -102,7 +102,7 @@ export default StyleSheet.create({
         marginTop: 'auto',
     },
     // ---------------------------------
-    
+
     emptyContainer: {
         flex: 1,
         justifyContent: 'center',

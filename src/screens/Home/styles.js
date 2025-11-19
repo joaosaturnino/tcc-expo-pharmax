@@ -158,7 +158,6 @@ export default StyleSheet.create({
         color: '#7f8c8d',
         textDecorationLine: 'line-through',
     },
-    // ---------------------------------
     
     marcasList: {
         paddingBottom: 15,
@@ -194,33 +193,48 @@ export default StyleSheet.create({
         fontWeight: '500',
         textAlign: 'center',
     },
-    espacoFinal: {
-        height: 30,
-    },
+    
+    // --- ESTILOS CARD FARMACIA MELHORADOS ---
     bannerFarmaciaCard: {
         width: 200,
-        height: 110,
+        height: 140, // Aumentado para caber melhor
         marginRight: 16,
         borderRadius: 12,
         overflow: 'hidden',
         backgroundColor: '#fff',
         alignItems: 'center',
-        justifyContent: 'flex-end',
+        justifyContent: 'space-between', 
         shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.08,
         shadowRadius: 4,
-        elevation: 2,
+        elevation: 3, 
+        borderWidth: 1,
+        borderColor: '#f0f0f0',
+    },
+    bannerFarmaciaImagemContainer: {
+        width: '100%',
+        height: 100, // Área fixa para imagem
+        backgroundColor: '#f9f9f9', 
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderBottomWidth: 1,
+        borderBottomColor: '#f0f0f0',
     },
     bannerFarmaciaImagem: {
-        width: '100%',
-        height: 80,
-        borderTopLeftRadius: 12,
-        borderTopRightRadius: 12,
+        width: '80%', 
+        height: '80%',
     },
     bannerFarmaciaNome: {
-        fontSize: 15,
-        fontWeight: 'bold',
+        fontSize: 14,
+        fontWeight: '600',
         color: '#2c3e50',
-        marginVertical: 6,
+        marginVertical: 10,
+        textAlign: 'center',
+        paddingHorizontal: 5,
+    },
+
+    espacoFinal: {
+        height: 30,
     },
 });
