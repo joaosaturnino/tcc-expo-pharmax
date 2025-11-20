@@ -5,36 +5,38 @@ const { width } = Dimensions.get('window');
 export default StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f8f9fa',
+        backgroundColor: '#f8f9fa', // Cor de fundo cinza claro
     },
     scrollContainer: {
         flexGrow: 1,
-        // justifyContent: 'center', // Removi para o topo não ficar flutuando quando teclado abre
         paddingHorizontal: 20,
         paddingVertical: 40,
     },
     header: {
-        alignItems: 'center',
+        // Não usamos alignItems: 'center' aqui para permitir que o botão 
+        // de voltar fique alinhado à esquerda naturalmente
         marginBottom: 30,
-        width: '100%', // Garante largura total para alinhar o botão voltar
+        width: '100%',
     },
-    // ESTILO NOVO PARA O BOTÃO VOLTAR
+    // Estilo do botão de voltar (ícone)
     backButton: {
-        alignSelf: 'flex-start', // Alinha à esquerda
-        marginBottom: 10,
-        padding: 5,
+        alignSelf: 'flex-start', // Garante que fique na esquerda
+        marginBottom: 15,        // Espaço entre a seta e o título
+        padding: 5,              // Aumenta a área clicável
     },
     title: {
         fontSize: 28,
         fontWeight: 'bold',
         color: '#2c3e50',
         marginBottom: 8,
-        textAlign: 'center',
+        textAlign: 'center', // Centraliza apenas o texto
+        alignSelf: 'center',
     },
     subtitle: {
         fontSize: 16,
         color: '#7f8c8d',
         textAlign: 'center',
+        alignSelf: 'center',
     },
     formContainer: {
         width: '100%',
@@ -49,6 +51,7 @@ export default StyleSheet.create({
         marginBottom: 15,
         fontSize: 16,
         color: '#2c3e50',
+        // Sombra suave no Android e iOS
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
@@ -56,19 +59,21 @@ export default StyleSheet.create({
         elevation: 2,
     },
     cadastroButton: {
-        backgroundColor: '#66CD00',
+        backgroundColor: '#66CD00', // Verde PharmaX
         borderRadius: 8,
         paddingVertical: 15,
         alignItems: 'center',
         marginTop: 10,
+        // Sombra mais forte no botão
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
         elevation: 5,
     },
+    // Estilo visual quando está carregando
     buttonDisabled: {
-        backgroundColor: '#9bd675',
+        backgroundColor: '#9bd675', // Verde mais claro
         elevation: 0,
     },
     cadastroButtonText: {

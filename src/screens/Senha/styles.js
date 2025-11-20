@@ -5,23 +5,26 @@ const { width } = Dimensions.get('window');
 export default StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f8f9fa',
+        backgroundColor: '#f8f9fa', // Cor de fundo suave
     },
     scrollContainer: {
         flexGrow: 1,
         paddingHorizontal: 20,
         paddingVertical: 40,
     },
+    // --- HEADER ---
     header: {
         width: '100%',
         marginBottom: 30,
         marginTop: 10,
-        alignItems: 'center', // Centraliza o texto, mas o botão back ficará à esquerda via alignSelf
+        // Não usamos alignItems: 'center' aqui para permitir 
+        // que o botão de voltar fique à esquerda
     },
     backButton: {
-        alignSelf: 'flex-start', // Joga a seta para a esquerda
-        marginBottom: 10,
-        padding: 5,
+        alignSelf: 'flex-start', // Força o botão a ficar na esquerda
+        marginBottom: 20,
+        padding: 8, // Aumenta a área de toque
+        borderRadius: 20,
     },
     title: {
         fontSize: 28,
@@ -37,6 +40,8 @@ export default StyleSheet.create({
         lineHeight: 22,
         paddingHorizontal: 10,
     },
+
+    // --- FORMULÁRIO ---
     formContainer: {
         width: '100%',
     },
@@ -47,18 +52,20 @@ export default StyleSheet.create({
         borderRadius: 8,
         paddingHorizontal: 15,
         paddingVertical: 12,
-        marginBottom: 20, // Reduzi um pouco para caber melhor
+        marginBottom: 20,
         fontSize: 16,
         color: '#2c3e50',
-        // Sombra
+        // Sombra suave para dar profundidade
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
         shadowOpacity: 0.1,
         shadowRadius: 2,
         elevation: 2,
     },
+
+    // --- BOTÃO DE AÇÃO ---
     recuperarButton: {
-        backgroundColor: '#66CD00',
+        backgroundColor: '#66CD00', // Verde destaque
         borderRadius: 8,
         paddingVertical: 15,
         alignItems: 'center',
@@ -69,23 +76,14 @@ export default StyleSheet.create({
         shadowRadius: 3.84,
         elevation: 5,
     },
+    // Estilo visual quando o botão está carregando
     buttonDisabled: {
-        backgroundColor: '#9bd675',
+        backgroundColor: '#9bd675', // Verde mais claro
         elevation: 0,
     },
     recuperarButtonText: {
         color: '#fff',
         fontSize: 18,
         fontWeight: 'bold',
-    },
-    linksContainer: {
-        marginTop: 30,
-        alignItems: 'center',
-    },
-    link: {
-        color: '#66CD00',
-        fontSize: 16,
-        marginVertical: 8,
-        fontWeight: '500',
     },
 });

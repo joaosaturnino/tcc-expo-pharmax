@@ -1,6 +1,7 @@
 import { StyleSheet, Dimensions } from 'react-native';
 
 const { width } = Dimensions.get('window');
+// Calcula largura do card para caber 2 por linha com margens
 const cardWidth = (width / 2) - 24;
 
 export default StyleSheet.create({
@@ -8,8 +9,9 @@ export default StyleSheet.create({
         flex: 1,
         backgroundColor: '#f8f9fa',
     },
+    // Header fixo no topo
     header: {
-        paddingTop: 50, 
+        paddingTop: 50,
         paddingHorizontal: 16,
         paddingBottom: 12,
         backgroundColor: '#fff',
@@ -18,20 +20,23 @@ export default StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
+        position: 'relative',
     },
     backButton: {
         position: 'absolute',
         left: 16,
-        top: 50, 
+        top: 50,
         bottom: 12,
         justifyContent: 'center',
-        zIndex: 1,
+        zIndex: 10,
+        width: 40,
     },
     headerTitle: {
         fontSize: 20,
         fontWeight: '600',
         color: '#2c3e50',
     },
+    // Área do Input
     searchContainer: {
         padding: 16,
         backgroundColor: '#fff',
@@ -56,7 +61,7 @@ export default StyleSheet.create({
         height: 50,
         justifyContent: 'center',
     },
-    
+
     // --- SEÇÕES ---
     section: {
         marginTop: 24,
@@ -69,15 +74,14 @@ export default StyleSheet.create({
         paddingHorizontal: 16,
     },
 
-    // --- CARD DE FARMÁCIA / LABORATÓRIO ---
+    // --- CARD HORIZONTAL (FARMÁCIA/LAB) ---
     entidadeCard: {
-        width: 140, // Largura fixa para lista horizontal
+        width: 140,
         backgroundColor: '#fff',
         borderRadius: 16,
         padding: 12,
-        marginRight: 12, // Espaçamento horizontal entre cards
+        marginRight: 12,
         alignItems: 'center',
-        // Sombra
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
@@ -89,18 +93,13 @@ export default StyleSheet.create({
     entidadeImagemContainer: {
         width: 80,
         height: 80,
-        borderRadius: 40, // Circular
+        borderRadius: 40,
         backgroundColor: '#fff',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 8,
         borderWidth: 1,
         borderColor: '#f1f2f6',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-        elevation: 2,
     },
     entidadeImagem: {
         width: 60,
@@ -108,19 +107,19 @@ export default StyleSheet.create({
         borderRadius: 30,
     },
     entidadeNome: {
-        fontSize: 14,
+        fontSize: 13,
         fontWeight: '700',
         color: '#2c3e50',
         textAlign: 'center',
         marginBottom: 2,
     },
     entidadeTipo: {
-        fontSize: 12,
+        fontSize: 11,
         color: '#95a5a6',
         fontWeight: '500',
     },
 
-    // --- CARD DE MEDICAMENTO ---
+    // --- GRID DE MEDICAMENTOS ---
     gridContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
@@ -141,11 +140,18 @@ export default StyleSheet.create({
         elevation: 2,
         borderWidth: 1,
         borderColor: '#f1f2f6',
+        position: 'relative',
     },
+
+    // --- CORREÇÃO AQUI: MUDADO PARA VERMELHO ---
     produtoCardEmPromocao: {
-        backgroundColor: '#fffbeb',
-        borderColor: '#e74c3c',
+        backgroundColor: '#FEF2F2', // Fundo vermelho bem claro
+        borderColor: '#FECACA',     // Borda vermelha clara
+        borderWidth: 1.5,           // Borda um pouco mais grossa
+        shadowColor: "#EF4444",     // Sombra avermelhada
+        elevation: 6,
     },
+
     produtoImagem: {
         width: 100,
         height: 100,
@@ -187,7 +193,7 @@ export default StyleSheet.create({
         position: 'absolute',
         top: -1,
         right: -1,
-        backgroundColor: '#e74c3c',
+        backgroundColor: '#EF4444', // Vermelho forte para a etiqueta
         paddingHorizontal: 8,
         paddingVertical: 2,
         borderTopRightRadius: 12,
@@ -199,8 +205,8 @@ export default StyleSheet.create({
         fontSize: 11,
         fontWeight: 'bold',
     },
-    
-    // --- Empty State ---
+
+    // --- ESTADO VAZIO ---
     emptyContainer: {
         flex: 1,
         justifyContent: 'center',

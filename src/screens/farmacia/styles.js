@@ -5,9 +5,9 @@ const { width } = Dimensions.get('window');
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F2F4F7', // Fundo cinza claro para contraste
+        backgroundColor: '#F2F4F7',
     },
-    // Banner Grande
+    // --- HEADER / BANNER ---
     bannerGrandeContainer: {
         height: 200,
         position: 'relative',
@@ -21,7 +21,6 @@ const styles = StyleSheet.create({
         ...StyleSheet.absoluteFillObject,
         backgroundColor: 'rgba(0,0,0,0.4)',
     },
-    // Perfil sobre o Banner
     perfilContainer: {
         position: 'absolute',
         bottom: 20,
@@ -33,19 +32,14 @@ const styles = StyleSheet.create({
     perfilImagemWrapper: {
         width: 80,
         height: 80,
-        backgroundColor: 'transparent',
         borderRadius: 40,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 8,
+        // Sombra
         shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 4,
-        },
+        shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
         elevation: 8,
+        marginBottom: 8,
     },
     perfilImagem: {
         width: 80,
@@ -69,15 +63,16 @@ const styles = StyleSheet.create({
         color: '#2c3e50',
         marginLeft: 6,
     },
-    
-    // --- ESTILOS DO CARD DE INFORMAÇÕES (NOVO) ---
+
+    // --- INFO CARD ---
     infoCard: {
         backgroundColor: '#fff',
         borderRadius: 16,
         padding: 16,
         marginHorizontal: 16,
-        marginTop: 16, // Espaço abaixo do banner
+        marginTop: 16,
         marginBottom: 0,
+        // Sombra leve
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
@@ -133,42 +128,48 @@ const styles = StyleSheet.create({
         color: '#334155',
         fontWeight: '500',
     },
-    // ---------------------------------------------
 
-    // Contador
+    // --- CONTADOR E LISTA ---
     contadorContainer: {
         padding: 16,
-        // backgroundColor: '#F2F4F7', // Removido para não conflitar visualmente
         marginTop: 10,
+        paddingBottom: 8, // Ajuste fino
     },
     contadorText: {
         fontSize: 14,
         color: '#7f8c8d',
         textAlign: 'center',
     },
-    // Lista de medicamentos
     medicamentosList: {
-        padding: 16,
-        paddingTop: 0,
+        paddingHorizontal: 16,
+        paddingBottom: 40, // Espaço extra no final da lista
     },
+
+    // --- CARD MEDICAMENTO ---
     medicamentoCard: {
         flexDirection: 'row',
         backgroundColor: '#fff',
         borderRadius: 12,
         padding: 16,
         marginBottom: 12,
+        // Sombra
         shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 3,
         elevation: 3,
+
         position: 'relative',
         borderWidth: 2,
-        borderColor: 'transparent',
-        overflow: 'hidden',
+        borderColor: 'transparent', // Borda transparente por padrão
+        overflow: 'visible', // Mudado para visible para o badge funcionar melhor se sair da borda
+    },
+    medicamentoCardEmPromocao: {
+        backgroundColor: '#FEF2F2', // Fundo vermelho bem claro
+        borderColor: '#FECACA',     // Borda vermelha clara
+        borderWidth: 1.5,           // Borda um pouco mais grossa
+        shadowColor: "#EF4444",     // Sombra avermelhada
+        elevation: 6,
     },
     medicamentoImagem: {
         width: 60,
@@ -183,9 +184,6 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
         borderRadius: 6,
-    },
-    medicamentoImagemTexto: {
-        fontSize: 24,
     },
     medicamentoInfo: {
         flex: 1,
@@ -207,36 +205,37 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#27ae60',
     },
-    medicamentoCardEmPromocao: {
-        backgroundColor: '#fffbeb',
-        borderColor: '#e74c3c',
-    },
-    promoBadge: {
-        position: 'absolute',
-        top: -1,
-        right: -1,
-        backgroundColor: '#e74c3c',
-        paddingHorizontal: 8,
-        paddingVertical: 2,
-        borderTopRightRadius: 12,
-        borderBottomLeftRadius: 12,
-        zIndex: 1,
-    },
-    promoBadgeTexto: {
-        color: '#fff',
-        fontSize: 11,
-        fontWeight: 'bold',
-    },
     medicamentoPrecoAntigo: {
         fontSize: 14,
         color: '#7f8c8d',
         textDecorationLine: 'line-through',
     },
+
+    // --- BADGE PROMOÇÃO ---
+    promoBadge: {
+        position: 'absolute',
+        top: -2, // Ajuste fino para colar na borda
+        right: -2,
+        backgroundColor: '#e74c3c',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderTopRightRadius: 10,
+        borderBottomLeftRadius: 10,
+        zIndex: 10,
+    },
+    promoBadgeTexto: {
+        color: '#fff',
+        fontSize: 10,
+        fontWeight: 'bold',
+    },
+
+    // --- EMPTY STATE ---
     emptyContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         padding: 40,
+        marginTop: 40,
     },
     emptyText: {
         fontSize: 16,
@@ -244,9 +243,9 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginTop: 16,
     },
-    espacoFinal: {
-        height: 20,
-    },
+    medicamentoImagemTexto: {
+        fontSize: 40, // Tamanho do emoji
+    }
 });
 
 export default styles;

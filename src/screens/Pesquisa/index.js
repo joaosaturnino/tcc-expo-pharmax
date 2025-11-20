@@ -15,7 +15,24 @@ import { Ionicons } from '@expo/vector-icons';
 import styles from './styles';
 import api from '../../services/api';
 
-// --- Função Helper de Promoção ---
+// --- CONFIGURAÇÃO DE IP E IMAGENS ---
+const SERVER_IP = '192.168.200.27:3334';
+const BASE_URL = `http://${SERVER_IP}`;
+
+// Helper robusto para corrigir URLs de imagem
+const getImageUrl = (caminho, tipo = 'padrao') => {
+    if (!caminho) return null;
+    if (typeof caminho === 'string' && caminho.startsWith('http')) {
+        return { uri: caminho };
+    }
+    if (typeof caminho === 'string') {
+        const cleanPath = caminho.startsWith('/') ? caminho.substring(1) : caminho;
+        return { uri: `${BASE_URL}/${cleanPath}` };
+    }
+    return null;
+};
+
+// --- HELPER: CÁLCULO DE PROMOÇÃO ---
 function calcularPrecoPromocional(item) {
     const precoOriginal = parseFloat(item.preco || item.medp_preco);
     const desconto = parseFloat(item.promo_desconto);
@@ -33,12 +50,17 @@ function calcularPrecoPromocional(item) {
 
     if (estaEmPromocao) {
         const precoComDesconto = precoOriginal * (1 - desconto / 100);
-        return { precoOriginal: precoOriginal.toFixed(2).replace('.', ','), precoComDesconto: precoComDesconto.toFixed(2).replace('.', ','), estaEmPromocao: true, descontoPorcento: desconto };
+        return {
+            precoOriginal: precoOriginal.toFixed(2).replace('.', ','),
+            precoComDesconto: precoComDesconto.toFixed(2).replace('.', ','),
+            estaEmPromocao: true,
+            descontoPorcento: desconto
+        };
     }
     return { precoOriginal: precoOriginal.toFixed(2).replace('.', ','), precoComDesconto: null, estaEmPromocao: false, descontoPorcento: 0 };
 }
 
-// --- Hook de Debounce ---
+// --- HOOK: DEBOUNCE (Delay na digitação) ---
 function useDebounce(value, delay) {
     const [debouncedValue, setDebouncedValue] = useState(value);
     useEffect(() => {
@@ -51,8 +73,8 @@ function useDebounce(value, delay) {
 export default function Pesquisa() {
     const navigation = useNavigation();
     const route = useRoute();
-    const { termo: termoInicial } = route.params || {};
 
+    const { termo: termoInicial } = route.params || {};
     const [searchText, setSearchText] = useState(termoInicial || '');
 
     const [medicamentos, setMedicamentos] = useState([]);
@@ -64,8 +86,14 @@ export default function Pesquisa() {
 
     const debouncedSearchTerm = useDebounce(searchText, 600);
 
-    const fetchResultados = useCallback(async (termo) => {
-        if (!termo || termo.trim().length === 0) {
+    // --- FUNÇÃO DE BUSCA ---
+    const fetchResultados = useCallback(async (termoBruto) => {
+        // CORREÇÃO AQUI: Remove espaços do início e fim (trim)
+        // Isso resolve o problema do autocompletar do teclado adicionar espaço extra
+        const termo = termoBruto ? termoBruto.trim() : '';
+
+        // Se o termo for vazio (mesmo que tivesse só espaços antes), limpa tudo
+        if (termo.length === 0) {
             setMedicamentos([]);
             setFarmacias([]);
             setLaboratorios([]);
@@ -78,27 +106,46 @@ export default function Pesquisa() {
         setHasSearched(true);
 
         try {
-            // Busca em paralelo: Medicamentos, Farmácias e Laboratórios
+            // Usa o 'termo' já limpo nas requisições
             const [resMed, resFarm, resLab] = await Promise.all([
                 api.get(`/medicamentos/todos?search=${termo}&limit=50`),
                 api.get('/farmacias'),
                 api.get('/todoslab')
             ]);
 
-            setMedicamentos(resMed.data.dados || []);
+            // 1. TRATAMENTO DE MEDICAMENTOS
+            let listaMedicamentos = resMed.data.dados || [];
 
-            // Filtra Farmácias localmente pelo nome
+            listaMedicamentos.sort((a, b) => {
+                const getPrecoReal = (item) => {
+                    let preco = parseFloat(item.preco || item.medp_preco);
+                    const promo = calcularPrecoPromocional(item);
+                    if (promo.estaEmPromocao) {
+                        const desconto = parseFloat(item.promo_desconto);
+                        return preco * (1 - desconto / 100);
+                    }
+                    return preco;
+                };
+                return getPrecoReal(a) - getPrecoReal(b);
+            });
+            setMedicamentos(listaMedicamentos);
+
+            // 2. TRATAMENTO DE FARMÁCIAS (Filtro Local usando termo limpo)
             const dadosFarm = resFarm.data.dados || [];
-            const farmsFiltradas = dadosFarm.filter(f => f.farm_nome.toLowerCase().includes(termo.toLowerCase()));
+            const farmsFiltradas = dadosFarm.filter(f =>
+                f.farm_nome.toLowerCase().includes(termo.toLowerCase())
+            );
             setFarmacias(farmsFiltradas);
 
-            // Filtra Laboratórios localmente pelo nome
+            // 3. TRATAMENTO DE LABORATÓRIOS (Filtro Local usando termo limpo)
             let dadosLab = resLab.data.dados || resLab.data || [];
-            const labsFiltrados = dadosLab.filter(l => (l.lab_nome || l.nome).toLowerCase().includes(termo.toLowerCase()));
+            const labsFiltrados = dadosLab.filter(l =>
+                (l.lab_nome || l.nome || '').toLowerCase().includes(termo.toLowerCase())
+            );
             setLaboratorios(labsFiltrados);
 
         } catch (error) {
-            console.error('Erro ao buscar resultados:', error);
+            console.error('Erro na pesquisa:', error);
             setMedicamentos([]);
             setFarmacias([]);
             setLaboratorios([]);
@@ -107,7 +154,9 @@ export default function Pesquisa() {
         }
     }, []);
 
+    // Dispara a busca sempre que o texto "debounced" mudar
     useEffect(() => {
+        // O debounce passa o texto bruto, mas o fetchResultados agora faz o trim()
         fetchResultados(debouncedSearchTerm);
     }, [debouncedSearchTerm, fetchResultados]);
 
@@ -119,15 +168,15 @@ export default function Pesquisa() {
         setHasSearched(false);
     };
 
-    // --- CARD DE MEDICAMENTO ---
+    // --- RENDERIZAÇÃO: MEDICAMENTO ---
     const renderMedicamento = ({ item }) => {
         const nomeMed = item.med_nome || item.nome;
         const marca = item.lab_nome || item.marca;
         const promo = calcularPrecoPromocional(item);
+
         const imagemOrigem = item.med_imagem || item.imagem;
-        const imageSource = typeof imagemOrigem === 'string' && imagemOrigem.startsWith('http')
-            ? { uri: imagemOrigem }
-            : require('../../../public/caixa-medicamento-padrao5.png');
+        const sourceValidado = getImageUrl(imagemOrigem);
+        const imageSource = sourceValidado || require('../../../public/caixa-medicamento-padrao5.png');
 
         return (
             <TouchableOpacity
@@ -142,13 +191,15 @@ export default function Pesquisa() {
                 <View style={styles.produtoImagem}>
                     <Image source={imageSource} style={styles.produtoImagemReal} resizeMode="contain" />
                 </View>
+
                 <Text style={styles.produtoNome} numberOfLines={1}>{nomeMed}</Text>
                 <Text style={styles.produtoMarca}>{marca}</Text>
+
                 {promo.estaEmPromocao ? (
-                    <>
+                    <View>
                         <Text style={styles.produtoPrecoAntigo}>R$ {promo.precoOriginal}</Text>
                         <Text style={styles.produtoPreco}>R$ {promo.precoComDesconto}</Text>
-                    </>
+                    </View>
                 ) : (
                     <Text style={styles.produtoPreco}>R$ {promo.precoOriginal}</Text>
                 )}
@@ -156,9 +207,11 @@ export default function Pesquisa() {
         );
     };
 
-    // --- CARD DE FARMÁCIA ---
+    // --- RENDERIZAÇÃO: FARMÁCIA ---
     const renderFarmacia = ({ item }) => {
-        const imageSource = item.farm_logo_url ? { uri: item.farm_logo_url } : require('../../../public/logo.png');
+        const sourceValidado = getImageUrl(item.farm_logo_url);
+        const imageSource = sourceValidado || require('../../../public/logo.png');
+
         return (
             <TouchableOpacity
                 style={styles.entidadeCard}
@@ -177,11 +230,13 @@ export default function Pesquisa() {
         );
     };
 
-    // --- CARD DE LABORATÓRIO ---
+    // --- RENDERIZAÇÃO: LABORATÓRIO ---
     const renderLaboratorio = ({ item }) => {
         const nomeLab = item.lab_nome || item.nome;
         const imgUrl = item.lab_logo_url || item.lab_logo;
-        const imageSource = imgUrl ? { uri: imgUrl } : require('../../../public/logo.png');
+        const sourceValidado = getImageUrl(imgUrl);
+        const imageSource = sourceValidado || require('../../../public/logo.png');
+
         return (
             <TouchableOpacity
                 style={styles.entidadeCard}
@@ -200,7 +255,7 @@ export default function Pesquisa() {
         );
     };
 
-    // --- RENDERIZAÇÃO PRINCIPAL ---
+    // --- CONTEÚDO PRINCIPAL ---
     const renderContent = () => {
         if (loading) {
             return (
@@ -230,7 +285,6 @@ export default function Pesquisa() {
                 showsVerticalScrollIndicator={false}
                 onScrollBeginDrag={Keyboard.dismiss}
             >
-                {/* LISTA HORIZONTAL DE FARMÁCIAS */}
                 {farmacias.length > 0 && (
                     <View style={styles.section}>
                         <Text style={styles.sectionTitle}>Farmácias</Text>
@@ -245,7 +299,6 @@ export default function Pesquisa() {
                     </View>
                 )}
 
-                {/* LISTA HORIZONTAL DE LABORATÓRIOS */}
                 {laboratorios.length > 0 && (
                     <View style={styles.section}>
                         <Text style={styles.sectionTitle}>Laboratórios</Text>
@@ -260,7 +313,6 @@ export default function Pesquisa() {
                     </View>
                 )}
 
-                {/* GRADE VERTICAL DE MEDICAMENTOS */}
                 {medicamentos.length > 0 && (
                     <View style={styles.section}>
                         <Text style={styles.sectionTitle}>Medicamentos</Text>

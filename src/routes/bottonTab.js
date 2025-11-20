@@ -1,23 +1,74 @@
+import React, { useCallback } from 'react';
+import { BackHandler, Alert } from 'react-native';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 
-import Home from "./../screens/Home/index";
-import Favoritos from "./../screens/Favoritos/index";
-import Perfil from "./../screens/Perfil/index";
+// --- IMPORTS DAS TELAS ---
+// OBSERVAÇÃO IMPORTANTE:
+// O erro "Element type is invalid" acontece se estes caminhos estiverem errados.
+// O React Native procura automaticamente por um 'index.js' dentro da pasta.
+// Se o seu arquivo se chama 'Home.js' (e não index.js), mude para: '../screens/Home/Home'
+import Home from "../screens/Home";
+import Favoritos from "../screens/Favoritos";
+import Perfil from "../screens/Perfil";
 
 const Tab = createBottomTabNavigator();
 
-// 1. A função agora recebe { route } como uma propriedade (prop)
 export default function BottomTab({ route }) {
 
-    // 2. Extrai o userId dos parâmetros que vieram da tela de Login.
-    // O '|| {}' é uma segurança para evitar que o app quebre se não houver parâmetros.
+    // 1. RECUPERAÇÃO DE DADOS (SAFE MODE)
+    // Usamos "|| {}" para evitar que o App feche se 'route.params' vier vazio (undefined).
+    // Isso pega o ID do usuário que logou para passar para as próximas telas.
     const { userId } = route.params || {};
+
+    // 2. CONTROLE DO BOTÃO VOLTAR (HARDWARE BACK BUTTON - ANDROID)
+    // O useFocusEffect garante que esse código só rode quando a aba estiver VISÍVEL/FOCADA.
+    useFocusEffect(
+        useCallback(() => {
+            const onBackPress = () => {
+                // Cria o alerta perguntando se o usuário quer sair
+                Alert.alert(
+                    "Sair",
+                    "Deseja sair do aplicativo?",
+                    [
+                        { text: "Não", style: "cancel", onPress: () => { } }, // Não faz nada
+                        {
+                            text: "Sim",
+                            style: "destructive",
+                            onPress: () => BackHandler.exitApp() // Fecha o App totalmente
+                        }
+                    ]
+                );
+
+                // RETORNAR TRUE É O SEGREDO:
+                // Diz ao sistema Android: "Eu já cuidei do clique, não faça a ação padrão (voltar)".
+                return true;
+            };
+
+            // Adiciona o "escutador" do evento
+            const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+            // 3. LIMPEZA DE MEMÓRIA (CLEANUP)
+            // Essa função roda automaticamente quando saímos da tela.
+            return () => {
+                // Verifica se o método 'remove' existe (versões novas do React Native)
+                if (subscription && subscription.remove) {
+                    subscription.remove();
+                } else {
+                    // Método antigo para versões anteriores (Fallback)
+                    BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+                }
+            };
+        }, [])
+    );
 
     return (
         <Tab.Navigator
             screenOptions={({ route }) => ({
-                tabBarIcon: ({ color, size, focused }) => { // 'focused' pode ser usado para ícones diferentes
+                // 4. ÍCONES DINÂMICOS
+                // Muda o ícone (cheio ou contorno) dependendo se a aba está ativa (focused)
+                tabBarIcon: ({ color, size, focused }) => {
                     let iconName;
 
                     if (route.name === 'Home') {
@@ -30,41 +81,39 @@ export default function BottomTab({ route }) {
 
                     return <Ionicons name={iconName} size={size} color={color} />;
                 },
-                tabBarActiveTintColor: '#A2CD5A',
-                tabBarInactiveTintColor: '#888',
+                // 5. ESTILIZAÇÃO DA BARRA
+                tabBarActiveTintColor: '#A2CD5A', // Cor verde (Ativo)
+                tabBarInactiveTintColor: '#888',  // Cor cinza (Inativo)
                 tabBarStyle: {
                     backgroundColor: 'white',
                     borderTopWidth: 1,
                     borderTopColor: '#ddd',
-                    paddingVertical: 5,
                     height: 60,
+                    paddingBottom: 5,
                 },
-                tabBarLabelStyle: {
-                    fontSize: 12,
-                    marginBottom: 5,
-                },
-                headerShown: false,
+                headerShown: false, // Remove o cabeçalho padrão (Header)
             })}
         >
+            {/* 6. PASSAGEM DE PARÂMETROS (PROP DRILLING)
+               O 'initialParams' injeta o 'userId' dentro de cada tela.
+               Lá na Home, você acessa usando: const { userId } = route.params;
+            */}
             <Tab.Screen
                 name="Home"
                 component={Home}
-                options={{ title: 'Home' }}
-                // 3. Passa o userId para a tela Home
+                options={{ title: 'Início' }}
                 initialParams={{ userId: userId }}
             />
             <Tab.Screen
                 name="Favoritos"
                 component={Favoritos}
                 options={{ title: 'Favoritos' }}
-                // 3. Passa o userId para a tela Favoritos
                 initialParams={{ userId: userId }}
             />
             <Tab.Screen
                 name="Perfil"
                 component={Perfil}
-                options={{ title: 'Perfil' }}
-                // 3. Passa o userId para a tela Perfil
+                options={{ title: 'Meu Perfil' }}
                 initialParams={{ userId: userId }}
             />
         </Tab.Navigator>

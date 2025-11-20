@@ -7,9 +7,9 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#F2F4F7', // Fundo cinza claro moderno
     },
-    // Banner
+    // --- BANNER E PERFIL ---
     bannerGrandeContainer: {
-        height: 180, // Reduzi um pouco para dar espaço às infos
+        height: 180, // Altura do banner
         position: 'relative',
         backgroundColor: '#fff',
     },
@@ -19,11 +19,11 @@ const styles = StyleSheet.create({
     },
     bannerOverlay: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0,0,0,0.4)',
+        backgroundColor: 'rgba(0,0,0,0.4)', // Escurece a imagem para o texto brilhar
     },
     perfilContainer: {
         position: 'absolute',
-        bottom: -30, // Faz o logo "vazar" para baixo do banner
+        bottom: -30, // Faz o logo "vazar" para baixo do banner (efeito visual)
         left: 0,
         right: 0,
         alignItems: 'center',
@@ -37,6 +37,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 8,
+        // Sombra do logo
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
@@ -68,9 +69,9 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
 
-    // --- ESTILOS DO CARD DE INFORMAÇÕES (NOVO) ---
+    // --- CARD DE INFORMAÇÕES (Endereço/Tel) ---
     infoCard: {
-        marginTop: 45, // Espaço para compensar o logo vazado
+        marginTop: 45, // Margem superior para compensar o logo que vazou
         marginHorizontal: 16,
         backgroundColor: '#fff',
         borderRadius: 16,
@@ -131,9 +132,8 @@ const styles = StyleSheet.create({
         color: '#334155',
         fontWeight: '500',
     },
-    // ---------------------------------------------
 
-    // Contador
+    // --- CONTADOR ---
     contadorContainer: {
         paddingHorizontal: 20,
         paddingBottom: 10,
@@ -144,10 +144,10 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
 
-    // Lista
+    // --- LISTA DE MEDICAMENTOS ---
     medicamentosList: {
-        padding: 16,
-        paddingTop: 0,
+        paddingHorizontal: 16,
+        paddingBottom: 20, // Espaço no final da rolagem
     },
     medicamentoCard: {
         flexDirection: 'row',
@@ -155,6 +155,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 12,
         marginBottom: 12,
+        // Sombra suave
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
@@ -162,10 +163,14 @@ const styles = StyleSheet.create({
         elevation: 2,
         borderWidth: 1,
         borderColor: 'transparent',
+        position: 'relative', // Necessário para o badge funcionar
     },
     medicamentoCardEmPromocao: {
-        backgroundColor: '#FFF7ED', // Fundo laranja claro
-        borderColor: '#FDBA74',
+        backgroundColor: '#FEF2F2', // Fundo vermelho bem claro
+        borderColor: '#FECACA',     // Borda vermelha clara
+        borderWidth: 1.5,           // Borda um pouco mais grossa
+        shadowColor: "#EF4444",     // Sombra avermelhada
+        elevation: 6,
     },
     medicamentoImagem: {
         width: 70,
@@ -211,6 +216,8 @@ const styles = StyleSheet.create({
         color: '#94A3B8',
         textDecorationLine: 'line-through',
     },
+
+    // --- BADGE PROMOÇÃO ---
     promoBadge: {
         position: 'absolute',
         top: 0,
@@ -227,6 +234,8 @@ const styles = StyleSheet.create({
         fontSize: 10,
         fontWeight: 'bold',
     },
+
+    // --- EMPTY STATE ---
     emptyContainer: {
         flex: 1,
         justifyContent: 'center',

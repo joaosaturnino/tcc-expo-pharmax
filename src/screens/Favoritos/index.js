@@ -12,119 +12,136 @@ import {
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
-import api from '../../services/api';
+import api from '../../services/api'; // Certifique-se que o caminho da API está correto
 import styles from './styles';
 
-// --- Função Helper de Promoção (sem alteração) ---
+// --- HELPER: Lógica de Promoção ---
+// Calcula se o item está em oferta baseado nas datas e no desconto
 function calcularPrecoPromocional(item) {
     const precoOriginal = parseFloat(item.preco || item.medp_preco);
     const desconto = parseFloat(item.promo_desconto);
 
+    // Validações de segurança para evitar erros matemáticos
     if (isNaN(precoOriginal) || !desconto || desconto <= 0 || !item.promo_inicio || !item.promo_fim) {
         return { estaEmPromocao: false, descontoPorcento: 0 };
     }
+
+    // Normalização de datas (zera as horas para comparar apenas o dia)
     const hoje = new Date();
     const inicio = new Date(item.promo_inicio);
     const fim = new Date(item.promo_fim);
     hoje.setHours(0, 0, 0, 0);
     inicio.setHours(0, 0, 0, 0);
     fim.setHours(0, 0, 0, 0);
+
     const estaEmPromocao = (hoje >= inicio && hoje <= fim);
+
     if (estaEmPromocao) {
         return { estaEmPromocao: true, descontoPorcento: desconto };
     }
     return { estaEmPromocao: false, descontoPorcento: 0 };
 }
-// ---------------------------------------------------
-
 
 export default function Favoritos() {
     const navigation = useNavigation();
+
+    // ESTADOS
     const [favoritos, setFavoritos] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [usuarioId, setUsuarioId] = useState(null);
 
-    // Função para carregar os favoritos (sem alteração)
+    // --- BUSCA DE DADOS ---
+    // useCallback evita que a função seja recriada a cada renderização
     const carregarFavoritos = useCallback(async (isRefresh = false) => {
         if (!isRefresh) setLoading(true);
+
         let idDoUsuario = usuarioId;
+
+        // 1. Se não temos o ID na memória, buscamos no Storage do celular
         if (!idDoUsuario) {
             try {
                 const userData = await AsyncStorage.getItem('usuario_info');
                 if (!userData) {
+                    // Se não tiver usuário logado, paramos aqui
                     setLoading(false);
                     setFavoritos([]);
                     return;
                 }
                 const usuario = JSON.parse(userData);
                 idDoUsuario = usuario?.usu_id;
-                setUsuarioId(idDoUsuario);
+                setUsuarioId(idDoUsuario); // Salva no estado para usar depois
             } catch (e) {
                 console.error("Erro ao ler AsyncStorage", e);
                 setLoading(false);
                 return;
             }
         }
-        if (!idDoUsuario) {
-            setLoading(false);
-            return;
-        }
-        try {
-            const response = await api.get(`/favoritos/usuario/${idDoUsuario}`);
-            if (response.data.sucesso) {
-                setFavoritos(response.data.dados);
-            } else {
-                Alert.alert('Erro', 'Não foi possível carregar os favoritos.');
+
+        // 2. Chamada à API
+        if (idDoUsuario) {
+            try {
+                const response = await api.get(`/favoritos/usuario/${idDoUsuario}`);
+                if (response.data.sucesso) {
+                    setFavoritos(response.data.dados || []);
+                } else {
+                    // Em alguns casos a API retorna sucesso: false se a lista estiver vazia
+                    setFavoritos([]);
+                }
+            } catch (error) {
+                // Não alertamos erro se for apenas "404 - Nenhum favorito", apenas limpamos a lista
+                if (error.response && error.response.status === 404) {
+                    setFavoritos([]);
+                } else {
+                    Alert.alert('Aviso', 'Não foi possível atualizar a lista de favoritos.');
+                }
+            } finally {
+                setLoading(false);
             }
-        } catch (error) {
-            const mensagem = error.response?.data?.mensagem || 'Ocorreu um erro. Tente novamente.';
-            Alert.alert('Erro na Requisição', mensagem);
-        } finally {
-            setLoading(false);
         }
     }, [usuarioId]);
 
+    // useFocusEffect: Recarrega a lista toda vez que a tela ganha foco (o usuário entra nela)
     useFocusEffect(
         React.useCallback(() => {
             carregarFavoritos();
         }, [carregarFavoritos])
     );
 
+    // Função para o "Puxar para Atualizar"
     const onRefresh = useCallback(async () => {
         setIsRefreshing(true);
         await carregarFavoritos(true);
         setIsRefreshing(false);
     }, [carregarFavoritos]);
 
-    // Remover favorito (sem alteração)
+    // --- REMOÇÃO DE FAVORITO ---
     const removerFavorito = async (fav_id, nome) => {
         Alert.alert(
             "Remover Favorito",
-            `Tem certeza que deseja remover ${nome} dos seus favoritos?`,
+            `Deseja remover "${nome}"?`,
             [
-                { text: "Cancelar", style: "cancel" },
+                { text: "Não", style: "cancel" },
                 {
-                    text: "Remover",
+                    text: "Sim, remover",
                     style: "destructive",
                     onPress: async () => {
-                        if (!usuarioId) {
-                            Alert.alert('Erro', 'ID do usuário não encontrado.');
-                            return;
-                        }
+                        if (!usuarioId) return;
+
                         try {
+                            // Axios DELETE com corpo (body) precisa da chave 'data'
                             const response = await api.delete(`/favoritos/${fav_id}`, {
                                 data: { usuario_id: usuarioId }
                             });
+
                             if (response.data.sucesso) {
-                                const novaLista = favoritos.filter(item => item.fav_id !== fav_id);
-                                setFavoritos(novaLista);
+                                // ATUALIZAÇÃO OTIMISTA: Remove da lista visualmente antes de recarregar
+                                setFavoritos(prev => prev.filter(item => item.fav_id !== fav_id));
                             } else {
-                                Alert.alert('Erro', response.data.mensagem || 'Não foi possível remover o favorito.');
+                                Alert.alert('Erro', response.data.mensagem);
                             }
                         } catch (error) {
-                            const mensagem = error.response?.data?.mensagem || 'Ocorreu um erro ao remover. Tente novamente.';
-                            Alert.alert('Erro na Requisição', mensagem);
+                            Alert.alert('Erro', 'Não foi possível remover o item.');
                         }
                     }
                 }
@@ -132,12 +149,14 @@ export default function Favoritos() {
         );
     };
 
-    // --- renderProduto ---
+    // --- RENDERIZAÇÃO DO CARD ---
     const renderProduto = ({ item }) => {
-
-        const imageSource = item.med_imagem
+        // Tratamento de Imagem Seguro:
+        // Usa uma imagem remota padrão se a do produto falhar ou não existir.
+        // Evita usar require() com caminhos complexos que podem quebrar o Expo.
+        const imageSource = (item.med_imagem && item.med_imagem.length > 5)
             ? { uri: item.med_imagem }
-            : require('../../../public/alergia.png');
+            : { uri: 'https://via.placeholder.com/150?text=Sem+Imagem' }; // URL Placeholder segura
 
         const promo = calcularPrecoPromocional(item);
 
@@ -145,24 +164,26 @@ export default function Favoritos() {
             <TouchableOpacity
                 style={[styles.produtoCard, promo.estaEmPromocao && styles.produtoCardEmPromocao]}
                 onPress={() => navigation.navigate('Produto', { produto: item })}
+                activeOpacity={0.7}
             >
+                {/* Etiqueta de Promoção */}
                 {promo.estaEmPromocao && (
                     <View style={styles.promoBadge}>
                         <Text style={styles.promoBadgeTexto}>{promo.descontoPorcento}% OFF</Text>
                     </View>
                 )}
 
-                {/* --- CORREÇÃO AQUI --- */}
-                {/* O ícone agora é um coração, para mostrar que "está favoritado" */}
-                {/* A função 'removerFavorito' continua no 'onPress' */}
+                {/* Botão de Remover (Coração) */}
                 <TouchableOpacity
                     style={styles.removerButton}
                     onPress={() => removerFavorito(item.fav_id, item.med_nome)}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }} // Aumenta a área de toque
                 >
+                    {/* Ícone de lixeira seria o padrão UX para remover, mas mantive o coração conforme pedido */}
                     <Ionicons name="heart" size={18} color="#fff" />
                 </TouchableOpacity>
-                {/* ------------------- */}
 
+                {/* Imagem */}
                 <View style={styles.produtoImagemContainer}>
                     <Image
                         source={imageSource}
@@ -170,18 +191,18 @@ export default function Favoritos() {
                         resizeMode="contain"
                     />
                 </View>
+
+                {/* Informações */}
                 <View style={styles.produtoInfo}>
                     <Text style={styles.produtoNome} numberOfLines={2}>{item.med_nome}</Text>
-                    <Text style={styles.produtoMarca}>{item.fabricante_nome}</Text>
+                    <Text style={styles.produtoMarca} numberOfLines={1}>{item.fabricante_nome || 'Laboratório'}</Text>
                     <Text style={styles.produtoDosagem}>{item.med_dosagem}</Text>
-
-                    {/* Bloco de Preço REMOVIDO */}
                 </View>
             </TouchableOpacity>
         );
     };
 
-    // (O resto do arquivo - if(loading), return(), etc. - continua igual)
+    // --- LOADING ---
     if (loading) {
         return (
             <View style={styles.container}>
@@ -189,13 +210,14 @@ export default function Favoritos() {
                     <Text style={styles.headerTitle}>Meus Favoritos</Text>
                 </View>
                 <View style={styles.vazioContainer}>
-                    <ActivityIndicator size="large" color="#2c3e50" />
+                    <ActivityIndicator size="large" color="#458B00" />
                     <Text style={[styles.vazioTexto, { marginTop: 10 }]}>Carregando...</Text>
                 </View>
             </View>
         );
     }
 
+    // --- LISTA VAZIA ---
     if (favoritos.length === 0) {
         return (
             <View style={styles.container}>
@@ -205,37 +227,39 @@ export default function Favoritos() {
                 <View style={styles.vazioContainer}>
                     <Text style={styles.vazioIcon}>❤️</Text>
                     <Text style={styles.vazioTexto}>
-                        {usuarioId ? "Nenhum produto favoritado" : "Você não está logado"}
+                        {usuarioId ? "Nenhum favorito ainda" : "Faça login"}
                     </Text>
                     <Text style={styles.vazioSubtexto}>
                         {usuarioId
-                            ? "Os produtos que você favoritar aparecerão aqui"
-                            : "Faça login para ver seus favoritos"}
+                            ? "Salve seus medicamentos preferidos para acesso rápido."
+                            : "Entre na sua conta para ver seus favoritos salvos."}
                     </Text>
                 </View>
             </View>
         );
     }
 
+    // --- LISTA COM DADOS ---
     return (
         <View style={styles.container}>
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>Meus Favoritos</Text>
-                <Text style={styles.subtitle}>{favoritos.length} produto(s) salvo(s)</Text>
+                <Text style={styles.subtitle}>{favoritos.length} itens salvos</Text>
             </View>
+
             <FlatList
                 data={favoritos}
                 renderItem={renderProduto}
-                keyExtractor={item => item.fav_id.toString()}
+                keyExtractor={item => String(item.fav_id)} // Converte ID para string para evitar warnings
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.listaContainer}
+                numColumns={2} // Grade de 2 colunas
                 ListFooterComponent={<View style={styles.espacoFinal} />}
-                numColumns={2}
                 refreshControl={
                     <RefreshControl
                         refreshing={isRefreshing}
                         onRefresh={onRefresh}
-                        colors={['#458B00']}
+                        colors={['#458B00']} // Cor verde do tema
                     />
                 }
             />

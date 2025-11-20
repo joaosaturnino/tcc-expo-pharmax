@@ -5,236 +5,271 @@ const { width } = Dimensions.get('window');
 export default StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#EEE9E9',
+        backgroundColor: '#F5F7FA', // Cor de fundo mais moderna e suave
     },
+
+    // --- HEADER E LOGO ---
     header: {
-        paddingTop: 0,
+        paddingTop: 10,
         paddingHorizontal: 16,
-        paddingBottom: 0,
-        backgroundColor: '#EEE9E9',
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
+        paddingBottom: 10,
+        backgroundColor: '#F5F7FA',
+        alignItems: 'center', // Centraliza a logo horizontalmente
     },
     logo: {
-        width: 250,
-        height: 150,
+        width: 180, // Reduzi um pouco para não ocupar tanto espaço da tela
+        height: 80,
         resizeMode: 'contain',
-        alignSelf: 'center',
-        marginBottom: 0,
-        marginTop: 10,
     },
+
+    // --- BARRA DE PESQUISA ---
     searchContainer: {
-        padding: 16,
-        backgroundColor: '#EEE9E9',
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
+        paddingHorizontal: 16,
+        paddingBottom: 16,
+        backgroundColor: '#F5F7FA',
     },
     searchInput: {
-        backgroundColor: '#f1f2f6',
-        borderRadius: 25,
+        backgroundColor: '#fff',
+        borderRadius: 12,
         paddingHorizontal: 20,
         paddingVertical: 12,
-        fontSize: 16,
+        fontSize: 15,
         color: '#2c3e50',
+        // Sombra leve na barra de pesquisa
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 2,
+        borderWidth: 1,
+        borderColor: '#E2E8F0',
     },
+
+    // --- SEÇÕES (Categorias, Destaques, etc) ---
     section: {
-        marginTop: 20,
+        marginTop: 24,
         paddingHorizontal: 16,
     },
     sectionHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 15,
+        marginBottom: 16,
     },
     sectionTitle: {
         fontSize: 18,
-        fontWeight: 'bold',
-        color: '#2c3e50',
+        fontWeight: '700',
+        color: '#1e293b',
     },
     verTudo: {
         fontSize: 14,
-        color: '#006400',
-        fontWeight: '500',
+        color: '#2A7CC7', // Azul padrão de links
+        fontWeight: '600',
     },
+
+    // --- LISTA DE CATEGORIAS ---
     categoriasList: {
         paddingBottom: 10,
+        paddingRight: 16,
     },
     categoriaItem: {
         alignItems: 'center',
-        marginRight: 20,
-        width: 80,
+        marginRight: 16,
+        width: 72,
     },
     categoriaIcon: {
-        width: 48,
-        height: 48,
+        width: 56,
+        height: 56,
+        borderRadius: 28, // Deixa redondinho
+        backgroundColor: '#fff',
         marginBottom: 8,
+        // Pequena borda para destacar do fundo
+        borderWidth: 1,
+        borderColor: '#E2E8F0',
     },
     categoriaNome: {
-        fontSize: 12,
-        color: '#2c3e50',
+        fontSize: 11,
+        color: '#475569',
         textAlign: 'center',
         fontWeight: '500',
     },
+
+    // --- LISTA DE PRODUTOS ---
     produtosList: {
         paddingBottom: 15,
+        paddingRight: 16,
     },
     produtoCard: {
-        width: 140,
+        width: 150,
         backgroundColor: '#fff',
-        borderRadius: 12,
+        borderRadius: 16,
         padding: 12,
-        marginRight: 15,
+        marginRight: 16,
+        // Sombra
         shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.06,
+        shadowRadius: 6,
         elevation: 3,
-        borderWidth: 2, 
-        borderColor: '#fff', 
-        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: '#f1f5f9',
+        position: 'relative',
     },
+
     produtoImagem: {
-        width: 60,
-        height: 60,
-        backgroundColor: '#f1f2f6',
+        width: '100%',
+        height: 100,
+        // backgroundColor: '#fff', // REMOVER ou COMENTAR esta linha para não ficar um quadrado branco atrás
         borderRadius: 8,
         justifyContent: 'center',
         alignItems: 'center',
-        alignSelf: 'center',
         marginBottom: 10,
     },
     produtoImagemReal: {
-        width: 80,
-        height: 80,
-        borderRadius: 8,
+        width: 90,
+        height: 90,
+        borderRadius: 45, // ADICIONADO: Metade de 90 para ficar um círculo perfeito
     },
-    produtoImagemTexto: {
-        fontSize: 24,
-    },
+    // produtoImagem: {
+    //     width: '100%',
+    //     height: 100,
+    //     backgroundColor: '#fff',
+    //     borderRadius: 8,
+    //     justifyContent: 'center',
+    //     alignItems: 'center',
+    //     marginBottom: 10,
+    // },
+    // produtoImagemReal: {
+    //     width: 90,
+    //     height: 90,
+    // },
     produtoNome: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#2c3e50',
+        color: '#334155',
         marginBottom: 4,
+        height: 38, // Altura fixa para alinhar textos longos
     },
     produtoMarca: {
         fontSize: 12,
-        color: '#7f8c8d',
-        marginBottom: 6,
+        color: '#94a3b8',
+        marginBottom: 8,
     },
     produtoPreco: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#458B00',
+        color: '#16a34a', // Verde sucesso
     },
-    
-    // --- ESTILOS DE PROMOÇÃO ---
+
+    // --- PROMOÇÃO ---
     produtoCardEmPromocao: {
-        backgroundColor: '#fffbeb',
-        borderColor: '#e74c3c',
+        backgroundColor: '#FEF2F2', // Fundo vermelho bem claro
+        borderColor: '#FECACA',     // Borda vermelha clara
+        borderWidth: 1.5,           // Borda um pouco mais grossa
+        shadowColor: "#EF4444",     // Sombra avermelhada
+        elevation: 6,
     },
     promoBadge: {
         position: 'absolute',
-        top: -1,
-        right: -1,
-        backgroundColor: '#e74c3c',
+        top: 0,
+        right: 0,
+        backgroundColor: '#EF4444',
         paddingHorizontal: 8,
-        paddingVertical: 2,
-        borderTopRightRadius: 12,
+        paddingVertical: 4,
+        borderTopRightRadius: 15,
         borderBottomLeftRadius: 12,
-        zIndex: 1,
+        zIndex: 10,
     },
     promoBadgeTexto: {
         color: '#fff',
-        fontSize: 11,
+        fontSize: 10,
         fontWeight: 'bold',
     },
     produtoPrecoAntigo: {
-        fontSize: 13,
-        color: '#7f8c8d',
+        fontSize: 12,
+        color: '#94a3b8',
         textDecorationLine: 'line-through',
+        marginBottom: 2,
     },
-    
+
+    // --- LISTAS DE MARCAS E FARMÁCIAS ---
     marcasList: {
         paddingBottom: 15,
+        paddingRight: 16,
     },
+
+    // CARD DE LABORATÓRIO
     marcaCard: {
         alignItems: 'center',
-        marginRight: 20,
-        width: 80,
+        marginRight: 16,
+        width: 90,
     },
     marcaLogo: {
-        width: 60,
-        height: 60,
-        backgroundColor: '#3A5FCD',
-        borderRadius: 30,
+        width: 80,
+        height: 80,
+        backgroundColor: '#fff',
+        borderRadius: 40, // Mantém o container perfeitamente redondo
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 6,
+        marginBottom: 8,
+        // Sombra suave
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+        borderWidth: 1,
+        borderColor: '#E2E8F0',
+        // ADICIONADO: Garante que a imagem não vase pelos cantos se for grande
+        overflow: 'hidden', 
     },
     marcaLogoImagem: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
-        backgroundColor: '#fff',
-    },
-    marcaLogoTexto: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#fff',
+        width: 55, // Ajuste leve de tamanho (era 50) para preencher melhor
+        height: 55,
+        borderRadius: 27.5, // ADICIONADO: Deixa a própria imagem redonda
     },
     marcaNome: {
         fontSize: 12,
-        color: '#000',
+        color: '#475569',
         fontWeight: '500',
         textAlign: 'center',
     },
-    
-    // --- ESTILOS CARD FARMACIA MELHORADOS ---
+
+    // CARD DE FARMÁCIA
     bannerFarmaciaCard: {
-        width: 200,
-        height: 140, // Aumentado para caber melhor
+        width: 240,
+        height: 140,
         marginRight: 16,
-        borderRadius: 12,
-        overflow: 'hidden',
+        borderRadius: 16,
         backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'space-between', 
+        // Adicionei padding para organizar melhor o conteúdo centralizado
+        paddingTop: 10, 
+        
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.08,
         shadowRadius: 4,
-        elevation: 3, 
+        elevation: 3,
         borderWidth: 1,
-        borderColor: '#f0f0f0',
-    },
-    bannerFarmaciaImagemContainer: {
-        width: '100%',
-        height: 100, // Área fixa para imagem
-        backgroundColor: '#f9f9f9', 
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderBottomWidth: 1,
-        borderBottomColor: '#f0f0f0',
+        borderColor: '#f1f5f9',
     },
     bannerFarmaciaImagem: {
-        width: '80%', 
-        height: '80%',
+        width: 80,         // ALTERADO: De '100%' para tamanho fixo
+        height: 80,        // ALTERADO: Tamanho quadrado
+        borderRadius: 40,  // ADICIONADO: Metade da largura para ficar redonda
+        backgroundColor: '#f8fafc',
+        alignSelf: 'center', // ADICIONADO: Centraliza a imagem no card
     },
     bannerFarmaciaNome: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#2c3e50',
-        marginVertical: 10,
+        color: '#334155',
         textAlign: 'center',
-        paddingHorizontal: 5,
+        paddingVertical: 10,
+        backgroundColor: 'transparent', // ALTERADO: Para não cobrir nada
     },
 
     espacoFinal: {
-        height: 30,
+        height: 60, // Espaço extra no final da rolagem
     },
 });

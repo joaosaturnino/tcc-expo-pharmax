@@ -1,28 +1,31 @@
 import { StyleSheet, Dimensions } from 'react-native';
 
-const { width, height } = Dimensions.get('window');
+// Pega a largura total da tela do dispositivo atual
+const { width } = Dimensions.get('window');
 
 export default StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: '#f8f9fa',
+        flex: 1, // Ocupa a tela toda
+        backgroundColor: '#f8f9fa', // Fundo cinza claro (clean)
     },
     scrollContainer: {
-        flexGrow: 1,
-        justifyContent: 'center',
-        paddingHorizontal: 20,
+        flexGrow: 1, // Permite que o ScrollView cresça para ocupar espaço
+        justifyContent: 'center', // Centraliza tudo verticalmente
+        paddingHorizontal: 20, // Espaço nas laterais
         paddingVertical: 40,
     },
     logoContainer: {
         alignItems: 'center',
-        marginBottom: 40,
+        marginBottom: 30,
     },
     logo: {
-        width: width * 0.8,
-        height: width * 0.8,
-        marginBottom: 20,
-        //tintColor: '#000000ff', // Remove se sua logo já tiver cores
+        // Lógica Responsiva:
+        // A logo ocupará 70% da largura da tela, independente do celular
+        width: width * 0.7,
+        height: width * 0.4, // Mantém uma proporção retangular
+        marginBottom: 10,
     },
+    // Títulos (não usados no JSX atual, mas úteis manter)
     title: {
         fontSize: 24,
         fontWeight: 'bold',
@@ -42,12 +45,13 @@ export default StyleSheet.create({
         backgroundColor: '#fff',
         borderWidth: 1,
         borderColor: '#ddd',
-        borderRadius: 8,
+        borderRadius: 8, // Bordas arredondadas suaves
         paddingHorizontal: 15,
         paddingVertical: 12,
         marginBottom: 15,
         fontSize: 16,
         color: '#2c3e50',
+        // Configuração de Sombra (iOS)
         shadowColor: '#000',
         shadowOffset: {
             width: 0,
@@ -55,14 +59,16 @@ export default StyleSheet.create({
         },
         shadowOpacity: 0.1,
         shadowRadius: 2,
+        // Configuração de Sombra (Android)
         elevation: 2,
     },
     loginButton: {
-        backgroundColor: '#66CD00',
+        backgroundColor: '#66CD00', // Verde do tema PharmaX
         borderRadius: 8,
         paddingVertical: 15,
         alignItems: 'center',
         marginTop: 10,
+        // Sombra mais forte para destacar o botão
         shadowColor: '#000',
         shadowOffset: {
             width: 0,
@@ -78,13 +84,13 @@ export default StyleSheet.create({
         fontWeight: 'bold',
     },
     linksContainer: {
-        marginTop: 20,
+        marginTop: 25,
         alignItems: 'center',
     },
     link: {
-        color: '#66CD00',
-        fontSize: 16,
-        marginVertical: 8,
+        color: '#66CD00', // Link verde combinando com botão
+        fontSize: 15,
+        marginVertical: 5,
         fontWeight: '500',
     },
 });
