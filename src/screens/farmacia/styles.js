@@ -33,7 +33,6 @@ const styles = StyleSheet.create({
         width: 80,
         height: 80,
         borderRadius: 40,
-        // Sombra
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
@@ -72,7 +71,6 @@ const styles = StyleSheet.create({
         marginHorizontal: 16,
         marginTop: 16,
         marginBottom: 0,
-        // Sombra leve
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
@@ -129,11 +127,38 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
 
+    // --- NOTA MÉDIA ---
+    notaContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#FEF3C7', 
+        padding: 10,
+        borderRadius: 8,
+        marginTop: 0,
+        marginBottom: 12,
+        justifyContent: 'center'
+    },
+    notaValor: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#D97706', 
+        marginRight: 8,
+    },
+    notaEstrelasRow: {
+        flexDirection: 'row',
+        marginRight: 8,
+    },
+    notaTotalAvaliacoes: {
+        fontSize: 12,
+        color: '#92400E',
+        fontWeight: '600',
+    },
+
     // --- CONTADOR E LISTA ---
     contadorContainer: {
         padding: 16,
         marginTop: 10,
-        paddingBottom: 8, // Ajuste fino
+        paddingBottom: 8,
     },
     contadorText: {
         fontSize: 14,
@@ -142,7 +167,7 @@ const styles = StyleSheet.create({
     },
     medicamentosList: {
         paddingHorizontal: 16,
-        paddingBottom: 40, // Espaço extra no final da lista
+        paddingBottom: 40,
     },
 
     // --- CARD MEDICAMENTO ---
@@ -152,23 +177,21 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         padding: 16,
         marginBottom: 12,
-        // Sombra
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 3,
         elevation: 3,
-
         position: 'relative',
         borderWidth: 2,
-        borderColor: 'transparent', // Borda transparente por padrão
-        overflow: 'visible', // Mudado para visible para o badge funcionar melhor se sair da borda
+        borderColor: 'transparent',
+        overflow: 'visible',
     },
     medicamentoCardEmPromocao: {
-        backgroundColor: '#FEF2F2', // Fundo vermelho bem claro
-        borderColor: '#FECACA',     // Borda vermelha clara
-        borderWidth: 1.5,           // Borda um pouco mais grossa
-        shadowColor: "#EF4444",     // Sombra avermelhada
+        backgroundColor: '#FEF2F2',
+        borderColor: '#FECACA',
+        borderWidth: 1.5,
+        shadowColor: "#EF4444",
         elevation: 6,
     },
     medicamentoImagem: {
@@ -214,7 +237,7 @@ const styles = StyleSheet.create({
     // --- BADGE PROMOÇÃO ---
     promoBadge: {
         position: 'absolute',
-        top: -2, // Ajuste fino para colar na borda
+        top: -2,
         right: -2,
         backgroundColor: '#e74c3c',
         paddingHorizontal: 8,
@@ -244,7 +267,106 @@ const styles = StyleSheet.create({
         marginTop: 16,
     },
     medicamentoImagemTexto: {
-        fontSize: 40, // Tamanho do emoji
+        fontSize: 40,
+    },
+
+    // --- BOTÃO AVALIAR (NO CARD) ---
+    avaliarBtn: {
+        flexDirection: 'row',
+        backgroundColor: '#F59E0B', 
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        borderRadius: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 16,
+        shadowColor: '#F59E0B',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    avaliarBtnTexto: {
+        color: '#fff',
+        fontWeight: 'bold',
+        marginLeft: 8,
+        fontSize: 14,
+    },
+
+    // --- MODAL DE AVALIAÇÃO ---
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    },
+    modalContainer: {
+        width: '100%',
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        padding: 20,
+        elevation: 10,
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#1e293b',
+        marginBottom: 16,
+        textAlign: 'center',
+    },
+    starsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginBottom: 20,
+    },
+    starButton: {
+        padding: 5,
+    },
+    inputComentario: {
+        backgroundColor: '#F1F5F9',
+        borderRadius: 8,
+        padding: 12,
+        height: 100,
+        textAlignVertical: 'top', 
+        marginBottom: 20,
+        color: '#334155',
+    },
+    modalButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    
+    // BOTÕES DO MODAL
+    btnCancelar: {
+        flex: 1,
+        backgroundColor: '#E2E8F0',
+        padding: 12,
+        borderRadius: 8,
+        marginRight: 6,
+        alignItems: 'center',
+    },
+    // --- NOVO: BOTÃO EXCLUIR ---
+    btnExcluir: {
+        width: 50, // Quadrado ou menor que os outros
+        backgroundColor: '#EF4444', // Vermelho
+        padding: 12,
+        borderRadius: 8,
+        marginHorizontal: 6,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    btnConfirmar: {
+        flex: 1,
+        backgroundColor: '#2A7CC7',
+        padding: 12,
+        borderRadius: 8,
+        marginLeft: 6,
+        alignItems: 'center',
+    },
+    btnTexto: {
+        fontWeight: 'bold',
+        fontSize: 14,
     }
 });
 

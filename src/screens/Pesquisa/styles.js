@@ -1,226 +1,294 @@
-import { StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet, Dimensions, Platform } from 'react-native';
 
 const { width } = Dimensions.get('window');
-// Calcula largura do card para caber 2 por linha com margens
-const cardWidth = (width / 2) - 24;
+const spacing = 16;
+// Ajuste do card para acomodar o espaçamento
+const cardWidth = (width - (spacing * 2) - 12) / 2; 
 
 export default StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f8f9fa',
+        backgroundColor: '#FAFAFA',
     },
-    // Header fixo no topo
-    header: {
-        paddingTop: 50,
-        paddingHorizontal: 16,
-        paddingBottom: 12,
+    
+    // --- HEADER ---
+    headerContainer: {
+        paddingTop: Platform.OS === 'android' ? 40 : 60,
+        paddingHorizontal: spacing,
+        paddingBottom: 10,
         backgroundColor: '#fff',
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.05,
+        shadowRadius: 10,
+        elevation: 5,
+        zIndex: 100,
+    },
+    headerTopRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
-        position: 'relative',
+        marginBottom: 16,
     },
     backButton: {
-        position: 'absolute',
-        left: 16,
-        top: 50,
-        bottom: 12,
-        justifyContent: 'center',
-        zIndex: 10,
-        width: 40,
+        padding: 8,
+        marginRight: 8,
+        marginLeft: -8,
     },
     headerTitle: {
-        fontSize: 20,
-        fontWeight: '600',
-        color: '#2c3e50',
+        fontSize: 24,
+        fontWeight: '700',
+        color: '#1e293b',
+        letterSpacing: -0.5,
     },
-    // Área do Input
-    searchContainer: {
-        padding: 16,
-        backgroundColor: '#fff',
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
+    
+    // --- BUSCA ---
+    searchBox: {
         flexDirection: 'row',
         alignItems: 'center',
+        backgroundColor: '#F1F5F9',
+        borderRadius: 16,
+        paddingHorizontal: 16,
+        height: 50,
+        borderWidth: 1,
+        borderColor: '#E2E8F0',
     },
     searchInput: {
         flex: 1,
-        backgroundColor: '#f1f2f6',
-        borderRadius: 25,
-        paddingHorizontal: 20,
-        paddingVertical: 12,
-        paddingRight: 40,
         fontSize: 16,
-        color: '#2c3e50',
+        color: '#334155',
+        marginLeft: 10,
+        height: '100%',
     },
     clearButton: {
-        position: 'absolute',
-        right: 25,
-        height: 50,
-        justifyContent: 'center',
+        padding: 8,
     },
 
-    // --- SEÇÕES ---
+    // --- FILTROS ---
+    filterScrollView: {
+        maxHeight: 60,
+        backgroundColor: '#fff',
+        paddingBottom: 10,
+    },
+    filterContentContainer: {
+        paddingHorizontal: spacing,
+        paddingVertical: 8,
+    },
+    filterButton: {
+        paddingHorizontal: 18,
+        paddingVertical: 8,
+        borderRadius: 25,
+        backgroundColor: '#F1F5F9',
+        marginRight: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    filterButtonActive: {
+        backgroundColor: '#2A7CC7',
+        shadowColor: '#2A7CC7',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 4,
+    },
+    filterText: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#64748B',
+    },
+    filterTextActive: {
+        color: '#fff',
+        fontWeight: '700',
+    },
+
+    // --- CONTEÚDO ---
+    scrollContent: {
+        paddingTop: 20,
+        paddingBottom: 40,
+    },
     section: {
-        marginTop: 24,
+        marginBottom: 32,
+    },
+    sectionHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: spacing,
+        marginBottom: 16,
     },
     sectionTitle: {
         fontSize: 18,
-        fontWeight: 'bold',
-        color: '#2c3e50',
-        marginBottom: 12,
-        paddingHorizontal: 16,
+        fontWeight: '800',
+        color: '#1e293b',
+    },
+    sectionBadge: {
+        backgroundColor: '#E0F2FE',
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderRadius: 6,
+    },
+    sectionBadgeText: {
+        fontSize: 12,
+        fontWeight: '700',
+        color: '#0284C7',
     },
 
-    // --- CARD HORIZONTAL (FARMÁCIA/LAB) ---
+    // --- CARD ENTIDADE (FARMÁCIA/LAB) ---
     entidadeCard: {
-        width: 140,
+        width: 130,
         backgroundColor: '#fff',
         borderRadius: 16,
         padding: 12,
-        marginRight: 12,
+        marginRight: 16,
         alignItems: 'center',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
+        shadowOpacity: 0.06,
+        shadowRadius: 6,
         elevation: 3,
         borderWidth: 1,
-        borderColor: '#f0f0f0',
+        borderColor: '#F1F5F9',
     },
+    // IMAGEM REDONDA: Container
     entidadeImagemContainer: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
+        width: 80,             // Tamanho
+        height: 80,            // Tamanho igual
+        borderRadius: 40,      // Metade do tamanho (80 / 2 = 40)
         backgroundColor: '#fff',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 8,
+        marginBottom: 10,
         borderWidth: 1,
-        borderColor: '#f1f2f6',
+        borderColor: '#F8FAFC',
+        overflow: 'hidden',    // Garante que a imagem não saia do círculo
     },
+    // IMAGEM REDONDA: Imagem interna
     entidadeImagem: {
-        width: 60,
-        height: 60,
-        borderRadius: 30,
+        width: '100%',
+        height: '100%',
+        borderRadius: 40,      // Força o arredondamento na imagem também
     },
     entidadeNome: {
         fontSize: 13,
-        fontWeight: '700',
-        color: '#2c3e50',
+        fontWeight: '600',
+        color: '#334155',
         textAlign: 'center',
-        marginBottom: 2,
+        marginBottom: 4,
     },
     entidadeTipo: {
-        fontSize: 11,
-        color: '#95a5a6',
+        fontSize: 10,
+        color: '#94A3B8',
         fontWeight: '500',
+        textTransform: 'uppercase',
     },
 
-    // --- GRID DE MEDICAMENTOS ---
+    // --- CARD MEDICAMENTO ---
     gridContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        paddingHorizontal: 8,
+        paddingHorizontal: spacing,
+        justifyContent: 'space-between',
     },
     produtoCard: {
         width: cardWidth,
         backgroundColor: '#fff',
-        borderRadius: 14,
+        borderRadius: 16,
         padding: 12,
-        marginHorizontal: 8,
         marginBottom: 16,
         alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
+        shadowColor: '#64748B',
+        shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.08,
-        shadowRadius: 4,
-        elevation: 2,
+        shadowRadius: 8,
+        elevation: 3,
         borderWidth: 1,
-        borderColor: '#f1f2f6',
-        position: 'relative',
+        borderColor: '#F8FAFC',
     },
-
-    // --- CORREÇÃO AQUI: MUDADO PARA VERMELHO ---
     produtoCardEmPromocao: {
-        backgroundColor: '#FEF2F2', // Fundo vermelho bem claro
-        borderColor: '#FECACA',     // Borda vermelha clara
-        borderWidth: 1.5,           // Borda um pouco mais grossa
-        shadowColor: "#EF4444",     // Sombra avermelhada
-        elevation: 6,
+        backgroundColor: '#FEF2F2',
+        borderColor: '#FCA5A5',
+        shadowColor: "#EF4444",
+        elevation: 4,
     },
-
+    
+    // IMAGEM REDONDA MEDICAMENTO
     produtoImagem: {
-        width: 100,
-        height: 100,
-        backgroundColor: '#f1f2f6',
-        borderRadius: 10,
+        width: 100,            // Largura fixa
+        height: 100,           // Altura fixa igual
+        borderRadius: 50,      // Metade (100 / 2 = 50) -> CÍRCULO PERFEITO
+        backgroundColor: '#f8fafc', // Fundo cinza claro para destacar o círculo
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 12,
+        overflow: 'hidden',    // Corta o que passar do círculo
     },
     produtoImagemReal: {
-        width: '100%',
-        height: '100%',
+        width: '65%',          // Imagem interna um pouco menor para caber bonito no círculo
+        height: '65%',
     },
+    
     produtoNome: {
-        fontSize: 15,
-        fontWeight: '600',
-        color: '#2c3e50',
+        fontSize: 14,
+        fontWeight: '700',
+        color: '#334155',
         marginBottom: 4,
         textAlign: 'center',
+        lineHeight: 20,
     },
     produtoMarca: {
-        fontSize: 13,
-        color: '#7f8c8d',
-        marginBottom: 6,
+        fontSize: 12,
+        color: '#94A3B8',
+        marginBottom: 8,
         textAlign: 'center',
+    },
+    priceTag: {
+        flexDirection: 'column',
+        alignItems: 'center',
     },
     produtoPreco: {
-        fontSize: 17,
-        fontWeight: 'bold',
-        color: '#27ae60',
-        textAlign: 'center',
+        fontSize: 16,
+        fontWeight: '800',
+        color: '#10B981',
     },
     produtoPrecoAntigo: {
-        fontSize: 13,
-        color: '#7f8c8d',
+        fontSize: 12,
+        color: '#94A3B8',
         textDecorationLine: 'line-through',
+        marginBottom: 2,
     },
     promoBadge: {
         position: 'absolute',
-        top: -1,
-        right: -1,
-        backgroundColor: '#EF4444', // Vermelho forte para a etiqueta
+        top: 10,
+        left: 10,
+        backgroundColor: '#EF4444',
         paddingHorizontal: 8,
-        paddingVertical: 2,
-        borderTopRightRadius: 12,
-        borderBottomLeftRadius: 12,
+        paddingVertical: 4,
+        borderRadius: 6,
         zIndex: 1,
     },
     promoBadgeTexto: {
         color: '#fff',
-        fontSize: 11,
-        fontWeight: 'bold',
+        fontSize: 10,
+        fontWeight: '800',
     },
 
-    // --- ESTADO VAZIO ---
+    // --- EMPTY STATES ---
     emptyContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 20,
-        marginTop: 50,
+        padding: 40,
+        marginTop: 40,
+        opacity: 0.7,
     },
     emptyIcon: {
-        fontSize: 48,
+        fontSize: 60,
         marginBottom: 16,
+        color: '#CBD5E1',
     },
     emptyText: {
         fontSize: 16,
-        color: '#7f8c8d',
+        color: '#64748B',
         textAlign: 'center',
+        fontWeight: '500',
     },
 });

@@ -8,23 +8,25 @@ import {
     Image,
     ActivityIndicator,
     Keyboard,
-    ScrollView
+    ScrollView,
+    LayoutAnimation, 
+    Platform,
+    UIManager,
+    RefreshControl // <--- 1. Importado aqui
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import styles from './styles';
 import api from '../../services/api';
 
-// --- CONFIGURAÇÃO DE IP E IMAGENS ---
+// Configuração IP
 const SERVER_IP = '192.168.200.27:3334';
 const BASE_URL = `http://${SERVER_IP}`;
 
-// Helper robusto para corrigir URLs de imagem
-const getImageUrl = (caminho, tipo = 'padrao') => {
+// Helper Imagens
+const getImageUrl = (caminho) => {
     if (!caminho) return null;
-    if (typeof caminho === 'string' && caminho.startsWith('http')) {
-        return { uri: caminho };
-    }
+    if (typeof caminho === 'string' && caminho.startsWith('http')) return { uri: caminho };
     if (typeof caminho === 'string') {
         const cleanPath = caminho.startsWith('/') ? caminho.substring(1) : caminho;
         return { uri: `${BASE_URL}/${cleanPath}` };
@@ -32,7 +34,7 @@ const getImageUrl = (caminho, tipo = 'padrao') => {
     return null;
 };
 
-// --- HELPER: CÁLCULO DE PROMOÇÃO ---
+// Helper Promoção
 function calcularPrecoPromocional(item) {
     const precoOriginal = parseFloat(item.preco || item.medp_preco);
     const desconto = parseFloat(item.promo_desconto);
@@ -60,7 +62,7 @@ function calcularPrecoPromocional(item) {
     return { precoOriginal: precoOriginal.toFixed(2).replace('.', ','), precoComDesconto: null, estaEmPromocao: false, descontoPorcento: 0 };
 }
 
-// --- HOOK: DEBOUNCE (Delay na digitação) ---
+// Hook Debounce
 function useDebounce(value, delay) {
     const [debouncedValue, setDebouncedValue] = useState(value);
     useEffect(() => {
@@ -76,221 +78,212 @@ export default function Pesquisa() {
 
     const { termo: termoInicial } = route.params || {};
     const [searchText, setSearchText] = useState(termoInicial || '');
+    const [filter, setFilter] = useState('todos');
 
     const [medicamentos, setMedicamentos] = useState([]);
     const [farmacias, setFarmacias] = useState([]);
     const [laboratorios, setLaboratorios] = useState([]);
 
     const [loading, setLoading] = useState(false);
+    const [refreshing, setRefreshing] = useState(false); // <--- 2. Estado do Refresh
     const [hasSearched, setHasSearched] = useState(false);
 
     const debouncedSearchTerm = useDebounce(searchText, 600);
 
-    // --- FUNÇÃO DE BUSCA ---
-    const fetchResultados = useCallback(async (termoBruto) => {
-        // CORREÇÃO AQUI: Remove espaços do início e fim (trim)
-        // Isso resolve o problema do autocompletar do teclado adicionar espaço extra
+    const filterOptions = [
+        { id: 'todos', label: 'Tudo' },
+        { id: 'med', label: 'Medicamentos' },
+        { id: 'farm', label: 'Farmácias' },
+        { id: 'lab', label: 'Laboratórios' },
+    ];
+
+    const handleFilterChange = (newFilter) => {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        setFilter(newFilter);
+    };
+
+    // --- 3. Função de busca ajustada para aceitar isRefresh ---
+    const fetchResultados = useCallback(async (termoBruto, isRefresh = false) => {
         const termo = termoBruto ? termoBruto.trim() : '';
 
-        // Se o termo for vazio (mesmo que tivesse só espaços antes), limpa tudo
         if (termo.length === 0) {
             setMedicamentos([]);
             setFarmacias([]);
             setLaboratorios([]);
             setLoading(false);
             setHasSearched(false);
+            handleFilterChange('todos');
             return;
         }
 
-        setLoading(true);
+        // Se for refresh (puxou para baixo), não mostramos o loading de tela cheia
+        if (!isRefresh) setLoading(true);
+        
         setHasSearched(true);
 
         try {
-            // Usa o 'termo' já limpo nas requisições
             const [resMed, resFarm, resLab] = await Promise.all([
                 api.get(`/medicamentos/todos?search=${termo}&limit=50`),
                 api.get('/farmacias'),
                 api.get('/todoslab')
             ]);
 
-            // 1. TRATAMENTO DE MEDICAMENTOS
+            // Medicamentos
             let listaMedicamentos = resMed.data.dados || [];
-
             listaMedicamentos.sort((a, b) => {
-                const getPrecoReal = (item) => {
-                    let preco = parseFloat(item.preco || item.medp_preco);
+                const getPreco = (item) => {
+                    let p = parseFloat(item.preco || item.medp_preco);
                     const promo = calcularPrecoPromocional(item);
-                    if (promo.estaEmPromocao) {
-                        const desconto = parseFloat(item.promo_desconto);
-                        return preco * (1 - desconto / 100);
-                    }
-                    return preco;
+                    return promo.estaEmPromocao ? p * (1 - parseFloat(item.promo_desconto) / 100) : p;
                 };
-                return getPrecoReal(a) - getPrecoReal(b);
+                return getPreco(a) - getPreco(b);
             });
             setMedicamentos(listaMedicamentos);
 
-            // 2. TRATAMENTO DE FARMÁCIAS (Filtro Local usando termo limpo)
+            // Farmácias
             const dadosFarm = resFarm.data.dados || [];
-            const farmsFiltradas = dadosFarm.filter(f =>
-                f.farm_nome.toLowerCase().includes(termo.toLowerCase())
-            );
-            setFarmacias(farmsFiltradas);
+            setFarmacias(dadosFarm.filter(f => f.farm_nome.toLowerCase().includes(termo.toLowerCase())));
 
-            // 3. TRATAMENTO DE LABORATÓRIOS (Filtro Local usando termo limpo)
+            // Laboratórios
             let dadosLab = resLab.data.dados || resLab.data || [];
-            const labsFiltrados = dadosLab.filter(l =>
-                (l.lab_nome || l.nome || '').toLowerCase().includes(termo.toLowerCase())
-            );
-            setLaboratorios(labsFiltrados);
+            setLaboratorios(dadosLab.filter(l => (l.lab_nome || l.nome || '').toLowerCase().includes(termo.toLowerCase())));
 
         } catch (error) {
-            console.error('Erro na pesquisa:', error);
-            setMedicamentos([]);
-            setFarmacias([]);
-            setLaboratorios([]);
+            console.error(error);
         } finally {
-            setLoading(false);
+            if (!isRefresh) setLoading(false);
         }
     }, []);
 
-    // Dispara a busca sempre que o texto "debounced" mudar
+    // --- 4. Função chamada ao puxar para baixo ---
+    const onRefresh = useCallback(async () => {
+        setRefreshing(true);
+        // Chama a busca forçando isRefresh=true para não piscar a tela
+        await fetchResultados(searchText, true);
+        setRefreshing(false);
+    }, [fetchResultados, searchText]);
+
     useEffect(() => {
-        // O debounce passa o texto bruto, mas o fetchResultados agora faz o trim()
+        // Busca normal via digitação
         fetchResultados(debouncedSearchTerm);
     }, [debouncedSearchTerm, fetchResultados]);
 
     const clearSearch = () => {
         setSearchText('');
-        setMedicamentos([]);
-        setFarmacias([]);
-        setLaboratorios([]);
-        setHasSearched(false);
+        handleFilterChange('todos');
     };
 
-    // --- RENDERIZAÇÃO: MEDICAMENTO ---
+    // ... Render Items (Mantido Igual) ...
     const renderMedicamento = ({ item }) => {
-        const nomeMed = item.med_nome || item.nome;
-        const marca = item.lab_nome || item.marca;
         const promo = calcularPrecoPromocional(item);
-
-        const imagemOrigem = item.med_imagem || item.imagem;
-        const sourceValidado = getImageUrl(imagemOrigem);
-        const imageSource = sourceValidado || require('../../../public/caixa-medicamento-padrao5.png');
+        const source = getImageUrl(item.med_imagem || item.imagem);
+        const imageSource = source || require('../../../public/caixa-medicamento-padrao5.png');
 
         return (
             <TouchableOpacity
                 style={[styles.produtoCard, promo.estaEmPromocao && styles.produtoCardEmPromocao]}
                 onPress={() => navigation.navigate('Produto', { produto: item })}
+                activeOpacity={0.9}
             >
                 {promo.estaEmPromocao && (
                     <View style={styles.promoBadge}>
-                        <Text style={styles.promoBadgeTexto}>{promo.descontoPorcento}% OFF</Text>
+                        <Text style={styles.promoBadgeTexto}>{Math.round(promo.descontoPorcento)}% OFF</Text>
                     </View>
                 )}
                 <View style={styles.produtoImagem}>
                     <Image source={imageSource} style={styles.produtoImagemReal} resizeMode="contain" />
                 </View>
 
-                <Text style={styles.produtoNome} numberOfLines={1}>{nomeMed}</Text>
-                <Text style={styles.produtoMarca}>{marca}</Text>
+                <Text style={styles.produtoNome} numberOfLines={2}>{item.med_nome || item.nome}</Text>
+                <Text style={styles.produtoMarca}>{item.lab_nome || item.marca}</Text>
 
-                {promo.estaEmPromocao ? (
-                    <View>
+                <View style={styles.priceTag}>
+                    {promo.estaEmPromocao && (
                         <Text style={styles.produtoPrecoAntigo}>R$ {promo.precoOriginal}</Text>
-                        <Text style={styles.produtoPreco}>R$ {promo.precoComDesconto}</Text>
-                    </View>
-                ) : (
-                    <Text style={styles.produtoPreco}>R$ {promo.precoOriginal}</Text>
-                )}
+                    )}
+                    <Text style={[styles.produtoPreco, promo.estaEmPromocao && { color: '#EF4444' }]}>
+                        R$ {promo.estaEmPromocao ? promo.precoComDesconto : promo.precoOriginal}
+                    </Text>
+                </View>
             </TouchableOpacity>
         );
     };
 
-    // --- RENDERIZAÇÃO: FARMÁCIA ---
-    const renderFarmacia = ({ item }) => {
-        const sourceValidado = getImageUrl(item.farm_logo_url);
-        const imageSource = sourceValidado || require('../../../public/logo.png');
+    const renderEntidade = ({ item, tipo }) => {
+        const isFarm = tipo === 'farm';
+        const imgUrl = isFarm ? item.farm_logo_url : (item.lab_logo_url || item.lab_logo);
+        const nome = isFarm ? item.farm_nome : (item.lab_nome || item.nome);
+        const source = getImageUrl(imgUrl) || require('../../../public/logo.png');
 
         return (
             <TouchableOpacity
                 style={styles.entidadeCard}
-                onPress={() => navigation.navigate('Farmacia', {
-                    farm_id: item.farm_id,
-                    nome: item.farm_nome,
-                    imagemFarmacia: item.farm_logo_url
-                })}
+                onPress={() => navigation.navigate(isFarm ? 'Farmacia' : 'Laboratorio', isFarm ? { farm_id: item.farm_id, nome, imagemFarmacia: imgUrl } : { lab_id: item.lab_id, nome, imagemLaboratorio: imgUrl })}
+                activeOpacity={0.8}
             >
                 <View style={styles.entidadeImagemContainer}>
-                    <Image source={imageSource} style={styles.entidadeImagem} resizeMode="contain" />
+                    <Image source={source} style={styles.entidadeImagem} resizeMode="contain" />
                 </View>
-                <Text style={styles.entidadeNome} numberOfLines={1}>{item.farm_nome}</Text>
-                <Text style={styles.entidadeTipo}>Farmácia</Text>
+                <Text style={styles.entidadeNome} numberOfLines={2}>{nome}</Text>
+                <Text style={styles.entidadeTipo}>{isFarm ? 'Farmácia' : 'Laboratório'}</Text>
             </TouchableOpacity>
         );
     };
 
-    // --- RENDERIZAÇÃO: LABORATÓRIO ---
-    const renderLaboratorio = ({ item }) => {
-        const nomeLab = item.lab_nome || item.nome;
-        const imgUrl = item.lab_logo_url || item.lab_logo;
-        const sourceValidado = getImageUrl(imgUrl);
-        const imageSource = sourceValidado || require('../../../public/logo.png');
-
-        return (
-            <TouchableOpacity
-                style={styles.entidadeCard}
-                onPress={() => navigation.navigate('Laboratorio', {
-                    lab_id: item.lab_id,
-                    nome: nomeLab,
-                    imagemLaboratorio: imgUrl
-                })}
-            >
-                <View style={styles.entidadeImagemContainer}>
-                    <Image source={imageSource} style={styles.entidadeImagem} resizeMode="contain" />
-                </View>
-                <Text style={styles.entidadeNome} numberOfLines={1}>{nomeLab}</Text>
-                <Text style={styles.entidadeTipo}>Laboratório</Text>
-            </TouchableOpacity>
-        );
-    };
-
-    // --- CONTEÚDO PRINCIPAL ---
     const renderContent = () => {
         if (loading) {
             return (
                 <View style={styles.emptyContainer}>
                     <ActivityIndicator size="large" color="#2A7CC7" />
-                    <Text style={styles.emptyText}>Buscando...</Text>
+                    <Text style={{ marginTop: 10, color: '#999' }}>Buscando resultados...</Text>
                 </View>
             );
         }
 
-        const totalResultados = medicamentos.length + farmacias.length + laboratorios.length;
+        const showFarmacias = (filter === 'todos' || filter === 'farm') && farmacias.length > 0;
+        const showLaboratorios = (filter === 'todos' || filter === 'lab') && laboratorios.length > 0;
+        const showMedicamentos = (filter === 'todos' || filter === 'med') && medicamentos.length > 0;
 
-        if (hasSearched && totalResultados === 0) {
+        // Se não tem resultados, mas já buscou, permitimos o ScrollView para poder dar Refresh caso tenha sido erro de rede
+        if (hasSearched && !showFarmacias && !showLaboratorios && !showMedicamentos) {
             return (
-                <View style={styles.emptyContainer}>
-                    <Text style={styles.emptyIcon}>🔍</Text>
-                    <Text style={styles.emptyText}>
-                        Nenhum resultado encontrado para "{searchText}"
-                    </Text>
-                </View>
+                <ScrollView 
+                    contentContainerStyle={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+                    refreshControl={
+                        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#2A7CC7']} />
+                    }
+                >
+                    <Ionicons name="search-outline" style={styles.emptyIcon} />
+                    <Text style={styles.emptyText}>Nenhum resultado encontrado.</Text>
+                    <Text style={{fontSize: 12, color: '#ccc', marginTop: 10}}>Puxe para atualizar</Text>
+                </ScrollView>
             );
         }
 
         return (
             <ScrollView
-                contentContainerStyle={{ paddingBottom: 40 }}
+                contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
                 onScrollBeginDrag={Keyboard.dismiss}
+                // --- 5. RefreshControl adicionado aqui ---
+                refreshControl={
+                    <RefreshControl 
+                        refreshing={refreshing} 
+                        onRefresh={onRefresh}
+                        colors={['#2A7CC7']} // Android
+                        tintColor="#2A7CC7" // iOS
+                    />
+                }
             >
-                {farmacias.length > 0 && (
+                {showFarmacias && (
                     <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>Farmácias</Text>
+                        <View style={styles.sectionHeader}>
+                            <Text style={styles.sectionTitle}>Farmácias</Text>
+                            <View style={styles.sectionBadge}><Text style={styles.sectionBadgeText}>{farmacias.length}</Text></View>
+                        </View>
                         <FlatList
                             data={farmacias}
-                            renderItem={renderFarmacia}
+                            renderItem={({ item }) => renderEntidade({ item, tipo: 'farm' })}
                             keyExtractor={item => `farm-${item.farm_id}`}
                             horizontal
                             showsHorizontalScrollIndicator={false}
@@ -299,12 +292,15 @@ export default function Pesquisa() {
                     </View>
                 )}
 
-                {laboratorios.length > 0 && (
+                {showLaboratorios && (
                     <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>Laboratórios</Text>
+                        <View style={styles.sectionHeader}>
+                            <Text style={styles.sectionTitle}>Laboratórios</Text>
+                            <View style={styles.sectionBadge}><Text style={styles.sectionBadgeText}>{laboratorios.length}</Text></View>
+                        </View>
                         <FlatList
                             data={laboratorios}
-                            renderItem={renderLaboratorio}
+                            renderItem={({ item }) => renderEntidade({ item, tipo: 'lab' })}
                             keyExtractor={item => `lab-${item.lab_id || item.id}`}
                             horizontal
                             showsHorizontalScrollIndicator={false}
@@ -313,12 +309,15 @@ export default function Pesquisa() {
                     </View>
                 )}
 
-                {medicamentos.length > 0 && (
+                {showMedicamentos && (
                     <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>Medicamentos</Text>
+                        <View style={styles.sectionHeader}>
+                            <Text style={styles.sectionTitle}>Medicamentos</Text>
+                            <View style={styles.sectionBadge}><Text style={styles.sectionBadgeText}>{medicamentos.length}</Text></View>
+                        </View>
                         <View style={styles.gridContainer}>
                             {medicamentos.map(item => (
-                                <View key={`med-${item.med_id}`} style={{ width: '50%' }}>
+                                <View key={`med-${item.med_id}`}>
                                     {renderMedicamento({ item })}
                                 </View>
                             ))}
@@ -331,29 +330,62 @@ export default function Pesquisa() {
 
     return (
         <View style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <Ionicons name="arrow-back" size={24} color="#2c3e50" />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>Pesquisar</Text>
+            <View style={styles.headerContainer}>
+                <View style={styles.headerTopRow}>
+                    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                        <Ionicons name="chevron-back" size={28} color="#1e293b" />
+                    </TouchableOpacity>
+                    <Text style={styles.headerTitle}>Explorar</Text>
+                </View>
+
+                <View style={styles.searchBox}>
+                    <Ionicons name="search" size={20} color="#94A3B8" />
+                    <TextInput
+                        style={styles.searchInput}
+                        placeholder="O que você procura hoje?"
+                        placeholderTextColor="#94A3B8"
+                        value={searchText}
+                        onChangeText={setSearchText}
+                        returnKeyType="search"
+                        autoFocus={!termoInicial}
+                    />
+                    {searchText.length > 0 && (
+                        <TouchableOpacity onPress={clearSearch} style={styles.clearButton}>
+                            <Ionicons name="close-circle" size={20} color="#94A3B8" />
+                        </TouchableOpacity>
+                    )}
+                </View>
             </View>
 
-            <View style={styles.searchContainer}>
-                <TextInput
-                    style={styles.searchInput}
-                    placeholder="Buscar produto, farmácia..."
-                    placeholderTextColor="#999"
-                    value={searchText}
-                    onChangeText={setSearchText}
-                    returnKeyType="search"
-                    autoFocus={!termoInicial}
-                />
-                {searchText.length > 0 && (
-                    <TouchableOpacity onPress={clearSearch} style={styles.clearButton}>
-                        <Ionicons name="close-circle" size={22} color="#999" />
-                    </TouchableOpacity>
-                )}
-            </View>
+            {hasSearched && (
+                <View style={{ backgroundColor: '#fff', zIndex: 90 }}>
+                    <ScrollView 
+                        horizontal 
+                        showsHorizontalScrollIndicator={false} 
+                        style={styles.filterScrollView}
+                        contentContainerStyle={styles.filterContentContainer}
+                    >
+                        {filterOptions.map((opt) => (
+                            <TouchableOpacity
+                                key={opt.id}
+                                style={[
+                                    styles.filterButton,
+                                    filter === opt.id && styles.filterButtonActive
+                                ]}
+                                onPress={() => handleFilterChange(opt.id)}
+                                activeOpacity={0.7}
+                            >
+                                <Text style={[
+                                    styles.filterText,
+                                    filter === opt.id && styles.filterTextActive
+                                ]}>
+                                    {opt.label}
+                                </Text>
+                            </TouchableOpacity>
+                        ))}
+                    </ScrollView>
+                </View>
+            )}
 
             {renderContent()}
         </View>

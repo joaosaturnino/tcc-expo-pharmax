@@ -8,7 +8,8 @@ import {
   Linking,
   ActivityIndicator,
   Platform,
-  Alert
+  Alert,
+  RefreshControl // <--- 1. Importado aqui
 } from 'react-native';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -21,7 +22,7 @@ import api from '../../services/api';
 const SERVER_IP = '192.168.200.27:3334';
 const BASE_URL = `http://${SERVER_IP}`;
 
-// Helper para corrigir URL da imagem (igual às outras telas)
+// Helper para corrigir URL da imagem
 const getImageUrl = (caminho) => {
   if (!caminho) return { uri: `${BASE_URL}/public/medicamentos/caixa-medicamento-padrao5.png` };
   if (typeof caminho === 'string' && caminho.startsWith('http')) return { uri: caminho };
@@ -73,13 +74,11 @@ export default function Produto() {
   const navigation = useNavigation();
   const route = useRoute();
 
-  // Recupera o objeto produto passado pela tela anterior
   const { produto } = route.params || {};
 
   // --- NORMALIZAÇÃO DOS DADOS ---
-  // Garante que temos os dados independente do nome da propriedade vinda da API
   const med_id = produto?.med_id || produto?.medicamento_id || produto?.id;
-  const farm_id_origem = produto?.farmacia_id || produto?.farm_id; // ID da farmácia de onde viemos (se houver)
+  const farm_id_origem = produto?.farmacia_id || produto?.farm_id;
 
   const med_nome = produto?.med_nome || produto?.nome || "Produto";
   const med_marca = produto?.lab_nome || produto?.lab_med || produto?.marca || "Genérico";
@@ -91,8 +90,9 @@ export default function Produto() {
   const formaProduto = produto?.forma_nome;
 
   // Estados
-  const [farmacias, setFarmacias] = useState([]); // Lista de farmácias que vendem este produto
+  const [farmacias, setFarmacias] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false); // <--- 2. Estado para o refresh
   const [isFavorito, setIsFavorito] = useState(false);
   const [favId, setFavId] = useState(null);
   const [loadingFavorito, setLoadingFavorito] = useState(false);
@@ -105,7 +105,7 @@ export default function Produto() {
     });
   }, [navigation, med_nome]);
 
-  // Formatação da Quantidade (Ex: "10 Comprimidos" ou "200ml")
+  // Formatação da Quantidade
   let med_info_display = "";
   if (qtdeProduto) {
     if (typeof qtdeProduto === 'string') med_info_display = qtdeProduto;
@@ -115,72 +115,85 @@ export default function Produto() {
     med_info_display = "Conteúdo não especificado";
   }
 
-  // Tratamento da Imagem
   const med_imagem_source = getImageUrl(produto?.med_imagem || produto?.imagem);
 
-  // --- BUSCA FARMÁCIAS QUE VENDEM O PRODUTO ---
-  useEffect(() => {
-    async function fetchFarmaciasDoProduto() {
-      if (!med_id) {
-        setLoading(false);
-        return;
-      }
-      setLoading(true);
-      try {
-        const response = await api.get(`/medicamentos/${med_id}/farmacias`);
-        setFarmacias(response.data.dados ?? []);
-      } catch (error) {
-        console.error('Erro ao buscar farmácias:', error);
-        setFarmacias([]);
-      } finally {
-        setLoading(false);
-      }
+  // --- 3. REFACTOR: LÓGICA DE BUSCA DE FARMÁCIAS (Extraída para reutilização) ---
+  const fetchFarmaciasDoProduto = useCallback(async (isRefresh = false) => {
+    if (!med_id) {
+      setLoading(false);
+      return;
     }
-    fetchFarmaciasDoProduto();
+    
+    // Se não for um refresh manual, ativa o loading geral da tela
+    if (!isRefresh) setLoading(true);
+    
+    try {
+      const response = await api.get(`/medicamentos/${med_id}/farmacias`);
+      setFarmacias(response.data.dados ?? []);
+    } catch (error) {
+      console.error('Erro ao buscar farmácias:', error);
+      setFarmacias([]);
+    } finally {
+      if (!isRefresh) setLoading(false);
+    }
   }, [med_id]);
 
-  // --- VERIFICAÇÃO DE FAVORITO ---
-  // Verifica se este produto (nesta farmácia específica) já é favorito
+  // UseEffect chama a função criada acima
+  useEffect(() => {
+    fetchFarmaciasDoProduto();
+  }, [fetchFarmaciasDoProduto]);
+
+  // --- 4. REFACTOR: LÓGICA DE VERIFICAR FAVORITO (Extraída para reutilização) ---
+  const verificarFavorito = useCallback(async () => {
+    if (!med_id || !farm_id_origem) return;
+
+    try {
+      const userData = await AsyncStorage.getItem('usuario_info');
+      if (!userData) return;
+
+      const usuario = JSON.parse(userData);
+      const usuario_id = usuario?.usu_id;
+      if (!usuario_id) return;
+
+      const response = await api.get(`/favoritos/usuario/${usuario_id}`);
+      const listaFavoritosDB = response.data.dados || [];
+
+      const favoritoEncontrado = listaFavoritosDB.find(
+        item => item.med_id == med_id && item.farmacia_id == farm_id_origem
+      );
+
+      if (favoritoEncontrado) {
+        setIsFavorito(true);
+        setFavId(favoritoEncontrado.fav_id);
+      } else {
+        setIsFavorito(false);
+        setFavId(null);
+      }
+    } catch (error) {
+      console.log("Erro verificar favorito:", error);
+    }
+  }, [med_id, farm_id_origem]);
+
+  // UseFocusEffect chama a função criada acima
   useFocusEffect(
     useCallback(() => {
-      const verificarFavorito = async () => {
-        // Só verifica favorito se tivermos o ID da farmácia de origem (clicou num card de oferta)
-        if (!med_id || !farm_id_origem) return;
-
-        try {
-          const userData = await AsyncStorage.getItem('usuario_info');
-          if (!userData) return;
-
-          const usuario = JSON.parse(userData);
-          const usuario_id = usuario?.usu_id;
-          if (!usuario_id) return;
-
-          const response = await api.get(`/favoritos/usuario/${usuario_id}`);
-          const listaFavoritosDB = response.data.dados || [];
-
-          const favoritoEncontrado = listaFavoritosDB.find(
-            item => item.med_id == med_id && item.farmacia_id == farm_id_origem
-          );
-
-          if (favoritoEncontrado) {
-            setIsFavorito(true);
-            setFavId(favoritoEncontrado.fav_id);
-          } else {
-            setIsFavorito(false);
-            setFavId(null);
-          }
-        } catch (error) {
-          console.log("Erro verificar favorito:", error);
-        }
-      };
-
       verificarFavorito();
-    }, [med_id, farm_id_origem])
+    }, [verificarFavorito])
   );
+
+  // --- 5. FUNÇÃO ON REFRESH (Puxar para atualizar) ---
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    // Chama as duas funções ao mesmo tempo e espera terminarem
+    await Promise.all([
+      fetchFarmaciasDoProduto(true), // Passa true para não piscar a tela inteira
+      verificarFavorito()
+    ]);
+    setRefreshing(false);
+  }, [fetchFarmaciasDoProduto, verificarFavorito]);
 
   // --- TOGGLE FAVORITO ---
   const toggleFavorito = async () => {
-    // Se o produto foi aberto pela pesquisa global (sem farmácia específica), não favoritemos por enquanto
     if (!farm_id_origem) {
       Alert.alert("Aviso", "Para favoritar, selecione uma oferta específica de uma farmácia abaixo.");
       return;
@@ -199,12 +212,10 @@ export default function Produto() {
       const usuario = JSON.parse(userData);
 
       if (isFavorito) {
-        // Remover
         await api.delete(`/favoritos/${favId}`, { data: { usuario_id: usuario.usu_id } });
         setIsFavorito(false);
         setFavId(null);
       } else {
-        // Adicionar
         const dadosPost = {
           usuario_id: usuario.usu_id,
           medicamento_id: med_id,
@@ -221,17 +232,15 @@ export default function Produto() {
     }
   };
 
-  // --- AÇÕES DE LINK EXTERNO ---
+  // --- AÇÕES LINK EXTERNO ---
   const fazerChamada = (telefone) => {
     if (!telefone) return;
-    // Remove caracteres não numéricos para garantir funcionamento
     const numeroLimpo = telefone.replace(/\D/g, '');
     Linking.openURL(`tel:${numeroLimpo}`);
   };
 
   const abrirMapa = (coordenadas) => {
     if (!coordenadas) return;
-    // Exemplo coordenadas: "-23.5505,-46.6333"
     const url = Platform.select({
       ios: `maps:0,0?q=${coordenadas}`,
       android: `geo:0,0?q=${coordenadas}`
@@ -239,7 +248,7 @@ export default function Produto() {
     Linking.openURL(url);
   };
 
-  // --- RENDERIZAÇÃO DE ITEM (FARMÁCIA) ---
+  // --- RENDERIZAÇÃO DE ITEM ---
   const renderCardFarmacia = (item) => {
     const nome = item.farm_nome || 'Farmácia';
     const endereco = item.farm_endereco || 'Endereço indisponível';
@@ -254,13 +263,11 @@ export default function Produto() {
         styles.farmaciaCard,
         promo.estaEmPromocao && styles.farmaciaCardEmPromocao
       ]}>
-
         {promo.estaEmPromocao && (
           <View style={styles.promoBadge}>
             <Text style={styles.promoBadgeTexto}>{promo.descontoPorcento}% OFF</Text>
           </View>
         )}
-
         <Text style={styles.farmaciaNome}>{nome}</Text>
         <Text style={styles.farmaciaEndereco}>{endereco}</Text>
         {distancia ? <Text style={styles.farmaciaDistancia}>Aprox. {distancia}</Text> : null}
@@ -278,14 +285,12 @@ export default function Produto() {
           </View>
 
           <View style={styles.farmaciaAcoes}>
-            {/* Se tiver coordenadas, mostra botão Mapa */}
             {coordenadas && (
               <TouchableOpacity style={styles.farmaciaBotao} onPress={() => abrirMapa(coordenadas)}>
                 <MaterialCommunityIcons name="map-marker" size={16} color="#2A7CC7" />
                 <Text style={styles.farmaciaBotaoTexto}>Mapa</Text>
               </TouchableOpacity>
             )}
-            {/* Se tiver telefone, mostra botão Ligar */}
             {telefone && (
               <TouchableOpacity style={styles.farmaciaBotao} onPress={() => fazerChamada(telefone)}>
                 <MaterialCommunityIcons name="phone" size={16} color="#2A7CC7" />
@@ -306,7 +311,19 @@ export default function Produto() {
 
   return (
     <View style={styles.container}>
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.content} 
+        showsVerticalScrollIndicator={false}
+        // --- 6. ADICIONADO REFRESH CONTROL AQUI ---
+        refreshControl={
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={onRefresh}
+            colors={['#2A7CC7']} // Usando a cor primary do seu styles
+            tintColor="#2A7CC7" // Para iOS
+          />
+        }
+      >
 
         {/* CABEÇALHO DO PRODUTO */}
         <View style={styles.produtoHeader}>
@@ -318,13 +335,7 @@ export default function Produto() {
             />
           </View>
           <View style={styles.produtoInfoBasica}>
-            
-            {/* === CORREÇÃO APLICADA AQUI === */}
-            {/* justifyContent: space-between joga o texto para esquerda e botão para direita */}
-            {/* alignItems: flex-start garante alinhamento ao topo se o texto quebrar linha */}
             <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-              
-              {/* flex: 1 faz o texto ocupar apenas o espaço disponível, sem empurrar o botão */}
               <Text 
                 style={[styles.produtoNome, { flex: 1, marginRight: 8 }]} 
                 numberOfLines={2}
@@ -332,11 +343,10 @@ export default function Produto() {
                 {med_nome}
               </Text>
 
-              {/* Botão de Favoritar */}
               {farm_id_origem && (
                 <TouchableOpacity
                   onPress={toggleFavorito}
-                  style={{ padding: 4 }} // Espaçamento para o clique
+                  style={{ padding: 4 }}
                   disabled={loadingFavorito}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
@@ -352,7 +362,6 @@ export default function Produto() {
                 </TouchableOpacity>
               )}
             </View>
-            {/* === FIM DA CORREÇÃO === */}
 
             <View style={styles.produtoMarcaWrapper}>
               <Text style={styles.produtoMarca}>{med_marca}</Text>
