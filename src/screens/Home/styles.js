@@ -5,7 +5,7 @@ const { width } = Dimensions.get('window');
 export default StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F5F7FA', // Cor de fundo mais moderna e suave
+        backgroundColor: '#F5F7FA',
     },
 
     // --- HEADER E LOGO ---
@@ -14,10 +14,10 @@ export default StyleSheet.create({
         paddingHorizontal: 16,
         paddingBottom: 10,
         backgroundColor: '#F5F7FA',
-        alignItems: 'center', // Centraliza a logo horizontalmente
+        alignItems: 'center',
     },
     logo: {
-        width: 180, // Reduzi um pouco para não ocupar tanto espaço da tela
+        width: 180,
         height: 80,
         resizeMode: 'contain',
     },
@@ -35,7 +35,6 @@ export default StyleSheet.create({
         paddingVertical: 12,
         fontSize: 15,
         color: '#2c3e50',
-        // Sombra leve na barra de pesquisa
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
@@ -45,7 +44,7 @@ export default StyleSheet.create({
         borderColor: '#E2E8F0',
     },
 
-    // --- SEÇÕES (Categorias, Destaques, etc) ---
+    // --- SEÇÕES ---
     section: {
         marginTop: 24,
         paddingHorizontal: 16,
@@ -63,7 +62,7 @@ export default StyleSheet.create({
     },
     verTudo: {
         fontSize: 14,
-        color: '#2A7CC7', // Azul padrão de links
+        color: '#2A7CC7',
         fontWeight: '600',
     },
 
@@ -80,10 +79,9 @@ export default StyleSheet.create({
     categoriaIcon: {
         width: 56,
         height: 56,
-        borderRadius: 28, // Deixa redondinho
+        borderRadius: 28,
         backgroundColor: '#fff',
         marginBottom: 8,
-        // Pequena borda para destacar do fundo
         borderWidth: 1,
         borderColor: '#E2E8F0',
     },
@@ -105,7 +103,6 @@ export default StyleSheet.create({
         borderRadius: 16,
         padding: 12,
         marginRight: 16,
-        // Sombra
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.06,
@@ -119,7 +116,6 @@ export default StyleSheet.create({
     produtoImagem: {
         width: '100%',
         height: 100,
-        // backgroundColor: '#fff', // REMOVER ou COMENTAR esta linha para não ficar um quadrado branco atrás
         borderRadius: 8,
         justifyContent: 'center',
         alignItems: 'center',
@@ -128,27 +124,14 @@ export default StyleSheet.create({
     produtoImagemReal: {
         width: 90,
         height: 90,
-        borderRadius: 45, // ADICIONADO: Metade de 90 para ficar um círculo perfeito
+        borderRadius: 45,
     },
-    // produtoImagem: {
-    //     width: '100%',
-    //     height: 100,
-    //     backgroundColor: '#fff',
-    //     borderRadius: 8,
-    //     justifyContent: 'center',
-    //     alignItems: 'center',
-    //     marginBottom: 10,
-    // },
-    // produtoImagemReal: {
-    //     width: 90,
-    //     height: 90,
-    // },
     produtoNome: {
         fontSize: 14,
         fontWeight: '600',
         color: '#334155',
         marginBottom: 4,
-        height: 38, // Altura fixa para alinhar textos longos
+        height: 38,
     },
     produtoMarca: {
         fontSize: 12,
@@ -158,15 +141,15 @@ export default StyleSheet.create({
     produtoPreco: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: '#16a34a', // Verde sucesso
+        color: '#16a34a',
     },
 
     // --- PROMOÇÃO ---
     produtoCardEmPromocao: {
-        backgroundColor: '#FEF2F2', // Fundo vermelho bem claro
-        borderColor: '#FECACA',     // Borda vermelha clara
-        borderWidth: 1.5,           // Borda um pouco mais grossa
-        shadowColor: "#EF4444",     // Sombra avermelhada
+        backgroundColor: '#FEF2F2',
+        borderColor: '#FECACA',
+        borderWidth: 1.5,
+        shadowColor: "#EF4444",
         elevation: 6,
     },
     promoBadge: {
@@ -208,11 +191,10 @@ export default StyleSheet.create({
         width: 80,
         height: 80,
         backgroundColor: '#fff',
-        borderRadius: 40, // Mantém o container perfeitamente redondo
+        borderRadius: 40,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 8,
-        // Sombra suave
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
@@ -220,13 +202,12 @@ export default StyleSheet.create({
         elevation: 2,
         borderWidth: 1,
         borderColor: '#E2E8F0',
-        // ADICIONADO: Garante que a imagem não vase pelos cantos se for grande
         overflow: 'hidden', 
     },
     marcaLogoImagem: {
-        width: 55, // Ajuste leve de tamanho (era 50) para preencher melhor
+        width: 55,
         height: 55,
-        borderRadius: 27.5, // ADICIONADO: Deixa a própria imagem redonda
+        borderRadius: 27.5,
     },
     marcaNome: {
         fontSize: 12,
@@ -242,9 +223,7 @@ export default StyleSheet.create({
         marginRight: 16,
         borderRadius: 16,
         backgroundColor: '#fff',
-        // Adicionei padding para organizar melhor o conteúdo centralizado
         paddingTop: 10, 
-        
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.08,
@@ -252,13 +231,37 @@ export default StyleSheet.create({
         elevation: 3,
         borderWidth: 1,
         borderColor: '#f1f5f9',
+        // ESSENCIAL PARA O BADGE DE NOTA FUNCIONAR:
+        position: 'relative', 
     },
+    
+    // --- ESTILOS DO BADGE DE NOTA (NOVO) ---
+    bannerFarmaciaBadge: {
+        position: 'absolute', // Flutua sobre o card
+        top: 10,              // Distância do topo
+        right: 10,            // Distância da direita
+        backgroundColor: '#FFFBEB', // Fundo amarelo bem claro
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: '#FCD34D', // Borda dourada
+        zIndex: 10,             // Garante que fique acima da imagem
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    bannerFarmaciaBadgeTexto: {
+        fontSize: 12,
+        fontWeight: 'bold',
+        color: '#D97706', // Texto cor de ouro escuro/laranja
+    },
+
     bannerFarmaciaImagem: {
-        width: 80,         // ALTERADO: De '100%' para tamanho fixo
-        height: 80,        // ALTERADO: Tamanho quadrado
-        borderRadius: 40,  // ADICIONADO: Metade da largura para ficar redonda
+        width: 80,
+        height: 80,
+        borderRadius: 40,
         backgroundColor: '#f8fafc',
-        alignSelf: 'center', // ADICIONADO: Centraliza a imagem no card
+        alignSelf: 'center',
     },
     bannerFarmaciaNome: {
         fontSize: 14,
@@ -266,10 +269,10 @@ export default StyleSheet.create({
         color: '#334155',
         textAlign: 'center',
         paddingVertical: 10,
-        backgroundColor: 'transparent', // ALTERADO: Para não cobrir nada
+        backgroundColor: 'transparent',
     },
 
     espacoFinal: {
-        height: 60, // Espaço extra no final da rolagem
+        height: 60,
     },
 });

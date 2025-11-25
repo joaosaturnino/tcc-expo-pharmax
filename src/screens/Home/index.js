@@ -8,22 +8,19 @@ import {
   ScrollView,
   Image,
   RefreshControl,
-  Alert // Importante para feedback de erro
+  Alert
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import styles from './styles';
 import api from '../../services/api';
 
-// URL de fallback caso a imagem venha quebrada da API
 const DEFAULT_IMAGE_URL = 'http://10.72.152.164:3334/public/medicamentos/caixa-medicamento-padrao5.png';
 
 // --- Função Helper de Promoção ---
-// Calcula o preço final e valida se a promoção está ativa hoje
 function calcularPrecoPromocional(item) {
   const precoOriginal = parseFloat(item.preco || item.medp_preco);
   const desconto = parseFloat(item.promo_desconto);
 
-  // Validações de segurança
   if (isNaN(precoOriginal) || !desconto || desconto <= 0 || !item.promo_inicio || !item.promo_fim) {
     return {
       precoOriginal: isNaN(precoOriginal) ? ' --,--' : precoOriginal.toFixed(2).replace('.', ','),
@@ -33,7 +30,6 @@ function calcularPrecoPromocional(item) {
     };
   }
 
-  // Checagem de Datas
   const hoje = new Date();
   const inicio = new Date(item.promo_inicio);
   const fim = new Date(item.promo_fim);
@@ -71,13 +67,10 @@ export default function Home() {
   const [produtosDestaque, setProdutosDestaque] = useState([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // --- EFEITO DE CARREGAMENTO INICIAL ---
   useEffect(() => {
     carregarTodosDados();
   }, []);
 
-  // --- FUNÇÃO DE RECARGA (PULL TO REFRESH) ---
-  // Promise.all faz todas as requisições rodarem ao mesmo tempo, sendo mais rápido
   const carregarTodosDados = async () => {
     try {
       await Promise.all([
@@ -99,19 +92,13 @@ export default function Home() {
   // --- FETCH: PRODUTOS DESTAQUE ---
   async function fetchDestaques() {
     try {
-      // Busca 20 produtos para ter variedade
       const response = await api.get('/medicamentos/todos?limit=20');
       const allDados = response?.data?.dados?.filter(item => item) ?? [];
-
-      // Algoritmo de embaralhamento (Fisher-Yates Shuffle)
-      // Isso garante que os destaques mudem a cada recarga
       let shuffled = [...allDados];
       for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
       }
-
-      // Pega apenas os 6 primeiros após embaralhar
       setProdutosDestaque(shuffled.slice(0, 6));
     } catch (error) {
       console.error('Erro ao buscar destaques:', error);
@@ -119,10 +106,11 @@ export default function Home() {
     }
   }
 
-  // --- FETCH: FARMÁCIAS ---
+  // --- FETCH: FARMÁCIAS (ATUALIZADO) ---
   async function fetchFarmaciasPopulares() {
     try {
       const response = await api.get('/farmacias?qtde=4');
+      // Agora pegamos os dados diretos, pois o backend já manda 'farm_nota'
       const dados = response?.data?.dados?.filter(item => item) ?? [];
       setFarmaciasPopulares(dados);
     } catch (error) {
@@ -135,12 +123,8 @@ export default function Home() {
   async function fetchLaboratorios() {
     try {
       const response = await api.get('/laboratorios?qtde=6');
-      // Normaliza o array de dados caso venha em formatos diferentes
       let dados = response?.data?.dados ?? response?.data ?? [];
-
-      // Mapeia para garantir que o campo de URL da imagem seja consistente
       const mapped = Array.isArray(dados) ? dados.map(item => {
-        // Tenta encontrar a URL da logo em várias propriedades possíveis
         const url = item.lab_logo_url || item.logo_url || item.logo || item.imagem_url || null;
         return {
           ...item,
@@ -155,7 +139,6 @@ export default function Home() {
   }
 
   // --- DADOS ESTÁTICOS (CATEGORIAS) ---
-  // Usamos require() aqui pois as imagens estão dentro do App
   const categorias = [
     { id: '1', nome: 'Dor', imagem: require('../../../public/dor-de-cabeca.png') },
     { id: '2', nome: 'Antibiótico', imagem: require('../../../public/antibiotico.png') },
@@ -167,7 +150,6 @@ export default function Home() {
     { id: '11', nome: 'Coração', imagem: require('../../../public/coracao.png') },
   ];
 
-  // --- RENDERIZAÇÃO: CATEGORIA ---
   const renderCategoria = ({ item }) => {
     if (!item) return null;
     return (
@@ -178,24 +160,18 @@ export default function Home() {
           tipo_id: item.id
         })}
       >
-        {/* resizeMode="contain" evita corte da imagem redonda */}
         <Image source={item.imagem} style={styles.categoriaIcon} resizeMode="contain" />
         <Text style={styles.categoriaNome}>{item.nome}</Text>
       </TouchableOpacity>
     );
   };
 
-  // --- RENDERIZAÇÃO: PRODUTO (CARD) ---
   const renderProduto = ({ item }) => {
     if (!item) return null;
-
     const nome = item.med_nome || item.nome;
     const marca = item.lab_nome || item.marca || 'Genérico';
     const promo = calcularPrecoPromocional(item);
-
-    // Lógica de Imagem Segura
     const imagemOrigem = item.med_imagem || item.imagem;
-    // Se for string (URL), usa uri. Se for número (require), usa direto. Se for nulo, usa fallback.
     const imageSource = (typeof imagemOrigem === 'string' && imagemOrigem.length > 5)
       ? { uri: imagemOrigem }
       : (typeof imagemOrigem === 'number' ? imagemOrigem : { uri: DEFAULT_IMAGE_URL });
@@ -211,14 +187,11 @@ export default function Home() {
             <Text style={styles.promoBadgeTexto}>{promo.descontoPorcento}% OFF</Text>
           </View>
         )}
-
         <View style={styles.produtoImagem}>
           <Image source={imageSource} style={styles.produtoImagemReal} resizeMode="contain" />
         </View>
-
         <Text style={styles.produtoNome} numberOfLines={2}>{nome}</Text>
         <Text style={styles.produtoMarca} numberOfLines={1}>{marca}</Text>
-
         {promo.estaEmPromocao ? (
           <View>
             <Text style={styles.produtoPrecoAntigo}>R$ {promo.precoOriginal}</Text>
@@ -231,14 +204,11 @@ export default function Home() {
     );
   };
 
-  // --- RENDERIZAÇÃO: LABORATÓRIO ---
   const renderLaboratorio = ({ item }) => {
     if (!item) return null;
-
-    // Lógica local para exibir na Home
     const imageSource = (item.lab_logo_url)
       ? { uri: item.lab_logo_url }
-      : require('../../../public/cimed.png'); // Ou sua imagem padrão local
+      : require('../../../public/cimed.png');
 
     return (
       <TouchableOpacity
@@ -259,13 +229,16 @@ export default function Home() {
     );
   };
 
-  // --- RENDERIZAÇÃO: FARMÁCIA ---
+  // --- RENDERIZAÇÃO: FARMÁCIA (COM NOTA REAL) ---
   const renderBannerFarmacia = ({ item }) => {
     if (!item) return null;
 
     const imageSource = (typeof item.farm_logo_url === 'string' && item.farm_logo_url.length > 5)
       ? { uri: item.farm_logo_url }
-      : { uri: DEFAULT_IMAGE_URL }; // Fallback
+      : { uri: DEFAULT_IMAGE_URL };
+
+    // Usa a nota do backend (farm_nota). Se não tiver, assume 'Novo'
+    const notaExibida = item.farm_nota ? item.farm_nota : 'Novo';
 
     return (
       <TouchableOpacity
@@ -273,35 +246,34 @@ export default function Home() {
         onPress={() => navigation.navigate('Farmacia', {
           farm_id: item.farm_id,
           nome: item.farm_nome,
-          imagemFarmacia: item.farm_logo_url
+          imagemFarmacia: item.farm_logo_url,
+          nota: notaExibida
         })}
         activeOpacity={0.8}
       >
-        {/* ResizeMode="contain" garante que a logo apareça inteira sem distorcer */}
+        {/* BADGE DA NOTA */}
+        <View style={styles.bannerFarmaciaBadge}>
+          <Text style={styles.bannerFarmaciaBadgeTexto}>★ {notaExibida}</Text>
+        </View>
+
         <Image source={imageSource} style={styles.bannerFarmaciaImagem} resizeMode="contain" />
         <Text style={styles.bannerFarmaciaNome} numberOfLines={1}>{item.farm_nome}</Text>
       </TouchableOpacity>
     );
   };
 
-  // --- AÇÃO DE PESQUISA (CORRIGIDA) ---
   function handlePesquisar() {
-    // CORREÇÃO AQUI: Remove espaços do início e fim para evitar erros com autocomplete
     const termoLimpo = searchText.trim();
-
     if (termoLimpo.length > 0) {
       navigation.navigate('Pesquisa', { termo: termoLimpo });
-      setSearchText(''); // Limpa o campo após pesquisar
+      setSearchText('');
     } else {
       Alert.alert('Atenção', 'Digite algo para pesquisar.');
     }
   }
 
-  // --- RENDERIZAÇÃO PRINCIPAL (VIEW) ---
   return (
     <View style={styles.container}>
-
-      {/* CABEÇALHO */}
       <View style={styles.header}>
         <Image
           source={require('../../../public/LogoEscrita2.png')}
@@ -309,7 +281,6 @@ export default function Home() {
         />
       </View>
 
-      {/* BARRA DE PESQUISA */}
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
@@ -317,12 +288,11 @@ export default function Home() {
           placeholderTextColor="#94a3b8"
           value={searchText}
           onChangeText={setSearchText}
-          onSubmitEditing={handlePesquisar} // Pesquisa ao dar Enter no teclado
+          onSubmitEditing={handlePesquisar}
           returnKeyType="search"
         />
       </View>
 
-      {/* CONTEÚDO ROLÁVEL */}
       <ScrollView
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -334,7 +304,6 @@ export default function Home() {
           />
         }
       >
-        {/* SEÇÃO: CATEGORIAS */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Categorias</Text>
           <FlatList
@@ -347,7 +316,6 @@ export default function Home() {
           />
         </View>
 
-        {/* SEÇÃO: DESTAQUES */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Ofertas em Destaque</Text>
@@ -360,7 +328,6 @@ export default function Home() {
             </TouchableOpacity>
           </View>
           <FlatList
-            // Se não tiver destaques carregados, não mostra nada (evita erro com array mockado antigo)
             data={produtosDestaque}
             renderItem={renderProduto}
             keyExtractor={item => String(item.med_id)}
@@ -373,7 +340,6 @@ export default function Home() {
           />
         </View>
 
-        {/* SEÇÃO: FARMÁCIAS */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Farmácias Parceiras</Text>
@@ -397,7 +363,6 @@ export default function Home() {
           />
         </View>
 
-        {/* SEÇÃO: LABORATÓRIOS */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Laboratórios</Text>
@@ -421,7 +386,6 @@ export default function Home() {
           />
         </View>
 
-        {/* Espaço extra para garantir que o último item não fique escondido pela TabBar */}
         <View style={styles.espacoFinal} />
       </ScrollView>
     </View>
