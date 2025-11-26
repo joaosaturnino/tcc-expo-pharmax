@@ -113,19 +113,24 @@ export default StyleSheet.create({
         position: 'relative',
     },
 
+    // --- ALTERAÇÃO AQUI: ESTILO IGUAL AO DETALHES DO PRODUTO ---
     produtoImagem: {
-        width: '100%',
+        width: 100,
         height: 100,
-        borderRadius: 8,
+        backgroundColor: '#F8FAFC', // Fundo cinza claro
+        borderRadius: 16,           // <--- MUDANÇA: De 50 para 16 (Quadrado arredondado)
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 10,
+        alignSelf: 'center',
     },
     produtoImagemReal: {
-        width: 90,
-        height: 90,
-        borderRadius: 45,
+        width: '80%',               // Imagem interna um pouco menor
+        height: '80%',
+        resizeMode: 'contain',
     },
+    // -----------------------------------------------------------
+
     produtoNome: {
         fontSize: 14,
         fontWeight: '600',
@@ -136,6 +141,12 @@ export default StyleSheet.create({
     produtoMarca: {
         fontSize: 12,
         color: '#94a3b8',
+        marginBottom: 4,
+    },
+    produtoFarmacia: {
+        fontSize: 11,
+        color: '#2A7CC7',
+        fontWeight: '500',
         marginBottom: 8,
     },
     produtoPreco: {
@@ -231,29 +242,28 @@ export default StyleSheet.create({
         elevation: 3,
         borderWidth: 1,
         borderColor: '#f1f5f9',
-        // ESSENCIAL PARA O BADGE DE NOTA FUNCIONAR:
         position: 'relative', 
     },
     
-    // --- ESTILOS DO BADGE DE NOTA (NOVO) ---
+    // --- ESTILOS DO BADGE DE NOTA ---
     bannerFarmaciaBadge: {
-        position: 'absolute', // Flutua sobre o card
-        top: 10,              // Distância do topo
-        right: 10,            // Distância da direita
-        backgroundColor: '#FFFBEB', // Fundo amarelo bem claro
+        position: 'absolute',
+        top: 10,
+        right: 10,
+        backgroundColor: '#FFFBEB', 
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: '#FCD34D', // Borda dourada
-        zIndex: 10,             // Garante que fique acima da imagem
+        borderColor: '#FCD34D', 
+        zIndex: 10,
         flexDirection: 'row',
         alignItems: 'center',
     },
     bannerFarmaciaBadgeTexto: {
         fontSize: 12,
         fontWeight: 'bold',
-        color: '#D97706', // Texto cor de ouro escuro/laranja
+        color: '#D97706',
     },
 
     bannerFarmaciaImagem: {

@@ -110,7 +110,6 @@ export default function Home() {
   async function fetchFarmaciasPopulares() {
     try {
       const response = await api.get('/farmacias?qtde=4');
-      // Agora pegamos os dados diretos, pois o backend já manda 'farm_nota'
       const dados = response?.data?.dados?.filter(item => item) ?? [];
       setFarmaciasPopulares(dados);
     } catch (error) {
@@ -170,6 +169,10 @@ export default function Home() {
     if (!item) return null;
     const nome = item.med_nome || item.nome;
     const marca = item.lab_nome || item.marca || 'Genérico';
+    
+    // --- NOVO: Variável da Farmácia ---
+    const farmacia = item.farm_nome || 'Farmácia Parceira';
+    
     const promo = calcularPrecoPromocional(item);
     const imagemOrigem = item.med_imagem || item.imagem;
     const imageSource = (typeof imagemOrigem === 'string' && imagemOrigem.length > 5)
@@ -190,8 +193,13 @@ export default function Home() {
         <View style={styles.produtoImagem}>
           <Image source={imageSource} style={styles.produtoImagemReal} resizeMode="contain" />
         </View>
+        
         <Text style={styles.produtoNome} numberOfLines={2}>{nome}</Text>
         <Text style={styles.produtoMarca} numberOfLines={1}>{marca}</Text>
+        
+        {/* --- NOVO: Exibição do Nome da Farmácia --- */}
+        <Text style={styles.produtoFarmacia} numberOfLines={1}>🏪 {farmacia}</Text>
+
         {promo.estaEmPromocao ? (
           <View>
             <Text style={styles.produtoPrecoAntigo}>R$ {promo.precoOriginal}</Text>
@@ -237,7 +245,6 @@ export default function Home() {
       ? { uri: item.farm_logo_url }
       : { uri: DEFAULT_IMAGE_URL };
 
-    // Usa a nota do backend (farm_nota). Se não tiver, assume 'Novo'
     const notaExibida = item.farm_nota ? item.farm_nota : 'Novo';
 
     return (
@@ -321,7 +328,7 @@ export default function Home() {
             <Text style={styles.sectionTitle}>Ofertas em Destaque</Text>
             <TouchableOpacity
               onPress={() => navigation.navigate('Categoria', {
-                nome: 'Todas os Medicamentos'
+                nome: 'Todos os Medicamentos'
               })}
             >
               <Text style={styles.verTudo}>Ver mais</Text>

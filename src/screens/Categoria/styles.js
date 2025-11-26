@@ -4,7 +4,6 @@ const { width } = Dimensions.get('window');
 
 // Cálculo da largura do card:
 // (Largura da tela / 2 colunas) - (marginHorizontal * 2 + padding da lista / 2)
-// Ajustado para evitar quebra de layout
 const cardWidth = (width / 2) - 24;
 
 export default StyleSheet.create({
@@ -18,7 +17,7 @@ export default StyleSheet.create({
         backgroundColor: '#fff',
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
-        marginBottom: 10, // Espaço abaixo do contador
+        marginBottom: 10, 
     },
     contadorText: {
         fontSize: 16,
@@ -27,7 +26,7 @@ export default StyleSheet.create({
     },
     medicamentosList: {
         paddingHorizontal: 8,
-        paddingBottom: 40, // Espaço extra no final da lista
+        paddingBottom: 40, 
     },
     medicamentoCard: {
         width: cardWidth,
@@ -40,14 +39,14 @@ export default StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.08,
         shadowRadius: 4,
-        elevation: 2, // Sombra no Android
-        borderWidth: 1, // Reduzi para ficar mais delicado
+        elevation: 2, 
+        borderWidth: 1, 
         borderColor: '#eee',
         overflow: 'hidden',
-        position: 'relative', // Necessário para o badge absoluto funcionar bem
+        position: 'relative', 
     },
     medicamentoImagem: {
-        width: '100%', // Ocupa a largura do container pai
+        width: '100%', 
         height: 100,
         backgroundColor: '#f1f2f6',
         borderRadius: 10,
@@ -56,25 +55,32 @@ export default StyleSheet.create({
         marginBottom: 12,
         alignSelf: 'center',
     },
-    medicamentoImagemTexto: {
-        fontSize: 30,
-    },
     medicamentoInfo: {
         flex: 1,
-        justifyContent: 'space-between', // Distribui o conteúdo verticalmente
+        justifyContent: 'space-between', 
     },
     medicamentoNome: {
-        fontSize: 14, // Leve ajuste para nomes longos
+        fontSize: 14, 
         fontWeight: '600',
         color: '#2c3e50',
         marginBottom: 4,
-        height: 40, // Altura fixa para alinhar os cards se o nome tiver 2 linhas
+        height: 40, // Altura fixa para manter alinhamento
     },
     medicamentoCategoria: {
         fontSize: 12,
         color: '#95a5a6',
-        marginBottom: 6,
+        marginBottom: 4,
     },
+
+    // --- NOVO ESTILO: NOME DA FARMÁCIA ---
+    medicamentoFarmacia: {
+        fontSize: 11,
+        color: '#2A7CC7', // Azul do tema
+        fontWeight: '500',
+        marginBottom: 8,
+    },
+    // --------------------------------------
+
     medicamentoPreco: {
         fontSize: 16,
         fontWeight: 'bold',
@@ -83,10 +89,10 @@ export default StyleSheet.create({
 
     // --- ESTILOS DE PROMOÇÃO ---
     produtoCardEmPromocao: {
-        backgroundColor: '#FEF2F2', // Fundo vermelho bem claro
-        borderColor: '#FECACA',     // Borda vermelha clara
-        borderWidth: 1.5,           // Borda um pouco mais grossa
-        shadowColor: "#EF4444",     // Sombra avermelhada
+        backgroundColor: '#FEF2F2', 
+        borderColor: '#FECACA',     
+        borderWidth: 1.5,           
+        shadowColor: "#EF4444",     
         elevation: 6,
     },
     promoBadge: {
@@ -96,7 +102,7 @@ export default StyleSheet.create({
         backgroundColor: '#e74c3c',
         paddingHorizontal: 8,
         paddingVertical: 4,
-        borderTopRightRadius: 14, // Acompanha a borda do card
+        borderTopRightRadius: 14,
         borderBottomLeftRadius: 12,
         zIndex: 10,
     },
@@ -111,8 +117,8 @@ export default StyleSheet.create({
         textDecorationLine: 'line-through',
         marginBottom: 2,
     },
-    // ---------------------------------
 
+    // --- EMPTY STATE ---
     emptyContainer: {
         flex: 1,
         justifyContent: 'center',

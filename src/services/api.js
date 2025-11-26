@@ -9,7 +9,7 @@ import axios from "axios";
 // Windows: Abra o CMD e digite 'ipconfig' (procure por Endereço IPv4)
 // Mac/Linux: Abra o Terminal e digite 'ifconfig'
 
-const SEU_IP = '172.16.0.96'; // <--- ATENÇÃO: Verifique se este número mudou hoje!
+const SEU_IP = '192.168.200.27'; // <--- ATENÇÃO: Verifique se este número mudou hoje!
 const PORTA = '3334';
 
 const api = axios.create({

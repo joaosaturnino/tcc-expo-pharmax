@@ -12,7 +12,7 @@ import {
     LayoutAnimation, 
     Platform,
     UIManager,
-    RefreshControl // <--- 1. Importado aqui
+    RefreshControl 
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -85,7 +85,7 @@ export default function Pesquisa() {
     const [laboratorios, setLaboratorios] = useState([]);
 
     const [loading, setLoading] = useState(false);
-    const [refreshing, setRefreshing] = useState(false); // <--- 2. Estado do Refresh
+    const [refreshing, setRefreshing] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
 
     const debouncedSearchTerm = useDebounce(searchText, 600);
@@ -102,7 +102,6 @@ export default function Pesquisa() {
         setFilter(newFilter);
     };
 
-    // --- 3. Função de busca ajustada para aceitar isRefresh ---
     const fetchResultados = useCallback(async (termoBruto, isRefresh = false) => {
         const termo = termoBruto ? termoBruto.trim() : '';
 
@@ -116,7 +115,6 @@ export default function Pesquisa() {
             return;
         }
 
-        // Se for refresh (puxou para baixo), não mostramos o loading de tela cheia
         if (!isRefresh) setLoading(true);
         
         setHasSearched(true);
@@ -155,16 +153,13 @@ export default function Pesquisa() {
         }
     }, []);
 
-    // --- 4. Função chamada ao puxar para baixo ---
     const onRefresh = useCallback(async () => {
         setRefreshing(true);
-        // Chama a busca forçando isRefresh=true para não piscar a tela
         await fetchResultados(searchText, true);
         setRefreshing(false);
     }, [fetchResultados, searchText]);
 
     useEffect(() => {
-        // Busca normal via digitação
         fetchResultados(debouncedSearchTerm);
     }, [debouncedSearchTerm, fetchResultados]);
 
@@ -173,11 +168,13 @@ export default function Pesquisa() {
         handleFilterChange('todos');
     };
 
-    // ... Render Items (Mantido Igual) ...
     const renderMedicamento = ({ item }) => {
         const promo = calcularPrecoPromocional(item);
         const source = getImageUrl(item.med_imagem || item.imagem);
         const imageSource = source || require('../../../public/caixa-medicamento-padrao5.png');
+
+        // --- NOVO: Captura o nome da farmácia ---
+        const farmacia = item.farm_nome || 'Farmácia Parceira';
 
         return (
             <TouchableOpacity
@@ -196,6 +193,9 @@ export default function Pesquisa() {
 
                 <Text style={styles.produtoNome} numberOfLines={2}>{item.med_nome || item.nome}</Text>
                 <Text style={styles.produtoMarca}>{item.lab_nome || item.marca}</Text>
+
+                {/* --- NOVO: Exibe o nome da farmácia --- */}
+                <Text style={styles.produtoFarmacia} numberOfLines={1}>🏪 {farmacia}</Text>
 
                 <View style={styles.priceTag}>
                     {promo.estaEmPromocao && (
@@ -244,7 +244,6 @@ export default function Pesquisa() {
         const showLaboratorios = (filter === 'todos' || filter === 'lab') && laboratorios.length > 0;
         const showMedicamentos = (filter === 'todos' || filter === 'med') && medicamentos.length > 0;
 
-        // Se não tem resultados, mas já buscou, permitimos o ScrollView para poder dar Refresh caso tenha sido erro de rede
         if (hasSearched && !showFarmacias && !showLaboratorios && !showMedicamentos) {
             return (
                 <ScrollView 
@@ -265,13 +264,12 @@ export default function Pesquisa() {
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
                 onScrollBeginDrag={Keyboard.dismiss}
-                // --- 5. RefreshControl adicionado aqui ---
                 refreshControl={
                     <RefreshControl 
                         refreshing={refreshing} 
                         onRefresh={onRefresh}
-                        colors={['#2A7CC7']} // Android
-                        tintColor="#2A7CC7" // iOS
+                        colors={['#2A7CC7']}
+                        tintColor="#2A7CC7"
                     />
                 }
             >

@@ -210,21 +210,23 @@ export default StyleSheet.create({
         elevation: 4,
     },
     
-    // IMAGEM REDONDA MEDICAMENTO
+    // --- ALTERAÇÃO AQUI (Estilo Quadrado Arredondado) ---
     produtoImagem: {
-        width: 100,            // Largura fixa
-        height: 100,           // Altura fixa igual
-        borderRadius: 50,      // Metade (100 / 2 = 50) -> CÍRCULO PERFEITO
-        backgroundColor: '#f8fafc', // Fundo cinza claro para destacar o círculo
+        width: 100,            
+        height: 100,           
+        borderRadius: 16,      // <--- MUDANÇA: De 50 para 16
+        backgroundColor: '#f8fafc',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 12,
-        overflow: 'hidden',    // Corta o que passar do círculo
+        overflow: 'hidden',    
     },
     produtoImagemReal: {
-        width: '65%',          // Imagem interna um pouco menor para caber bonito no círculo
-        height: '65%',
+        width: '80%',          // <--- MUDANÇA: De 65% para 80%
+        height: '80%',
+        resizeMode: 'contain', 
     },
+    // ----------------------------------------------------
     
     produtoNome: {
         fontSize: 14,
@@ -237,8 +239,15 @@ export default StyleSheet.create({
     produtoMarca: {
         fontSize: 12,
         color: '#94A3B8',
-        marginBottom: 8,
+        marginBottom: 4, 
         textAlign: 'center',
+    },
+    produtoFarmacia: {
+        fontSize: 11,
+        color: '#2A7CC7', 
+        fontWeight: '500',
+        marginBottom: 8,
+        textAlign: 'center', 
     },
     priceTag: {
         flexDirection: 'column',

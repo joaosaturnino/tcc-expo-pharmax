@@ -12,105 +12,118 @@ import {
 import { useNavigation, useRoute } from '@react-navigation/native';
 import api from '../../services/api';
 
-// --- CONFIGURAÇÃO GLOBAL DA URL DE IMAGENS ---
-// Alterar aqui facilita a manutenção quando o IP muda.
+// --- CONFIGURAÇÃO GLOBAL ---
 const SERVER_IP = '192.168.200.27:3334';
 const BASE_URL = `http://${SERVER_IP}`;
 
-// Função auxiliar para tratar URLs de imagem (relativas ou absolutas)
+// --- HELPER: URL IMAGEM ---
 const getImageUrl = (caminho, tipo) => {
-    // 1. Se não vier caminho, devolve a imagem padrão baseada no tipo
     if (!caminho) {
+        if (tipo === 'medicamento') return { uri: `${BASE_URL}/public/medicamentos/caixa-medicamento-padrao5.png` };
         const pasta = tipo === 'farmacia' ? 'farmacias' : 'laboratorios';
         return { uri: `${BASE_URL}/public/${pasta}/logo.png` };
     }
-
-    // 2. Se já for um link completo (começa com http), usa ele mesmo
     if (typeof caminho === 'string' && caminho.startsWith('http')) {
         return { uri: caminho };
     }
-
-    // 3. Se for caminho relativo (ex: /uploads/foto.png), adiciona o servidor antes
     if (typeof caminho === 'string') {
         const cleanPath = caminho.startsWith('/') ? caminho.substring(1) : caminho;
         return { uri: `${BASE_URL}/${cleanPath}` };
     }
-
-    return { uri: `${BASE_URL}/public/${tipo === 'farmacia' ? 'farmacias' : 'laboratorios'}/padrao.png` };
+    return null;
 };
+
+// --- HELPER: PROMOÇÃO ---
+function calcularPrecoPromocional(item) {
+    const precoOriginal = parseFloat(item.preco || item.medp_preco);
+    const desconto = parseFloat(item.promo_desconto);
+
+    if (isNaN(precoOriginal) || !desconto || desconto <= 0 || !item.promo_inicio || !item.promo_fim) {
+        return { precoOriginal: isNaN(precoOriginal) ? ' --,--' : precoOriginal.toFixed(2).replace('.', ','), precoComDesconto: null, estaEmPromocao: false };
+    }
+
+    const hoje = new Date();
+    const inicio = new Date(item.promo_inicio);
+    const fim = new Date(item.promo_fim);
+    hoje.setHours(0, 0, 0, 0); inicio.setHours(0, 0, 0, 0); fim.setHours(0, 0, 0, 0);
+
+    const estaEmPromocao = (hoje >= inicio && hoje <= fim);
+
+    if (estaEmPromocao) {
+        const precoComDesconto = precoOriginal * (1 - desconto / 100);
+        return {
+            precoOriginal: precoOriginal.toFixed(2).replace('.', ','),
+            precoComDesconto: precoComDesconto.toFixed(2).replace('.', ','),
+            estaEmPromocao: true,
+            descontoPorcento: desconto
+        };
+    }
+    return { precoOriginal: precoOriginal.toFixed(2).replace('.', ','), precoComDesconto: null, estaEmPromocao: false };
+}
 
 export default function Listagem() {
     const navigation = useNavigation();
     const route = useRoute();
 
-    // Recebe os parâmetros enviados pela tela Home (tipo = 'farmacia' ou 'laboratorio')
+    // Aceita 'farmacia', 'laboratorio' ou 'medicamento'
     const { tipo, titulo } = route.params || {};
 
-    // --- ESTADOS ---
-    const [dados, setDados] = useState([]);          // Armazena a lista vinda da API
-    const [loading, setLoading] = useState(true);    // Controla o carregamento inicial (tela cheia)
-    const [refreshing, setRefreshing] = useState(false); // Controla o "puxar para atualizar"
+    const [dados, setDados] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
 
-    // Configura o título do cabeçalho dinamicamente
     useLayoutEffect(() => {
         navigation.setOptions({
             title: titulo || 'Listagem',
-            headerBackTitleVisible: false, // Esconde o texto "Voltar" no iOS
+            headerBackTitleVisible: false,
         });
     }, [navigation, titulo]);
 
-    // --- FUNÇÃO DE BUSCA (Reutilizável) ---
     const buscarDados = async () => {
         try {
             let url = '';
-            // Define qual rota da API chamar baseada no tipo
+            // --- LÓGICA DE ROTAS ---
             if (tipo === 'farmacia') {
-                url = '/farmacias'; // Rota que retorna todas as farmácias
+                url = '/farmacias';
             } else if (tipo === 'laboratorio') {
-                url = "/todoslab"; // Ajustado: Geralmente padroniza-se como /laboratorios, mas se sua API for /todoslab, mantenha.
+                url = "/todoslab";
+            } else if (tipo === 'medicamento') {
+                // Rota para buscar todos os medicamentos (exemplo: destaques ou busca geral)
+                url = "/medicamentos/todos?limit=50"; 
             }
 
             if (!url) return;
 
             const response = await api.get(url);
-
-            // Tratamento para garantir que pegamos o array correto, independente do formato da resposta
-            // (Ex: response.data.dados ou response.data direto)
             const lista = response.data.dados || response.data || [];
             setDados(lista);
 
         } catch (error) {
             console.error('Erro ao buscar listagem:', error);
-            // Dica: Aqui poderia adicionar um Alert.alert('Erro', 'Falha ao carregar')
         }
     };
 
-    // 1. Carregamento Inicial: Roda apenas uma vez quando a tela abre (ou se o 'tipo' mudar)
     useEffect(() => {
         setLoading(true);
         buscarDados().finally(() => setLoading(false));
     }, [tipo]);
 
-    // 2. Pull-to-Refresh: Função chamada pelo RefreshControl
     const onRefresh = useCallback(async () => {
-        setRefreshing(true);   // Ativa o spinner superior
-        await buscarDados();   // Aguarda a busca
-        setRefreshing(false);  // Desativa o spinner
+        setRefreshing(true);
+        await buscarDados();
+        setRefreshing(false);
     }, [tipo]);
 
-    // --- RENDERIZADORES DE ITEM (Cards) ---
-
+    // --- RENDER: FARMÁCIA ---
     const renderFarmacia = ({ item }) => {
-        // Usa a função auxiliar para garantir que a imagem carregue
         const imageSource = getImageUrl(item.farm_logo_url, 'farmacia');
-
         return (
             <TouchableOpacity
                 style={styles.card}
                 onPress={() => navigation.navigate('Farmacia', {
                     farm_id: item.farm_id,
                     nome: item.farm_nome,
-                    imagemFarmacia: item.farm_logo_url // Passa a URL original
+                    imagemFarmacia: item.farm_logo_url
                 })}
             >
                 <Image source={imageSource} style={styles.imagem} resizeMode="contain" />
@@ -123,9 +136,9 @@ export default function Listagem() {
         );
     };
 
+    // --- RENDER: LABORATÓRIO ---
     const renderLaboratorio = ({ item }) => {
         const nomeLab = item.lab_nome || item.nome;
-        // Verifica várias propriedades possíveis para a logo
         const rawImage = item.lab_logo_url || item.lab_logo || item.logo;
         const imageSource = getImageUrl(rawImage, 'laboratorio');
 
@@ -148,9 +161,55 @@ export default function Listagem() {
         );
     };
 
-    // --- RENDERIZAÇÃO DA TELA ---
+    // --- RENDER: MEDICAMENTO (NOVO) ---
+    const renderMedicamento = ({ item }) => {
+        const promo = calcularPrecoPromocional(item);
+        const source = getImageUrl(item.med_imagem || item.imagem, 'medicamento');
+        
+        // --- AQUI ESTÁ A ALTERAÇÃO SOLICITADA ---
+        const farmacia = item.farm_nome || 'Farmácia Parceira';
 
-    // Se estiver carregando pela primeira vez, mostra o loader centralizado
+        return (
+            <TouchableOpacity
+                style={[styles.cardProduto, promo.estaEmPromocao && styles.cardProdutoPromo]}
+                onPress={() => navigation.navigate('Produto', { produto: item })}
+            >
+                <Image source={source} style={styles.imagemProduto} resizeMode="contain" />
+                
+                <View style={styles.infoProduto}>
+                    <Text style={styles.nomeProduto} numberOfLines={2}>{item.med_nome || item.nome}</Text>
+                    <Text style={styles.marcaProduto}>{item.lab_nome || item.marca}</Text>
+                    
+                    {/* Exibindo o nome da farmácia */}
+                    <Text style={styles.farmaciaProduto} numberOfLines={1}>🏪 {farmacia}</Text>
+
+                    <View style={styles.priceContainer}>
+                        {promo.estaEmPromocao && (
+                            <Text style={styles.precoAntigo}>R$ {promo.precoOriginal}</Text>
+                        )}
+                        <Text style={[styles.precoAtual, promo.estaEmPromocao && { color: '#EF4444' }]}>
+                            R$ {promo.estaEmPromocao ? promo.precoComDesconto : promo.precoOriginal}
+                        </Text>
+                    </View>
+                </View>
+
+                {promo.estaEmPromocao && (
+                    <View style={styles.badgePromo}>
+                        <Text style={styles.badgeTexto}>{Math.round(promo.descontoPorcento)}%</Text>
+                    </View>
+                )}
+            </TouchableOpacity>
+        );
+    };
+
+    // --- DECISÃO DE QUAL RENDERIZADOR USAR ---
+    const renderItem = ({ item }) => {
+        if (tipo === 'farmacia') return renderFarmacia({ item });
+        if (tipo === 'laboratorio') return renderLaboratorio({ item });
+        if (tipo === 'medicamento') return renderMedicamento({ item });
+        return null;
+    };
+
     if (loading && !refreshing) {
         return (
             <View style={styles.loadingContainer}>
@@ -164,28 +223,20 @@ export default function Listagem() {
         <View style={styles.container}>
             <FlatList
                 data={dados}
-                // Decide qual função usar para desenhar o card baseada no tipo
-                renderItem={tipo === 'farmacia' ? renderFarmacia : renderLaboratorio}
-
-                // KeyExtractor: Garante performance dizendo ao React qual ID é único
-                keyExtractor={item => String(item.farm_id || item.lab_id || item.id || Math.random())}
-
+                renderItem={renderItem}
+                keyExtractor={item => String(item.farm_id || item.lab_id || item.med_id || Math.random())}
                 contentContainerStyle={styles.listContent}
-
-                // Componente para quando a lista volta vazia da API
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
                         <Text style={styles.emptyText}>Nenhum item encontrado.</Text>
                     </View>
                 }
-
-                // Configuração do Puxar para Atualizar
                 refreshControl={
                     <RefreshControl
                         refreshing={refreshing}
                         onRefresh={onRefresh}
-                        colors={['#2A7CC7']} // Cor do spinner no Android
-                        tintColor="#2A7CC7"  // Cor do spinner no iOS
+                        colors={['#2A7CC7']}
+                        tintColor="#2A7CC7"
                     />
                 }
             />
@@ -206,6 +257,7 @@ const styles = StyleSheet.create({
     listContent: {
         padding: 16
     },
+    // --- CARD PADRÃO (FARMÁCIA / LAB) ---
     card: {
         flexDirection: 'row',
         backgroundColor: '#fff',
@@ -213,7 +265,6 @@ const styles = StyleSheet.create({
         padding: 16,
         marginBottom: 12,
         alignItems: 'center',
-        // Sombra suave (iOS e Android)
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
@@ -225,7 +276,7 @@ const styles = StyleSheet.create({
     imagem: {
         width: 50,
         height: 50,
-        borderRadius: 25, // Deixa redonda
+        borderRadius: 25,
         backgroundColor: '#f8f9fa',
         marginRight: 16,
         borderWidth: 1,
@@ -249,6 +300,86 @@ const styles = StyleSheet.create({
         color: '#cbd5e1',
         fontWeight: '300'
     },
+
+    // --- NOVO: CARD DE MEDICAMENTO ---
+    cardProduto: {
+        flexDirection: 'row',
+        backgroundColor: '#fff',
+        borderRadius: 16,
+        padding: 12,
+        marginBottom: 12,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+        elevation: 2,
+        borderWidth: 1,
+        borderColor: '#f1f5f9'
+    },
+    cardProdutoPromo: {
+        backgroundColor: '#FEF2F2',
+        borderColor: '#FECACA',
+    },
+    imagemProduto: {
+        width: 70,
+        height: 70,
+        borderRadius: 8,
+        marginRight: 12,
+    },
+    infoProduto: {
+        flex: 1,
+        justifyContent: 'center',
+    },
+    nomeProduto: {
+        fontSize: 15,
+        fontWeight: '600',
+        color: '#334155',
+        marginBottom: 2,
+    },
+    marcaProduto: {
+        fontSize: 12,
+        color: '#94a3b8',
+        marginBottom: 4,
+    },
+    // Estilo específico para a Farmácia no card de listagem
+    farmaciaProduto: {
+        fontSize: 12,
+        color: '#2A7CC7',
+        fontWeight: '500',
+        marginBottom: 6,
+    },
+    priceContainer: {
+        flexDirection: 'row',
+        alignItems: 'baseline',
+    },
+    precoAntigo: {
+        fontSize: 11,
+        color: '#94a3b8',
+        textDecorationLine: 'line-through',
+        marginRight: 6,
+    },
+    precoAtual: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#10B981',
+    },
+    badgePromo: {
+        position: 'absolute',
+        top: 10,
+        right: 10,
+        backgroundColor: '#EF4444',
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+        borderRadius: 4,
+    },
+    badgeTexto: {
+        color: '#fff',
+        fontSize: 10,
+        fontWeight: 'bold',
+    },
+
+    // --- EMPTY STATE ---
     emptyContainer: {
         marginTop: 50,
         alignItems: 'center'
