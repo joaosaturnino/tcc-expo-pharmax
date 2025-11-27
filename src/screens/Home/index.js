@@ -14,7 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import styles from './styles';
 import api from '../../services/api';
 
-const DEFAULT_IMAGE_URL = 'http://10.72.152.164:3334/public/medicamentos/caixa-medicamento-padrao5.png';
+const DEFAULT_IMAGE_URL = 'http://172.16.0.34:3334/public/medicamentos/caixa-medicamento-padrao5.png';
 
 // --- Função Helper de Promoção ---
 function calcularPrecoPromocional(item) {
@@ -106,12 +106,23 @@ export default function Home() {
     }
   }
 
-  // --- FETCH: FARMÁCIAS (ATUALIZADO) ---
+  // --- FETCH: FARMÁCIAS (CORRIGIDO PARA LOGO) ---
   async function fetchFarmaciasPopulares() {
     try {
       const response = await api.get('/farmacias?qtde=4');
       const dados = response?.data?.dados?.filter(item => item) ?? [];
-      setFarmaciasPopulares(dados);
+      
+      // Mapeamento para garantir que a imagem seja encontrada independente do nome do campo
+      const dadosMapeados = dados.map(item => {
+        const url = item.farm_logo_url || item.logo_url || item.logo || item.imagem || item.url || null;
+        return {
+          ...item,
+          farm_logo_url: (typeof url === 'string' && url.length > 5) ? url : null,
+          farm_nome: item.farm_nome || item.nome || 'Farmácia Parceira'
+        };
+      });
+
+      setFarmaciasPopulares(dadosMapeados);
     } catch (error) {
       console.error('Erro ao buscar farmácias:', error);
       setFarmaciasPopulares([]);
@@ -170,7 +181,7 @@ export default function Home() {
     const nome = item.med_nome || item.nome;
     const marca = item.lab_nome || item.marca || 'Genérico';
     
-    // --- NOVO: Variável da Farmácia ---
+    // Variável da Farmácia
     const farmacia = item.farm_nome || 'Farmácia Parceira';
     
     const promo = calcularPrecoPromocional(item);
@@ -197,7 +208,6 @@ export default function Home() {
         <Text style={styles.produtoNome} numberOfLines={2}>{nome}</Text>
         <Text style={styles.produtoMarca} numberOfLines={1}>{marca}</Text>
         
-        {/* --- NOVO: Exibição do Nome da Farmácia --- */}
         <Text style={styles.produtoFarmacia} numberOfLines={1}>🏪 {farmacia}</Text>
 
         {promo.estaEmPromocao ? (
@@ -237,7 +247,7 @@ export default function Home() {
     );
   };
 
-  // --- RENDERIZAÇÃO: FARMÁCIA (COM NOTA REAL) ---
+  // --- RENDERIZAÇÃO: FARMÁCIA (COM NOTA REAL E CORREÇÃO DE LOGO) ---
   const renderBannerFarmacia = ({ item }) => {
     if (!item) return null;
 

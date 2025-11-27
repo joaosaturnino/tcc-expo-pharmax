@@ -13,21 +13,39 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import api from '../../services/api';
 
 // --- CONFIGURAÇÃO GLOBAL ---
-const SERVER_IP = '192.168.200.27:3334';
+// Verifique se este IP é exatamente o da sua máquina
+const SERVER_IP = '172.16.0.34:3334';
 const BASE_URL = `http://${SERVER_IP}`;
 
-// --- HELPER: URL IMAGEM ---
+// --- HELPER: URL IMAGEM (CORRIGIDO) ---
 const getImageUrl = (caminho, tipo) => {
+    // 1. Imagem Padrão se não houver caminho
     if (!caminho) {
         if (tipo === 'medicamento') return { uri: `${BASE_URL}/public/medicamentos/caixa-medicamento-padrao5.png` };
         const pasta = tipo === 'farmacia' ? 'farmacias' : 'laboratorios';
-        return { uri: `${BASE_URL}/public/${pasta}/logo.png` };
+        return { uri: `${BASE_URL}/public/${pasta}/padrao.png` }; // Ajustei para padrao.png que costuma existir
     }
-    if (typeof caminho === 'string' && caminho.startsWith('http')) {
-        return { uri: caminho };
-    }
+
+    // 2. CORREÇÃO CRÍTICA: Remove o ponto extra antes do IP (http://.172 -> http://172)
+    let urlLimpa = caminho;
     if (typeof caminho === 'string') {
-        const cleanPath = caminho.startsWith('/') ? caminho.substring(1) : caminho;
+        urlLimpa = caminho.replace('http://.', 'http://').replace('https://.', 'https://');
+    }
+
+    // 3. Se já for uma URL completa (http...), retorna ela limpa
+    if (typeof urlLimpa === 'string' && urlLimpa.startsWith('http')) {
+        return { uri: urlLimpa };
+    }
+
+    // 4. Se for apenas o nome do arquivo, monta a URL completa
+    if (typeof urlLimpa === 'string') {
+        const cleanPath = urlLimpa.startsWith('/') ? urlLimpa.substring(1) : urlLimpa;
+        
+        // Se for farmácia, e o caminho for só "logo.png", precisamos apontar para a pasta certa
+        if (tipo === 'farmacia' && !cleanPath.includes('/')) {
+             return { uri: `${BASE_URL}/public/logos/${cleanPath}` };
+        }
+
         return { uri: `${BASE_URL}/${cleanPath}` };
     }
     return null;
@@ -65,7 +83,6 @@ export default function Listagem() {
     const navigation = useNavigation();
     const route = useRoute();
 
-    // Aceita 'farmacia', 'laboratorio' ou 'medicamento'
     const { tipo, titulo } = route.params || {};
 
     const [dados, setDados] = useState([]);
@@ -86,20 +103,30 @@ export default function Listagem() {
             if (tipo === 'farmacia') {
                 url = '/farmacias';
             } else if (tipo === 'laboratorio') {
-                url = "/todoslab";
+                // Verifique se sua API usa /todoslab ou /laboratorios
+                url = "/laboratorios?qtde=50"; 
             } else if (tipo === 'medicamento') {
-                // Rota para buscar todos os medicamentos (exemplo: destaques ou busca geral)
                 url = "/medicamentos/todos?limit=50"; 
             }
 
             if (!url) return;
 
+            console.log(`Buscando dados de: ${url}`); // Debug
             const response = await api.get(url);
+            
+            // Tratamento flexível para o retorno
             const lista = response.data.dados || response.data || [];
+            
+            // Se vier vazio, loga para ajudar no debug
+            if (lista.length === 0) console.log("API retornou lista vazia.");
+            
             setDados(lista);
 
         } catch (error) {
             console.error('Erro ao buscar listagem:', error);
+            if (error.response) {
+                 console.log('Status erro:', error.response.status);
+            }
         }
     };
 
@@ -116,17 +143,24 @@ export default function Listagem() {
 
     // --- RENDER: FARMÁCIA ---
     const renderFarmacia = ({ item }) => {
-        const imageSource = getImageUrl(item.farm_logo_url, 'farmacia');
+        // Tenta pegar de qualquer campo possível
+        const rawUrl = item.farm_logo_url || item.farm_logo || item.logo;
+        const imageSource = getImageUrl(rawUrl, 'farmacia');
+        
         return (
             <TouchableOpacity
                 style={styles.card}
                 onPress={() => navigation.navigate('Farmacia', {
                     farm_id: item.farm_id,
                     nome: item.farm_nome,
-                    imagemFarmacia: item.farm_logo_url
+                    imagemFarmacia: imageSource.uri // Passa a URL já tratada
                 })}
             >
-                <Image source={imageSource} style={styles.imagem} resizeMode="contain" />
+                <Image 
+                    source={imageSource} 
+                    style={styles.imagem} // Estilo retangular
+                    resizeMode="contain" 
+                />
                 <View style={styles.info}>
                     <Text style={styles.nome}>{item.farm_nome}</Text>
                     <Text style={styles.subtitulo}>Ver produtos e ofertas</Text>
@@ -148,7 +182,7 @@ export default function Listagem() {
                 onPress={() => navigation.navigate('Laboratorio', {
                     lab_id: item.lab_id,
                     nome: nomeLab,
-                    imagemLaboratorio: rawImage
+                    imagemLaboratorio: imageSource.uri
                 })}
             >
                 <Image source={imageSource} style={styles.imagem} resizeMode="contain" />
@@ -161,12 +195,10 @@ export default function Listagem() {
         );
     };
 
-    // --- RENDER: MEDICAMENTO (NOVO) ---
+    // --- RENDER: MEDICAMENTO ---
     const renderMedicamento = ({ item }) => {
         const promo = calcularPrecoPromocional(item);
         const source = getImageUrl(item.med_imagem || item.imagem, 'medicamento');
-        
-        // --- AQUI ESTÁ A ALTERAÇÃO SOLICITADA ---
         const farmacia = item.farm_nome || 'Farmácia Parceira';
 
         return (
@@ -179,8 +211,6 @@ export default function Listagem() {
                 <View style={styles.infoProduto}>
                     <Text style={styles.nomeProduto} numberOfLines={2}>{item.med_nome || item.nome}</Text>
                     <Text style={styles.marcaProduto}>{item.lab_nome || item.marca}</Text>
-                    
-                    {/* Exibindo o nome da farmácia */}
                     <Text style={styles.farmaciaProduto} numberOfLines={1}>🏪 {farmacia}</Text>
 
                     <View style={styles.priceContainer}>
@@ -202,7 +232,6 @@ export default function Listagem() {
         );
     };
 
-    // --- DECISÃO DE QUAL RENDERIZADOR USAR ---
     const renderItem = ({ item }) => {
         if (tipo === 'farmacia') return renderFarmacia({ item });
         if (tipo === 'laboratorio') return renderLaboratorio({ item });
@@ -273,14 +302,15 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#f1f5f9'
     },
+    // --- ALTERAÇÃO AQUI: Formato Retangular para Logo ---
     imagem: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
-        backgroundColor: '#f8f9fa',
+        width: 80,            // Mais largo
+        height: 60,           // Menos alto
+        borderRadius: 8,      // Cantos levemente arredondados
+        backgroundColor: '#fff', 
         marginRight: 16,
         borderWidth: 1,
-        borderColor: '#eee'
+        borderColor: '#f1f5f9'
     },
     info: {
         flex: 1
@@ -301,7 +331,7 @@ const styles = StyleSheet.create({
         fontWeight: '300'
     },
 
-    // --- NOVO: CARD DE MEDICAMENTO ---
+    // --- CARD DE MEDICAMENTO ---
     cardProduto: {
         flexDirection: 'row',
         backgroundColor: '#fff',
@@ -342,7 +372,6 @@ const styles = StyleSheet.create({
         color: '#94a3b8',
         marginBottom: 4,
     },
-    // Estilo específico para a Farmácia no card de listagem
     farmaciaProduto: {
         fontSize: 12,
         color: '#2A7CC7',

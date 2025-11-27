@@ -20,7 +20,7 @@ import styles from './styles';
 import api from '../../services/api';
 
 // Configuração IP
-const SERVER_IP = '192.168.200.27:3334';
+const SERVER_IP = '172.16.0.34:3334';
 const BASE_URL = `http://${SERVER_IP}`;
 
 // Helper Imagens

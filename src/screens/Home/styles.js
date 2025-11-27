@@ -113,23 +113,21 @@ export default StyleSheet.create({
         position: 'relative',
     },
 
-    // --- ALTERAÇÃO AQUI: ESTILO IGUAL AO DETALHES DO PRODUTO ---
     produtoImagem: {
         width: 100,
         height: 100,
-        backgroundColor: '#F8FAFC', // Fundo cinza claro
-        borderRadius: 16,           // <--- MUDANÇA: De 50 para 16 (Quadrado arredondado)
+        backgroundColor: '#F8FAFC', 
+        borderRadius: 16,
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 10,
         alignSelf: 'center',
     },
     produtoImagemReal: {
-        width: '80%',               // Imagem interna um pouco menor
+        width: '80%', 
         height: '80%',
         resizeMode: 'contain',
     },
-    // -----------------------------------------------------------
 
     produtoNome: {
         fontSize: 14,
@@ -227,14 +225,14 @@ export default StyleSheet.create({
         textAlign: 'center',
     },
 
-    // CARD DE FARMÁCIA
+    // CARD DE FARMÁCIA (CORRIGIDO PARA LOGOS)
     bannerFarmaciaCard: {
         width: 240,
-        height: 140,
+        height: 150, // Aumentado para caber a logo
         marginRight: 16,
         borderRadius: 16,
         backgroundColor: '#fff',
-        paddingTop: 10, 
+        paddingTop: 12, 
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.08,
@@ -248,8 +246,8 @@ export default StyleSheet.create({
     // --- ESTILOS DO BADGE DE NOTA ---
     bannerFarmaciaBadge: {
         position: 'absolute',
-        top: 10,
-        right: 10,
+        top: 8,
+        right: 8,
         backgroundColor: '#FFFBEB', 
         paddingHorizontal: 8,
         paddingVertical: 4,
@@ -266,20 +264,24 @@ export default StyleSheet.create({
         color: '#D97706',
     },
 
+    // ESTILO DA LOGO DA FARMÁCIA
     bannerFarmaciaImagem: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-        backgroundColor: '#f8fafc',
+        width: 140,            // Mais largo para caber logos de farmácia (que costumam ser texto)
+        height: 70,            // Altura fixa
+        borderRadius: 8,       // Cantos arredondados (não redondo)
+        backgroundColor: '#fff', 
         alignSelf: 'center',
+        marginTop: 15,         // Espaço para não encostar na borda/badge
+        resizeMode: 'contain', // Importante para não cortar a imagem
     },
+    
     bannerFarmaciaNome: {
         fontSize: 14,
         fontWeight: '600',
         color: '#334155',
         textAlign: 'center',
-        paddingVertical: 10,
-        backgroundColor: 'transparent',
+        marginTop: 8,
+        paddingHorizontal: 10,
     },
 
     espacoFinal: {

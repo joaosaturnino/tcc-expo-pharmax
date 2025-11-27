@@ -217,7 +217,7 @@ export default function Laboratorio() {
     const imagemOrigem = item.med_imagem || item.imagem;
     const prodImageSource = (typeof imagemOrigem === 'string' && imagemOrigem.startsWith('http'))
       ? { uri: imagemOrigem }
-      : { uri: 'http://192.168.200.27:3334/public/medicamentos/sem-imagem.png' };
+      : { uri: 'http://172.16.0.34:3334/public/medicamentos/sem-imagem.png' };
 
     return (
       <TouchableOpacity
