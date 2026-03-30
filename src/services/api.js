@@ -9,11 +9,11 @@ import axios from "axios";
 // Windows: Abra o CMD e digite 'ipconfig' (procure por Endereço IPv4)
 // Mac/Linux: Abra o Terminal e digite 'ifconfig'
 
-const SEU_IP = '172.16.0.34'; // <--- ATENÇÃO: Verifique se este número mudou hoje!
+const SEU_IP = '10.101.130.164'; // <--- ATENÇÃO: Verifique se este número mudou hoje!
 const PORTA = '3334';
 
 const api = axios.create({
-    // Monta a URL base: http://192.168.200.27:3334
+    // Monta a URL base: http://172.16.0.32:3334
     baseURL: `http://${SEU_IP}:${PORTA}`,
 
     // Timeout: Define um limite de tempo (em milissegundos).

@@ -10,7 +10,7 @@ export default StyleSheet.create({
 
     // --- HEADER E LOGO ---
     header: {
-        paddingTop: 10,
+        paddingTop: 50,
         paddingHorizontal: 16,
         paddingBottom: 10,
         backgroundColor: '#F5F7FA',
@@ -225,10 +225,10 @@ export default StyleSheet.create({
         textAlign: 'center',
     },
 
-    // CARD DE FARMÁCIA (CORRIGIDO PARA LOGOS)
+    // CARD DE FARMÁCIA
     bannerFarmaciaCard: {
         width: 240,
-        height: 150, // Aumentado para caber a logo
+        height: 150, 
         marginRight: 16,
         borderRadius: 16,
         backgroundColor: '#fff',
@@ -243,7 +243,7 @@ export default StyleSheet.create({
         position: 'relative', 
     },
     
-    // --- ESTILOS DO BADGE DE NOTA ---
+    // BADGE DE NOTA
     bannerFarmaciaBadge: {
         position: 'absolute',
         top: 8,
@@ -266,13 +266,13 @@ export default StyleSheet.create({
 
     // ESTILO DA LOGO DA FARMÁCIA
     bannerFarmaciaImagem: {
-        width: 140,            // Mais largo para caber logos de farmácia (que costumam ser texto)
-        height: 70,            // Altura fixa
-        borderRadius: 8,       // Cantos arredondados (não redondo)
+        width: 140,            
+        height: 70,            
+        borderRadius: 8,       
         backgroundColor: '#fff', 
         alignSelf: 'center',
-        marginTop: 15,         // Espaço para não encostar na borda/badge
-        resizeMode: 'contain', // Importante para não cortar a imagem
+        marginTop: 15,         
+        resizeMode: 'contain', 
     },
     
     bannerFarmaciaNome: {

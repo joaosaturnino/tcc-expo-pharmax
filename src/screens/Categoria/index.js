@@ -12,7 +12,7 @@ import styles from './styles';
 import api from '../../services/api';
 
 // Fallback de imagem caso venha vazia
-const DEFAULT_IMAGE_URL = 'http://10.72.152.164:3334/public/medicamentos/caixa-medicamento-padrao5.png';
+const DEFAULT_IMAGE_URL = 'http://10.101.130.164:3334/public/medicamentos/caixa-medicamento-padrao5.png';
 
 // --- FUNÇÃO HELPER (Lógica de Promoção) ---
 function calcularPrecoPromocional(item) {
@@ -144,7 +144,7 @@ export default function Categoria() {
             <Text style={styles.medicamentoCategoria} numberOfLines={1}>{marca}</Text>
 
             {/* --- EXIBIÇÃO DA FARMÁCIA --- */}
-            <Text style={styles.medicamentoFarmacia} numberOfLines={1}>🏪 {farmacia}</Text>
+            <Text style={styles.medicamentoFarmacia} numberOfLines={1}> {farmacia}</Text>
           </View>
 
           <View>

@@ -14,7 +14,7 @@ import api from '../../services/api';
 
 // --- CONFIGURAÇÃO GLOBAL ---
 // Verifique se este IP é exatamente o da sua máquina
-const SERVER_IP = '172.16.0.34:3334';
+const SERVER_IP = '10.101.130.164:3334';
 const BASE_URL = `http://${SERVER_IP}`;
 
 // --- HELPER: URL IMAGEM (CORRIGIDO) ---
@@ -211,7 +211,7 @@ export default function Listagem() {
                 <View style={styles.infoProduto}>
                     <Text style={styles.nomeProduto} numberOfLines={2}>{item.med_nome || item.nome}</Text>
                     <Text style={styles.marcaProduto}>{item.lab_nome || item.marca}</Text>
-                    <Text style={styles.farmaciaProduto} numberOfLines={1}>🏪 {farmacia}</Text>
+                    <Text style={styles.farmaciaProduto} numberOfLines={1}> {farmacia}</Text>
 
                     <View style={styles.priceContainer}>
                         {promo.estaEmPromocao && (

@@ -20,7 +20,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import styles from './styles';
 import api from '../../services/api';
 
-const DEFAULT_FARMACIA_IMAGE = 'http://172.16.0.34:3334/public/farmacias/padrao.png';
+const DEFAULT_FARMACIA_IMAGE = 'http://10.101.130.164:3334/public/farmacias/padrao.png';
 
 // --- Função Helper de Promoção ---
 function calcularPrecoPromocional(item) {
@@ -485,7 +485,7 @@ export default function Farmacia() {
     const imagemOrigem = item.med_imagem || item.imagem;
     const prodImageSource = (typeof imagemOrigem === 'string' && imagemOrigem.startsWith('http'))
       ? { uri: imagemOrigem }
-      : { uri: 'http://172.16.0.34:3334/public/logo.png' };
+      : { uri: 'http://172.16.0.32:3334/public/logo.png' };
 
     return (
       <TouchableOpacity

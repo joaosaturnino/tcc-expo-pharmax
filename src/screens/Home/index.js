@@ -8,13 +8,14 @@ import {
   ScrollView,
   Image,
   RefreshControl,
-  Alert
+  Alert,
+  StatusBar // Mantive o StatusBar para garantir que fique escuro
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import styles from './styles';
 import api from '../../services/api';
 
-const DEFAULT_IMAGE_URL = 'http://172.16.0.34:3334/public/medicamentos/caixa-medicamento-padrao5.png';
+const DEFAULT_IMAGE_URL = 'http://10.101.130.164:3334/public/medicamentos/caixa-medicamento-padrao5.png';
 
 // --- Função Helper de Promoção ---
 function calcularPrecoPromocional(item) {
@@ -106,13 +107,12 @@ export default function Home() {
     }
   }
 
-  // --- FETCH: FARMÁCIAS (CORRIGIDO PARA LOGO) ---
+  // --- FETCH: FARMÁCIAS ---
   async function fetchFarmaciasPopulares() {
     try {
       const response = await api.get('/farmacias?qtde=4');
       const dados = response?.data?.dados?.filter(item => item) ?? [];
       
-      // Mapeamento para garantir que a imagem seja encontrada independente do nome do campo
       const dadosMapeados = dados.map(item => {
         const url = item.farm_logo_url || item.logo_url || item.logo || item.imagem || item.url || null;
         return {
@@ -180,10 +180,7 @@ export default function Home() {
     if (!item) return null;
     const nome = item.med_nome || item.nome;
     const marca = item.lab_nome || item.marca || 'Genérico';
-    
-    // Variável da Farmácia
     const farmacia = item.farm_nome || 'Farmácia Parceira';
-    
     const promo = calcularPrecoPromocional(item);
     const imagemOrigem = item.med_imagem || item.imagem;
     const imageSource = (typeof imagemOrigem === 'string' && imagemOrigem.length > 5)
@@ -198,7 +195,7 @@ export default function Home() {
       >
         {promo.estaEmPromocao && (
           <View style={styles.promoBadge}>
-            <Text style={styles.promoBadgeTexto}>{promo.descontoPorcento}% OFF</Text>
+            <Text style={styles.promoBadgeTexto}>{Math.floor(promo.descontoPorcento)}% OFF</Text>
           </View>
         )}
         <View style={styles.produtoImagem}>
@@ -207,8 +204,7 @@ export default function Home() {
         
         <Text style={styles.produtoNome} numberOfLines={2}>{nome}</Text>
         <Text style={styles.produtoMarca} numberOfLines={1}>{marca}</Text>
-        
-        <Text style={styles.produtoFarmacia} numberOfLines={1}>🏪 {farmacia}</Text>
+        <Text style={styles.produtoFarmacia} numberOfLines={1}> {farmacia}</Text>
 
         {promo.estaEmPromocao ? (
           <View>
@@ -247,7 +243,6 @@ export default function Home() {
     );
   };
 
-  // --- RENDERIZAÇÃO: FARMÁCIA (COM NOTA REAL E CORREÇÃO DE LOGO) ---
   const renderBannerFarmacia = ({ item }) => {
     if (!item) return null;
 
@@ -291,6 +286,7 @@ export default function Home() {
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#F5F7FA" />
       <View style={styles.header}>
         <Image
           source={require('../../../public/LogoEscrita2.png')}

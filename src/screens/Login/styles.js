@@ -88,7 +88,7 @@ export default StyleSheet.create({
         alignItems: 'center',
     },
     link: {
-        color: '#66CD00', // Link verde combinando com botão
+        color: '#458B00', // Link verde combinando com botão
         fontSize: 15,
         marginVertical: 5,
         fontWeight: '500',

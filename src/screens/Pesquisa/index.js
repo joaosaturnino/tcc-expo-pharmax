@@ -20,7 +20,7 @@ import styles from './styles';
 import api from '../../services/api';
 
 // Configuração IP
-const SERVER_IP = '172.16.0.34:3334';
+const SERVER_IP = '10.101.130.164:3334';
 const BASE_URL = `http://${SERVER_IP}`;
 
 // Helper Imagens
@@ -195,7 +195,7 @@ export default function Pesquisa() {
                 <Text style={styles.produtoMarca}>{item.lab_nome || item.marca}</Text>
 
                 {/* --- NOVO: Exibe o nome da farmácia --- */}
-                <Text style={styles.produtoFarmacia} numberOfLines={1}>🏪 {farmacia}</Text>
+                <Text style={styles.produtoFarmacia} numberOfLines={1}> {farmacia}</Text>
 
                 <View style={styles.priceTag}>
                     {promo.estaEmPromocao && (

@@ -11,7 +11,7 @@ const COLORS = {
     success: '#059669',
     danger: '#EF4444',
     border: '#E2E8F0',
-    cardPromoBg: '#FEF2F2' // Ajustado para vermelho bem claro
+    cardPromoBg: '#FEF2F2'
 };
 
 export default StyleSheet.create({
@@ -133,35 +133,28 @@ export default StyleSheet.create({
         paddingBottom: 20,
     },
 
-    // --- CARD DA FARMÁCIA (MODIFICADO PARA DESTAQUE) ---
+    // --- CARD DA FARMÁCIA ---
     farmaciaCard: {
         backgroundColor: COLORS.white,
         borderRadius: 16,
         padding: 16,
         marginBottom: 16,
-
-        // Aumentei a sombra para dar efeito de "elevação"
-        shadowColor: "#2A7CC7", // Sombra levemente azulada
+        shadowColor: "#2A7CC7",
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
         shadowRadius: 8,
-        elevation: 5, // Mais alto no Android
-
+        elevation: 5,
         borderWidth: 1,
-        borderColor: '#E2E8F0', // Borda sutil
+        borderColor: '#E2E8F0',
         position: 'relative',
     },
-
-    // Card de Promoção (Vermelho)
     farmaciaCardEmPromocao: {
-        backgroundColor: '#FEF2F2', // Fundo vermelho bem claro
-        borderColor: '#FECACA',     // Borda vermelha clara
-        borderWidth: 1.5,           // Borda um pouco mais grossa
-        shadowColor: "#EF4444",     // Sombra avermelhada
+        backgroundColor: '#FEF2F2',
+        borderColor: '#FECACA',
+        borderWidth: 1.5,
+        shadowColor: "#EF4444",
         elevation: 6,
     },
-
-    // Badge
     promoBadge: {
         position: 'absolute',
         top: 0,
@@ -169,7 +162,7 @@ export default StyleSheet.create({
         backgroundColor: COLORS.danger,
         paddingHorizontal: 12,
         paddingVertical: 6,
-        borderTopRightRadius: 14, // Ajustado para casar com o card
+        borderTopRightRadius: 14,
         borderBottomLeftRadius: 12,
         zIndex: 10,
     },
@@ -178,8 +171,6 @@ export default StyleSheet.create({
         fontSize: 11,
         fontWeight: 'bold',
     },
-
-    // Infos
     farmaciaNome: {
         fontSize: 18,
         fontWeight: 'bold',
@@ -211,12 +202,10 @@ export default StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         borderTopWidth: 1,
-        borderTopColor: '#F1F5F9', // Divisória mais clara
+        borderTopColor: '#F1F5F9',
         paddingTop: 12,
         marginTop: 4,
     },
-
-    // Preços (Aumentados)
     farmaciaPrecoAntigo: {
         fontSize: 13,
         color: '#94A3B8',
@@ -224,26 +213,24 @@ export default StyleSheet.create({
         marginBottom: -4,
     },
     farmaciaPreco: {
-        fontSize: 22, // Maior
-        fontWeight: '800', // Mais grosso
+        fontSize: 22,
+        fontWeight: '800',
         color: '#334155',
     },
     farmaciaPrecoPromocional: {
-        fontSize: 24, // Bem grande
+        fontSize: 24,
         fontWeight: '900',
-        color: '#16A34A', // Verde forte
+        color: '#16A34A',
     },
-
-    // Botões (Mais modernos)
     farmaciaAcoes: {
         flexDirection: 'row',
         alignItems: 'center',
     },
     farmaciaBotao: {
-        backgroundColor: '#EFF6FF', // Fundo azul claro
+        backgroundColor: '#EFF6FF',
         paddingVertical: 8,
         paddingHorizontal: 12,
-        borderRadius: 10, // Mais arredondado
+        borderRadius: 10,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
@@ -255,8 +242,147 @@ export default StyleSheet.create({
         color: COLORS.primary,
         marginLeft: 6,
     },
+    // Botão de Reserva Principal
+    botaoReservar: {
+        backgroundColor: '#458B00', // Verde PharmaX
+        paddingVertical: 10,
+        paddingHorizontal: 16,
+        borderRadius: 10,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginLeft: 8,
+        shadowColor: "#458B00",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    botaoReservarTexto: {
+        color: '#FFF',
+        fontWeight: 'bold',
+        marginLeft: 6,
+        fontSize: 13
+    },
 
     espacoFinal: {
         height: 60,
+    },
+
+    // --- MODAL DE RESERVA ---
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        justifyContent: 'flex-end', // Modal sobe de baixo
+    },
+    modalContent: {
+        backgroundColor: '#FFF',
+        borderTopLeftRadius: 24,
+        borderTopRightRadius: 24,
+        padding: 24,
+        paddingBottom: 40,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 10,
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    modalTitulo: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: COLORS.textDark,
+    },
+    modalSubtitulo: {
+        fontSize: 14,
+        color: COLORS.textGray,
+        marginBottom: 20,
+    },
+    // Controle de Quantidade
+    qtdContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 24,
+        backgroundColor: '#F8FAFC',
+        padding: 10,
+        borderRadius: 16,
+    },
+    qtdBotao: {
+        width: 44,
+        height: 44,
+        backgroundColor: '#FFF',
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#E2E8F0',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+        elevation: 1,
+    },
+    qtdTexto: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: COLORS.textDark,
+        marginHorizontal: 24,
+    },
+    // Resumo de Preço
+    resumoContainer: {
+        backgroundColor: '#F0FDF4',
+        padding: 16,
+        borderRadius: 12,
+        marginBottom: 24,
+        borderWidth: 1,
+        borderColor: '#BBF7D0',
+    },
+    resumoLinha: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 8,
+    },
+    resumoLabel: {
+        fontSize: 14,
+        color: '#166534',
+    },
+    resumoValor: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#166534',
+    },
+    resumoTotalLabel: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#14532D',
+    },
+    resumoTotalValor: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#16A34A',
+    },
+    // Botão Confirmar
+    btnConfirmarReserva: {
+        backgroundColor: '#458B00',
+        paddingVertical: 16,
+        borderRadius: 14,
+        alignItems: 'center',
+        shadowColor: "#458B00",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 4,
+    },
+    btnConfirmarTexto: {
+        color: '#FFF',
+        fontSize: 16,
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
     }
 });

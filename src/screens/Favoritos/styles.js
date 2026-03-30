@@ -1,167 +1,191 @@
-import { StyleSheet, Dimensions } from 'react-native';
+import { StyleSheet, Dimensions, Platform } from 'react-native';
 
 const { width } = Dimensions.get('window');
-
-// Cálculo dinâmico da largura do card para 2 colunas
-// (Largura total / 2) - (margens laterais)
-const cardWidth = (width / 2) - 24;
+const cardWidth = (width / 2) - 20; // 2 colunas com margens equilibradas
 
 export default StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#F5F7FA', // Cor de fundo levemente acinzentada/moderna
+        backgroundColor: '#F8FAFC', // Fundo cinza azulado muito claro
     },
+    
+    // --- HEADER ---
     header: {
-        paddingTop: 60, // Espaço seguro para StatusBar
-        paddingHorizontal: 20,
+        paddingTop: Platform.OS === 'android' ? 50 : 20,
+        paddingHorizontal: 24,
         paddingBottom: 20,
-        backgroundColor: '#F5F7FA',
-        // Removemos a borda inferior para um visual mais limpo "Clean"
+        backgroundColor: '#FFFFFF',
+        borderBottomWidth: 1,
+        borderBottomColor: '#F1F5F9',
     },
     headerTitle: {
         fontSize: 28,
-        fontWeight: 'bold',
-        color: '#1e293b',
-        textAlign: 'left', // Título alinhado à esquerda é mais moderno
+        fontWeight: '800', // Extra bold
+        color: '#1E293B', // Azul escuro moderno
+        letterSpacing: -0.5,
     },
     subtitle: {
         fontSize: 14,
-        color: '#64748b',
-        textAlign: 'left',
+        color: '#64748B',
         marginTop: 4,
+        fontWeight: '500',
     },
+
     listaContainer: {
         paddingHorizontal: 12,
-        paddingTop: 10,
+        paddingTop: 20,
+        paddingBottom: 100, // Espaço para não cortar o último item
     },
 
     // --- CARD DO PRODUTO ---
     produtoCard: {
         width: cardWidth,
-        backgroundColor: 'white',
-        borderRadius: 16, // Bordas mais arredondadas
+        backgroundColor: '#FFFFFF',
+        borderRadius: 16,
         padding: 12,
         marginBottom: 16,
-        marginHorizontal: 6, // Espaçamento entre colunas
-
-        // Sombra suave (iOS e Android)
-        shadowColor: '#000',
+        marginHorizontal: 4, // Espaço entre colunas
+        
+        // Sombra suave estilo iOS
+        shadowColor: "#64748B",
         shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 6,
-        elevation: 3,
-
-        alignItems: 'center',
+        shadowOpacity: 0.08,
+        shadowRadius: 12,
+        elevation: 4, // Sombra Android
+        
         borderWidth: 1,
-        borderColor: '#f1f5f9', // Borda muito sutil
-        overflow: 'hidden', // Garante que o botão de remover não saia do card
+        borderColor: '#F1F5F9',
         position: 'relative',
     },
+    
+    // Área da Imagem
     produtoImagemContainer: {
         width: '100%',
-        height: 110,
+        height: 100,
+        backgroundColor: '#F8FAFC',
         borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 12,
-        marginTop: 10, // Espaço para não colar no botão remover
+        marginBottom: 10,
     },
     produtoImagem: {
-        width: 90,
-        height: 90,
+        width: 70,
+        height: 70,
+        resizeMode: 'contain',
     },
+
+    // Textos
     produtoInfo: {
         width: '100%',
-        alignItems: 'flex-start', // Alinha texto à esquerda
     },
     produtoNome: {
-        fontSize: 14,
+        fontSize: 13,
         fontWeight: '700',
         color: '#334155',
         marginBottom: 4,
-        textAlign: 'left',
-        height: 40, // Altura fixa para alinhar cards vizinhos
+        height: 36, // Altura fixa para 2 linhas
+        lineHeight: 18,
     },
     produtoMarca: {
-        fontSize: 12,
-        color: '#94a3b8',
+        fontSize: 11,
+        color: '#94A3B8',
         marginBottom: 2,
-        textAlign: 'left',
+        fontWeight: '600',
     },
     produtoDosagem: {
-        fontSize: 12,
-        color: '#64748b',
-        marginBottom: 6,
-        textAlign: 'left',
+        fontSize: 11,
+        color: '#64748B',
     },
 
-    // --- BOTÃO DE REMOVER ---
+    // --- BOTÃO DE REMOVER (Canto superior direito) ---
     removerButton: {
         position: 'absolute',
-        top: 0,
-        left: 0,
-        backgroundColor: '#EF4444', // Vermelho alerta
-        width: 36, // Área de toque maior
-        height: 34,
-        borderTopLeftRadius: 16, // Acompanha a borda do card
-        borderBottomRightRadius: 16,
+        top: 8,
+        right: 8,
+        width: 28,
+        height: 28,
+        borderRadius: 14,
+        backgroundColor: '#FEF2F2', // Fundo vermelho bem claro
         justifyContent: 'center',
         alignItems: 'center',
-        zIndex: 10, // Garante que fica por cima da imagem
+        zIndex: 10,
+        borderWidth: 1,
+        borderColor: '#FEE2E2',
     },
 
     // --- PROMOÇÃO ---
     produtoCardEmPromocao: {
-        backgroundColor: '#FEF2F2', // Fundo vermelho bem claro
-        borderColor: '#FECACA',     // Borda vermelha clara
-        borderWidth: 1.5,           // Borda um pouco mais grossa
-        shadowColor: "#EF4444",     // Sombra avermelhada
-        elevation: 6,
+        borderColor: '#FECACA',
+        backgroundColor: '#FFF1F2', // Fundo rosado sutil
     },
     promoBadge: {
         position: 'absolute',
-        top: 0,
-        right: 0,
+        top: 8,
+        left: 8,
         backgroundColor: '#EF4444',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderTopRightRadius: 16,
-        borderBottomLeftRadius: 12,
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+        borderRadius: 6,
         zIndex: 10,
     },
     promoBadgeTexto: {
         color: '#fff',
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: 'bold',
     },
 
-    // --- EMPTY STATE (Vazio) ---
+    // --- EMPTY STATE ---
     vazioContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        padding: 40,
-        marginTop: 50,
+        paddingHorizontal: 40,
+        marginTop: 80,
     },
-    vazioIcon: {
-        fontSize: 60,
-        marginBottom: 16,
-        opacity: 0.8,
+    vazioIconBg: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        backgroundColor: '#F1F5F9',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 20,
     },
     vazioTexto: {
         fontSize: 18,
-        fontWeight: '600',
-        color: '#334155',
+        fontWeight: '700',
+        color: '#1E293B',
         marginBottom: 8,
         textAlign: 'center',
     },
     vazioSubtexto: {
         fontSize: 14,
-        color: '#94a3b8',
+        color: '#64748B',
         textAlign: 'center',
-        lineHeight: 20,
+        lineHeight: 22,
     },
-    espacoFinal: {
-        height: 40, // Espaço extra no final da lista para scroll
+    btnExplorar: {
+        marginTop: 24,
+        backgroundColor: '#458B00',
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 24,
+    },
+    btnExplorarText: {
+        color: '#FFF',
+        fontWeight: 'bold',
+        fontSize: 14,
+    },
+
+    // --- SKELETON (Loading) ---
+    skeletonCard: {
+        width: cardWidth,
+        height: 180,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 16,
+        margin: 4,
+        padding: 12,
+        borderWidth: 1,
+        borderColor: '#F1F5F9',
     },
 });

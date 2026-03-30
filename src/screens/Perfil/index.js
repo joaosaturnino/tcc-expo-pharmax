@@ -8,42 +8,40 @@ import {
     ScrollView,
     ActivityIndicator,
     KeyboardAvoidingView,
-    Platform
+    Platform,
+    StatusBar,
+    LayoutAnimation,
+    UIManager
 } from 'react-native';
-// useFocusEffect é essencial para recarregar os dados sempre que a tela "ganha foco"
 import { useNavigation, useFocusEffect, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 
 import api from '../../services/api';
-import styles from './styles';
+import styles from './styles'; 
+
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 export default function Perfil() {
     const navigation = useNavigation();
     const route = useRoute();
-
-    // 1. RECUPERAÇÃO DO ID:
-    // Tenta pegar o ID vindo da navegação (BottonTab -> Perfil).
-    // O "|| {}" evita erro caso route.params seja undefined.
     const { userId: userIdParam } = route.params || {};
 
-    // Estados para gerenciar a tela
     const [usuarioId, setUsuarioId] = useState(null);
-    const [loading, setLoading] = useState(true);       // Tela de carregamento inicial
-    const [editing, setEditing] = useState(false);      // Controla se os inputs estão editáveis
-    const [isSaving, setIsSaving] = useState(false);    // Loading do botão de salvar
+    const [loading, setLoading] = useState(true);
+    const [editing, setEditing] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
 
-    // Estado único para os dados do formulário
     const [userData, setUserData] = useState({
         nome: '',
         email: '',
         cpf: ''
     });
 
-    // --- HELPER: MÁSCARA CPF ---
-    // Formata o texto para o padrão 000.000.000-00
     const formatarCPF = (text) => {
-        let value = text.replace(/\D/g, ''); // Remove tudo que não é dígito
+        let value = text.replace(/\D/g, '');
         if (value.length > 11) value = value.slice(0, 11);
         value = value.replace(/(\d{3})(\d)/, '$1.$2');
         value = value.replace(/(\d{3})(\d)/, '$1.$2');
@@ -51,209 +49,238 @@ export default function Perfil() {
         return value;
     };
 
-    // --- BUSCA DE DADOS (API) ---
     async function carregarDadosDaApi(id) {
         if (!id) return;
         try {
             const response = await api.get(`/usuarios/${id}`);
-
             if (response.data && response.data.sucesso) {
                 const dados = response.data.dados;
-                // Preenche os inputs com os dados vindos do banco
                 setUserData({
-                    nome: dados.usu_nome || '',
-                    email: dados.usu_email || '',
-                    cpf: dados.usu_cpf || ''
+                    nome: dados.usu_nome || dados.nome || '',
+                    email: dados.usu_email || dados.email || '',
+                    cpf: dados.usu_cpf || dados.cpf || ''
                 });
             }
         } catch (error) {
-            console.error("Erro ao carregar perfil:", error);
-            Alert.alert("Erro", "Não foi possível carregar seus dados.");
+            console.error("Erro ao carregar:", error);
         } finally {
-            setLoading(false); // Desativa o loading independente do resultado
+            setLoading(false);
         }
     }
 
-    // --- LÓGICA DE IDENTIFICAÇÃO ---
-    // O useFocusEffect roda toda vez que o usuário entra nesta tela.
     useFocusEffect(
         useCallback(() => {
             async function identificarUsuario() {
                 setLoading(true);
-
-                // Prioridade 1: ID vindo da navegação (Login -> Home -> Perfil)
                 if (userIdParam) {
                     setUsuarioId(userIdParam);
                     await carregarDadosDaApi(userIdParam);
                     return;
                 }
-
-                // Prioridade 2: ID salvo no celular (AsyncStorage)
-                // Útil se o usuário fechou e abriu o app e o estado da navegação se perdeu
                 try {
                     const jsonValue = await AsyncStorage.getItem('usuario_info');
                     if (jsonValue) {
                         const usuarioLocal = JSON.parse(jsonValue);
-                        if (usuarioLocal.usu_id) {
-                            setUsuarioId(usuarioLocal.usu_id);
-                            await carregarDadosDaApi(usuarioLocal.usu_id);
+                        const idSalvo = usuarioLocal.usu_id || usuarioLocal.id;
+                        
+                        if (idSalvo) {
+                            setUsuarioId(idSalvo);
+                            await carregarDadosDaApi(idSalvo);
+                        } else {
+                            fazerLogout();
                         }
                     } else {
-                        // Se não achar ID nenhum, manda de volta pro Login
-                        navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+                        fazerLogout();
                     }
-                } catch (e) {
-                    setLoading(false);
+                } catch (e) { 
+                    setLoading(false); 
                 }
             }
             identificarUsuario();
-        }, [userIdParam]) // Array de dependências: recria a função se o param mudar
+        }, [userIdParam])
     );
 
-    // --- SALVAR ALTERAÇÕES ---
-    const handleSave = async () => {
-        // Validação simples
-        if (!userData.nome || !userData.email) {
-            return Alert.alert('Atenção', 'Nome e E-mail são obrigatórios.');
-        }
-
-        setIsSaving(true); // Ativa o spinner no botão
-
+    // Função segura de Logout
+    const fazerLogout = async () => {
         try {
-            const dadosParaAtualizar = {
-                usu_nome: userData.nome,
-                usu_email: userData.email,
-                usu_cpf: userData.cpf
-            };
-
-            const response = await api.put(`/usuarios/${usuarioId}`, dadosParaAtualizar);
-
-            if (response.data.sucesso) {
-                Alert.alert('Sucesso', 'Perfil atualizado com sucesso!');
-
-                // ATUALIZAÇÃO DE CACHE:
-                // É importante atualizar o AsyncStorage também, para que na próxima vez
-                // que o app abrir, ele mostre o nome novo sem precisar chamar a API.
-                const jsonValue = await AsyncStorage.getItem('usuario_info');
-                if (jsonValue) {
-                    const usuarioLocal = JSON.parse(jsonValue);
-                    usuarioLocal.usu_nome = userData.nome;
-                    usuarioLocal.usu_email = userData.email;
-                    await AsyncStorage.setItem('usuario_info', JSON.stringify(usuarioLocal));
-                }
-
-                setEditing(false); // Sai do modo de edição
-                await carregarDadosDaApi(usuarioId); // Recarrega dados para confirmar
+            await AsyncStorage.clear();
+            // Tenta resetar a navegação pai (Stack) em vez da Tab
+            const parent = navigation.getParent();
+            if (parent) {
+                parent.reset({ index: 0, routes: [{ name: 'Login' }] });
             } else {
-                Alert.alert('Erro', response.data.mensagem || 'Não foi possível atualizar.');
+                navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
             }
         } catch (error) {
-            Alert.alert('Erro', 'Falha na conexão ao salvar.');
-        } finally {
-            setIsSaving(false);
+            console.log(error);
+            navigation.navigate('Login');
         }
     };
 
-    // --- LOGOUT ---
-    const handleLogout = () => {
-        Alert.alert("Sair", "Deseja realmente sair da sua conta?", [
-            { text: "Cancelar", style: "cancel" },
-            {
-                text: "Sair",
-                style: "destructive", // Estilo vermelho no iOS
-                onPress: async () => {
-                    await AsyncStorage.clear(); // Limpa dados salvos
-                    navigation.reset({ index: 0, routes: [{ name: 'Login' }] }); // Reseta histórico e vai pro login
+    const handleSave = async () => {
+        if (!userData.nome || !userData.email) return Alert.alert('Atenção', 'Preencha os campos obrigatórios.');
+        
+        setIsSaving(true);
+        try {
+            const payload = { 
+                usu_nome: userData.nome, 
+                usu_email: userData.email, 
+                usu_cpf: userData.cpf 
+            };
+            
+            const response = await api.put(`/usuarios/${usuarioId}`, payload);
+
+            if (response.data.sucesso) {
+                Alert.alert('Sucesso', 'Perfil atualizado!');
+                const jsonValue = await AsyncStorage.getItem('usuario_info');
+                if (jsonValue) {
+                    const local = JSON.parse(jsonValue);
+                    local.usu_nome = userData.nome;
+                    local.usu_email = userData.email;
+                    local.usu_cpf = userData.cpf;
+                    await AsyncStorage.setItem('usuario_info', JSON.stringify(local));
                 }
+                LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                setEditing(false);
+                await carregarDadosDaApi(usuarioId);
+            } else {
+                Alert.alert('Erro', response.data.mensagem || 'Falha ao atualizar.');
             }
+        } catch (error) { 
+            Alert.alert('Erro', 'Verifique sua conexão.'); 
+        } finally { 
+            setIsSaving(false); 
+        }
+    };
+
+    const toggleEdit = () => {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        setEditing(!editing);
+    };
+
+    const handleLogoutConfirm = () => {
+        Alert.alert("Sair", "Tem certeza que deseja desconectar?", [
+            { text: "Cancelar", style: "cancel" },
+            { text: "Sair", style: "destructive", onPress: fazerLogout }
         ]);
     };
 
-    // Renderização de Loading Tela Cheia
     if (loading) {
         return (
             <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#66CD00" />
-                <Text style={styles.loadingText}>Carregando perfil...</Text>
+                <ActivityIndicator size="large" color="#458B00" />
             </View>
         );
     }
 
     return (
-        // KeyboardAvoidingView: Empurra a tela pra cima quando o teclado abre
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-            <ScrollView contentContainerStyle={styles.scrollContainer} style={styles.container}>
-
+            <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+            
+            <View style={styles.container}>
+                
                 <View style={styles.header}>
-                    <Text style={styles.title}>Meu Perfil</Text>
+                    <Text style={styles.headerTitle}>Meu Perfil</Text>
+                    
+                    {!editing && (
+                        <TouchableOpacity onPress={toggleEdit} style={styles.editToggleBtn}>
+                            <Ionicons name="create-outline" size={22} color="#458B00" />
+                        </TouchableOpacity>
+                    )}
+                    {editing && (
+                        <TouchableOpacity onPress={toggleEdit} style={styles.editToggleBtn}>
+                            <Text style={{color:'#64748B', fontWeight:'600'}}>Cancelar</Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
-                <View style={styles.profileContainer}>
-
-                    {/* ÁREA DA FOTO (AVATAR PADRÃO) */}
-                    <View style={styles.photoWrapper}>
-                        <View style={styles.profilePhotoPlaceholder}>
-                            {/* Ícone estático, já que não há upload de foto */}
-                            <Ionicons name="person" size={60} color="#FFF" />
+                <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+                    
+                    <View style={styles.profileHeader}>
+                        <View style={styles.photoContainer}>
+                            <View style={styles.profilePhoto}>
+                                <Ionicons name="person" size={55} color="#CBD5E1" />
+                            </View>
+                            <TouchableOpacity style={styles.cameraBadge} onPress={() => Alert.alert("Em breve", "Troca de foto.")}>
+                                <Ionicons name="camera" size={16} color="#FFF" />
+                            </TouchableOpacity>
                         </View>
+                        <Text style={styles.userName}>{userData.nome || 'Usuário'}</Text>
+                        <Text style={styles.userEmail}>{userData.email || 'email@exemplo.com'}</Text>
                     </View>
 
-                    {/* FORMULÁRIO */}
                     <View style={styles.form}>
-                        <Text style={styles.label}>Nome Completo</Text>
-                        <TextInput
-                            // Muda o estilo visual dependendo se está editando ou não
-                            style={editing ? styles.inputEditing : styles.inputReadonly}
-                            value={userData.nome}
-                            onChangeText={(t) => setUserData({ ...userData, nome: t })}
-                            editable={editing} // Trava/Destrava a digitação
-                        />
+                        
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.label}>Nome Completo</Text>
+                            <View style={[styles.inputContainer, editing && styles.inputContainerEditable]}>
+                                <Ionicons name="person-outline" size={20} color={editing ? "#458B00" : "#94A3B8"} style={styles.inputIcon} />
+                                <TextInput
+                                    style={styles.input}
+                                    value={userData.nome}
+                                    onChangeText={(t) => setUserData({ ...userData, nome: t })}
+                                    editable={editing}
+                                    placeholder="Seu nome"
+                                    placeholderTextColor="#94A3B8"
+                                />
+                            </View>
+                        </View>
 
-                        <Text style={styles.label}>E-mail</Text>
-                        <TextInput
-                            style={editing ? styles.inputEditing : styles.inputReadonly}
-                            value={userData.email}
-                            onChangeText={(t) => setUserData({ ...userData, email: t })}
-                            editable={editing}
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                        />
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.label}>E-mail</Text>
+                            <View style={[styles.inputContainer, editing && styles.inputContainerEditable]}>
+                                <Ionicons name="mail-outline" size={20} color={editing ? "#458B00" : "#94A3B8"} style={styles.inputIcon} />
+                                <TextInput
+                                    style={styles.input}
+                                    value={userData.email}
+                                    onChangeText={(t) => setUserData({ ...userData, email: t })}
+                                    editable={editing}
+                                    keyboardType="email-address"
+                                    autoCapitalize="none"
+                                    placeholder="seu@email.com"
+                                    placeholderTextColor="#94A3B8"
+                                />
+                            </View>
+                        </View>
 
-                        <Text style={styles.label}>CPF</Text>
-                        <TextInput
-                            style={editing ? styles.inputEditing : styles.inputReadonly}
-                            value={userData.cpf}
-                            onChangeText={(t) => setUserData({ ...userData, cpf: formatarCPF(t) })}
-                            editable={editing}
-                            keyboardType="numeric"
-                            maxLength={14}
-                        />
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.label}>CPF</Text>
+                            <View style={[styles.inputContainer, editing && styles.inputContainerEditable]}>
+                                <Ionicons name="card-outline" size={20} color={editing ? "#458B00" : "#94A3B8"} style={styles.inputIcon} />
+                                <TextInput
+                                    style={styles.input}
+                                    value={userData.cpf}
+                                    onChangeText={(t) => setUserData({ ...userData, cpf: formatarCPF(t) })}
+                                    editable={editing}
+                                    keyboardType="numeric"
+                                    maxLength={14}
+                                    placeholder="000.000.000-00"
+                                    placeholderTextColor="#94A3B8"
+                                />
+                            </View>
+                        </View>
 
-                        {/* ÁREA DE BOTÕES */}
-                        <View style={styles.buttonsContainer}>
-                            {/* Alterna entre botão de "Editar" e "Salvar" */}
-                            {editing ? (
+                        <View style={styles.footerButtons}>
+                            {editing && (
                                 <TouchableOpacity style={styles.saveButton} onPress={handleSave} disabled={isSaving}>
-                                    {isSaving ? (
-                                        <ActivityIndicator color="#FFF" />
-                                    ) : (
-                                        <Text style={styles.buttonText}>Salvar Alterações</Text>
+                                    {isSaving ? <ActivityIndicator color="#FFF" /> : (
+                                        <>
+                                            <Ionicons name="checkmark-circle" size={20} color="#FFF" />
+                                            <Text style={styles.saveButtonText}>Salvar Alterações</Text>
+                                        </>
                                     )}
-                                </TouchableOpacity>
-                            ) : (
-                                <TouchableOpacity style={styles.editButton} onPress={() => setEditing(true)}>
-                                    <Text style={styles.buttonText}>Editar Perfil</Text>
                                 </TouchableOpacity>
                             )}
 
-                            {/* Botão de Logout sempre visível */}
-                            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+                            <TouchableOpacity style={styles.logoutButton} onPress={handleLogoutConfirm}>
+                                <Ionicons name="log-out-outline" size={20} color="#EF4444" />
                                 <Text style={styles.logoutText}>Sair da Conta</Text>
                             </TouchableOpacity>
                         </View>
+
                     </View>
-                </View>
-            </ScrollView>
+                </ScrollView>
+            </View>
         </KeyboardAvoidingView>
     );
 }
